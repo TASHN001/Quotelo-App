@@ -121,7 +121,7 @@ export function Auth() {
       <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
         <div className="text-center mb-8">
           <img
-            src="/Quotelo.png"
+            src="/Quotelo_Logo.png"
             alt="Quotelo Logo"
             className="w-40 h-40 sm:w-44 sm:h-44 mx-auto mb-4 drop-shadow-md"
           />
@@ -149,9 +149,8 @@ export function Auth() {
         )}
         {connStatus === 'error' && (
           <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs text-orange-800">
-            <p className="font-semibold mb-1">Cannot reach Supabase servers</p>
-            <p className="text-orange-600 font-mono break-all mb-2">{connUrl}</p>
-            <p>Stop the dev server (<code>Ctrl+C</code>), then run <code>npm run dev</code> again.</p>
+            <p className="font-semibold mb-1">Connection error</p>
+            <p>Unable to reach Quotelo servers. Please check your internet connection and try again.</p>
           </div>
         )}
 
