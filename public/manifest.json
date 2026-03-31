@@ -1,0 +1,22 @@
+{
+  "name": "Quotelo",
+  "short_name": "Quotelo",
+  "description": "Create professional invoices and quotes instantly with AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f97316",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/Quotelo_Logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Quotelo_Logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
