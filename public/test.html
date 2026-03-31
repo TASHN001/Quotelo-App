@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quotelo — Supabase Connection Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    h1 { font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .subtitle { font-size: 0.875rem; color: #6b7280; margin-bottom: 24px; }
+    .url-box {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #374151;
+      word-break: break-all;
+      margin-bottom: 20px;
+    }
+    .result {
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .result.checking { background: #f3f4f6; display: block; }
+    .result.ok { background: #f0fdf4; border: 2px solid #22c55e; display: block; }
+    .result.error { background: #fff7ed; border: 2px solid #f97316; display: block; }
+    .result-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .checking .result-title { color: #6b7280; }
+    .ok .result-title { color: #16a34a; }
+    .error .result-title { color: #c2410c; }
+    .result-body { font-size: 0.8rem; color: #6b7280; line-height: 1.5; }
+    .ok .result-body { color: #15803d; }
+    .error .result-body { color: #9a3412; }
+    .raw {
+      background: #1f2937;
+      color: #d1fae5;
+      font-family: monospace;
+      font-size: 0.75rem;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    button {
+      background: #f97316;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
+    }
+    button:hover { background: #ea6b0a; }
+    button:disabled { background: #d1d5db; cursor: not-allowed; }
+    .hint {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.6;
+    }
+    code {
+      background: #f3f4f6;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: monospace;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Supabase Connection Test</h1>
+    <p class="subtitle">Tests whether your Supabase project is reachable from this browser.</p>
+
+    <div class="url-box" id="urlDisplay">Loading URL...</div>
+
+    <div class="result checking" id="result">
+      <div class="result-title">⏳ Testing connection...</div>
+      <div class="result-body">Making request to Supabase health endpoint...</div>
+    </div>
+
+    <button id="retryBtn" onclick="runTest()" disabled>Run Test Again</button>
+
+    <div class="hint">
+      If this shows <strong>CANNOT REACH</strong>, open your terminal, press <code>Ctrl+C</code>, then run <code>npm run dev</code> again. If still failing, check your Supabase project at supabase.com — it may be paused.
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://whdzebkoboxbtwjhrwsi.supabase.co';
+    const HEALTH_ENDPOINT = `${SUPABASE_URL}/auth/v1/health`;
+
+    document.getElementById('urlDisplay').textContent = HEALTH_ENDPOINT;
+
+    async function runTest() {
+      const result = document.getElementById('result');
+      const btn = document.getElementById('retryBtn');
+
+      btn.disabled = true;
+      result.className = 'result checking';
+      result.innerHTML = `
+        <div class="result-title">⏳ Testing connection...</div>
+        <div class="result-body">Making request to ${HEALTH_ENDPOINT}</div>
+      `;
+
+      try {
+        const res = await fetch(HEALTH_ENDPOINT);
+        const text = await res.text();
+
+        if (res.ok) {
+          result.className = 'result ok';
+          result.innerHTML = `
+            <div class="result-title">✅ SUPABASE IS REACHABLE</div>
+            <div class="result-body">
+              Status: ${res.status} ${res.statusText}<br>
+              The network connection is working. If sign-up still fails, the dev server needs a restart.<br>
+              <strong>Stop it with Ctrl+C, then run npm run dev again.</strong>
+              <div class="raw">${text}</div>
+            </div>
+          `;
+        } else {
+          result.className = 'result error';
+          result.innerHTML = `
+            <div class="result-title">⚠️ SUPABASE RETURNED AN ERROR</div>
+            <div class="result-body">
+              Status: ${res.status} ${res.statusText}<br>
+              The server responded but with an error. Check your Supabase project settings.
+              <div class="raw">${text}</div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        result.className = 'result error';
+        result.innerHTML = `
+          <div class="result-title">❌ CANNOT REACH SUPABASE</div>
+          <div class="result-body">
+            Error: ${err.message}<br><br>
+            This means the Supabase project at this URL is not responding.<br><br>
+            <strong>Possible causes:</strong><br>
+            1. Supabase free-tier project is paused → go to supabase.com and resume it<br>
+            2. Wrong URL in .env → verify VITE_SUPABASE_URL matches your project<br>
+            3. No internet connection
+          </div>
+        `;
+      }
+
+      btn.disabled = false;
+    }
+
+    runTest();
+  </script>
+</body>
+</html>
