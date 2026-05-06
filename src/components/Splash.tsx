@@ -1,65 +1,51 @@
+import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { useState, useEffect } from 'react';
-import { designSystem as ds } from '../lib/designSystem';
+import { ds } from '../lib/designSystem';
 
 export function Splash() {
   const { setCurrentScreen, authUser, dbUserProfile, isLoading } = useApp();
-  const [logoVisible, setLogoVisible] = useState(false);
+  const [novifyVisible, setNovifyVisible] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLogoVisible(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setNovifyVisible(true), 600);
+    return () => clearTimeout(t);
   }, []);
 
-  console.log('[Splash] Rendering, isLoading:', isLoading, 'authUser:', !!authUser, 'dbUserProfile:', !!dbUserProfile);
+  function handleStart() {
+    if (!authUser)                            return setCurrentScreen('auth');
+    if (!dbUserProfile?.eula_accepted)        return setCurrentScreen('eula');
+    if (dbUserProfile?.onboarding_complete)   return setCurrentScreen('home');
+    setCurrentScreen('onboarding');
+  }
 
   return (
-    <div className={`min-h-screen ${ds.surfaces.base.light} ${ds.surfaces.base.dark} flex flex-col items-center justify-between p-8`}>
-      <div className="flex-1 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-between p-8">
+      <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
         <img
           src="/Quotelo.png"
-          alt="Quotelo Logo"
-          className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mb-6 drop-shadow-lg"
+          alt="Quotelo"
+          className="w-48 h-48 mb-6 drop-shadow-sm"
         />
-
-        <h1 className={`${ds.typography.h1} text-gray-900 dark:text-white mb-3`}>Quotelo</h1>
-
-        <p className={`${ds.typography.body} text-gray-500 dark:text-gray-400 text-center mb-12`}>
+        <h1 className={`${ds.largeTitle} text-black mb-3 text-center`}>Quotelo</h1>
+        <p className={`${ds.callout} text-[#8e8e93] text-center mb-14`}>
           The future of effortless billing.
         </p>
 
         <button
-          onClick={() => {
-            if (!authUser) {
-              setCurrentScreen('auth');
-            } else if (!dbUserProfile?.eula_accepted) {
-              setCurrentScreen('eula');
-            } else if (dbUserProfile?.onboarding_complete) {
-              setCurrentScreen('home');
-            } else {
-              setCurrentScreen('onboarding');
-            }
-          }}
-          className={`w-full max-w-sm ${ds.button.primary.base} ${ds.button.primary.hover} ${ds.button.primary.active} text-white py-4 px-8 ${ds.radius.lg} font-semibold text-lg ${ds.button.primary.shadow} ${ds.button.primary.hoverShadow} ${ds.button.primary.activeShadow} ${ds.transition.spring} active:scale-[0.98]`}
-          style={{ animation: 'shake 2.5s ease-in-out infinite' }}
+          onClick={handleStart}
+          disabled={isLoading}
+          className={`${ds.btnPrimary} w-full text-center`}
         >
-          Get Started
+          {isLoading ? 'Loading…' : 'Get Started'}
         </button>
       </div>
 
       <div className="text-center pb-8">
-        <p className={`${ds.typography.caption} text-gray-400 dark:text-gray-500 tracking-wider mb-2`}>
-          POWERED BY
-        </p>
+        <p className={`${ds.caption} text-[#c7c7cc] mb-2`}>POWERED BY</p>
         <img
           src="/novify_logo_(1).png"
-          alt="Novify Logo"
-          className={`h-12 mx-auto transition-all duration-1000 ease-in-out ${
-            logoVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-          }`}
+          alt="Novify"
+          className={`h-10 mx-auto ${ds.transition} ${novifyVisible ? 'opacity-100' : 'opacity-0'}`}
         />
       </div>
     </div>
