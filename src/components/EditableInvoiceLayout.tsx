@@ -67,6 +67,26 @@ export function EditableInvoiceLayout({
     }));
   };
 
+  const parsePaymentTerms = (raw: string | undefined): string => {
+    if (!raw) return '';
+    if (raw.trimStart().startsWith('{')) {
+      try {
+        const p = JSON.parse(raw);
+        const dueLabels: Record<string, string> = {
+          on_receipt: 'Payment due on receipt',
+          net_7: 'Payment due within 7 days (Net 7)',
+          net_14: 'Payment due within 14 days (Net 14)',
+          net_30: 'Payment due within 30 days (Net 30)',
+        };
+        const parts: string[] = [];
+        if (p.dueType) parts.push(p.customDays ? `Payment due within ${p.customDays} days` : (dueLabels[p.dueType] || p.dueType));
+        if (p.latePaymentNotice) parts.push(p.latePaymentNotice);
+        return parts.join('\n');
+      } catch { return raw; }
+    }
+    return raw;
+  };
+
   const calculateTotals = (items: LineItem[]) => {
     const subtotal = items.reduce((sum, item) => sum + item.total, 0);
     const tax = subtotal * (document.tax_total / document.subtotal || 0);
@@ -76,14 +96,14 @@ export function EditableInvoiceLayout({
 
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
-      <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
+      <div className={styles.header || 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4'}>
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className={styles.logoContainer || 'w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center flex-shrink-0'}>
+          <div className={styles.logoContainer || 'flex items-center justify-center flex-shrink-0'}>
             {data.business.logoUrl ? (
               <img
                 src={data.business.logoUrl}
                 alt={data.business.name}
-                className={styles.logo || 'w-full h-full object-contain'}
+                style={{ height: '48px', width: 'auto', objectFit: 'contain', display: 'block' }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -271,7 +291,7 @@ export function EditableInvoiceLayout({
             </p>
             {document.payment_terms ? (
               <EditableField
-                value={document.payment_terms}
+                value={parsePaymentTerms(document.payment_terms)}
                 onSave={async (value) => onUpdate('payment_terms', value)}
                 className={styles.footerText || 'text-sm text-gray-700'}
                 placeholder="Type any payment details here..."
