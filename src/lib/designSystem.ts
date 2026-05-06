@@ -72,7 +72,7 @@ export const ds = {
 };
 
 // Status badge helper — returns className string for a given status
-export function statusBadge(status: 'draft' | 'sent' | 'paid' | 'overdue' | 'viewed' | string): string {
+export function statusBadge(status: 'draft' | 'sent' | 'paid' | 'overdue' | 'viewed'): string {
   const map: Record<string, string> = {
     draft:   'bg-[#f2f2f7] text-[#8e8e93]',
     sent:    'bg-[#dbeafe] text-[#1d4ed8]',
@@ -81,5 +81,10 @@ export function statusBadge(status: 'draft' | 'sent' | 'paid' | 'overdue' | 'vie
     viewed:  'bg-[#f3e8ff] text-[#6b21a8]',
   };
   const base = 'inline-block text-[11px] font-bold px-2.5 py-1 rounded-full';
-  return `${base} ${map[status.toLowerCase()] ?? map.draft}`;
+  const normalized = status.toLowerCase();
+  if (import.meta.env.DEV && !map[normalized]) {
+    console.warn(`statusBadge: unknown status "${status}", falling back to draft style`);
+  }
+  const color = map[normalized] ?? 'bg-[#f2f2f7] text-[#8e8e93]';
+  return `${base} ${color}`;
 }
