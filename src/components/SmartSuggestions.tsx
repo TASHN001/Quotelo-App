@@ -3,6 +3,7 @@ import { Repeat, AlertCircle, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { isOverdue } from '../lib/statusManager';
+import { ds } from '../lib/designSystem';
 import type { Document, Client } from '../lib/types';
 
 interface Suggestion {
@@ -118,41 +119,38 @@ export function SmartSuggestions() {
   }
 
   return (
-    <div className="space-y-2 mb-6">
-      {suggestions.map((suggestion) => (
+    <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4">
+      <p className={`${ds.caption} text-[#8e8e93] px-4 pt-3 pb-1`}>Suggestions</p>
+      {suggestions.map((suggestion, idx) => (
         <button
           key={suggestion.id}
           onClick={suggestion.onClick}
-          className={`w-full rounded-2xl p-4 flex items-center gap-3 transition-all hover:shadow-md ${
-            suggestion.type === 'overdue-alert'
-              ? 'bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-800/50'
-              : 'bg-gradient-to-r from-blue-50 to-orange-50 dark:from-blue-900/20 dark:to-orange-900/20 border border-blue-200 dark:border-blue-800/50'
+          className={`w-full flex items-start gap-3 px-4 py-2.5 ${ds.transition} ${ds.press} ${
+            idx < suggestions.length - 1 ? 'border-b border-[#f2f2f7]' : ''
           }`}
         >
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-            suggestion.type === 'overdue-alert'
-              ? 'bg-red-500'
-              : 'bg-blue-500'
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+            suggestion.type === 'overdue-alert' ? 'bg-[#fee2e2]' : 'bg-[#fff7ed]'
           }`}>
             {suggestion.icon === 'alert' ? (
-              <AlertCircle className="w-5 h-5 text-white" strokeWidth={2} />
+              <AlertCircle className="w-4 h-4 text-[#f97316]" strokeWidth={2} />
             ) : (
-              <Repeat className="w-5 h-5 text-white" strokeWidth={2} />
+              <Repeat className="w-4 h-4 text-[#f97316]" strokeWidth={2} />
             )}
           </div>
 
-          <div className="flex-1 text-left">
-            <p className="font-semibold text-gray-900 dark:text-white text-sm">
+          <div className="flex-1 text-left min-w-0">
+            <p className={`${ds.callout} text-[#3c3c43]`}>
               {suggestion.title}
             </p>
             {suggestion.subtitle && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              <p className={`${ds.footnote} text-[#8e8e93] mt-0.5`}>
                 {suggestion.subtitle}
               </p>
             )}
           </div>
 
-          <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+          <ChevronRight className="w-4 h-4 text-[#c7c7cc] flex-shrink-0 mt-0.5" />
         </button>
       ))}
     </div>

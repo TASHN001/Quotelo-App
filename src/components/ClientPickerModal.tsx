@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, Search, Plus, User } from 'lucide-react';
 import { Client } from '../lib/types';
 import { db } from '../lib/database';
+import { ds } from '../lib/designSystem';
 
 interface ClientPickerModalProps {
   onClose: () => void;
@@ -13,7 +13,7 @@ interface ClientPickerModalProps {
 export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId }: ClientPickerModalProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
 
   useEffect(() => {
     filterClients();
-  }, [searchQuery, clients]);
+  }, [search, clients]);
 
   const loadClients = async () => {
     setIsLoading(true);
@@ -35,12 +35,12 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
   };
 
   const filterClients = () => {
-    if (!searchQuery.trim()) {
+    if (!search.trim()) {
       setFilteredClients(clients);
       return;
     }
 
-    const query = searchQuery.toLowerCase();
+    const query = search.toLowerCase();
     const filtered = clients.filter(client => {
       return (
         client.name?.toLowerCase().includes(query) ||
@@ -62,88 +62,82 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl p-6 max-w-lg w-full max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 whitespace-nowrap">Select a Client</h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onAddClient}
-              className="px-2 py-1 bg-orange-50 text-orange-600 rounded-lg text-xs font-semibold hover:bg-orange-100 transition-colors flex items-center gap-1 whitespace-nowrap"
-            >
-              <Plus className="w-3.5 h-3.5" strokeWidth={2} />
-              Add Client
-            </button>
-            <button
-              onClick={onClose}
-              className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="relative bg-white rounded-t-[20px] shadow-[0_-4px_16px_rgba(0,0,0,0.10)] max-h-[80vh] flex flex-col">
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-2">
+          <div className="w-9 h-1 bg-[#e5e5ea] rounded-full" />
         </div>
-
-        <div className="relative mb-4">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" strokeWidth={2} />
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pb-3 border-b border-[#f2f2f7]">
+          <button onClick={onClose} className={`${ds.callout} text-[#8e8e93]`}>Cancel</button>
+          <h2 className={`${ds.headline} text-black`}>Select Client</h2>
+          <button onClick={onAddClient} className={`${ds.callout} text-[#f97316] font-semibold`}>New</button>
+        </div>
+        {/* Search */}
+        <div className="px-4 py-3 border-b border-[#f2f2f7]">
           <input
             type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by name, email, or phone..."
-            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none"
+            placeholder="Search clients"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className={ds.input}
           />
         </div>
-
+        {/* Client list */}
         <div className="flex-1 overflow-y-auto">
+          {/* Continue without client option */}
           <button
             onClick={handleContinueWithoutClient}
-            className="w-full p-4 mb-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
+            className={`w-full flex items-center gap-3 px-4 py-3 ${ds.transition} ${ds.press} border-b border-[#f2f2f7]`}
           >
-            <p className="font-semibold text-gray-700">Continue without selecting a client</p>
-            <p className="text-sm text-gray-500 mt-1">You can add client details manually</p>
+            <div className="w-9 h-9 rounded-full bg-[#f2f2f7] flex items-center justify-center flex-shrink-0">
+              <span className={`${ds.callout} font-semibold text-[#8e8e93]`}>—</span>
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className={`${ds.callout} font-semibold text-[#8e8e93] truncate`}>Continue without client</p>
+              <p className={`${ds.footnote} text-[#8e8e93] truncate`}>Add client details manually</p>
+            </div>
           </button>
 
           {isLoading ? (
-            <div className="text-center py-8 text-gray-500">Loading clients...</div>
+            <div className={`text-center py-8 ${ds.callout} text-[#8e8e93]`}>Loading clients...</div>
           ) : filteredClients.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">
-                {searchQuery ? 'No clients match your search' : 'No clients yet'}
+            <div className="text-center py-8 px-4">
+              <p className={`${ds.callout} text-[#8e8e93] mb-4`}>
+                {search ? 'No clients match your search' : 'No clients yet'}
               </p>
-              {!searchQuery && (
+              {!search && (
                 <button
                   onClick={onAddClient}
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow"
+                  className={ds.btnPrimary}
                 >
                   Add Your First Client
                 </button>
               )}
             </div>
           ) : (
-            <div className="space-y-2">
-              {filteredClients.map((client) => (
-                <button
-                  key={client.id}
-                  onClick={() => handleSelectClient(client)}
-                  className="w-full p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all text-left"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <User className="w-5 h-5 text-white" strokeWidth={2} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{client.name}</p>
-                      {client.email && (
-                        <p className="text-sm text-gray-600 truncate mt-1">{client.email}</p>
-                      )}
-                      {client.phone && (
-                        <p className="text-sm text-gray-500 mt-1">{client.phone}</p>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
+            filteredClients.map((client, idx) => (
+              <button
+                key={client.id}
+                onClick={() => handleSelectClient(client)}
+                className={`w-full flex items-center gap-3 px-4 py-3 ${ds.transition} ${ds.press} ${
+                  idx < filteredClients.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+                }`}
+              >
+                <div className="w-9 h-9 rounded-full bg-[#f2f2f7] flex items-center justify-center flex-shrink-0">
+                  <span className={`${ds.callout} font-semibold text-[#3c3c43]`}>
+                    {(client.name || '?').charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className={`${ds.callout} font-semibold text-black truncate`}>{client.name}</p>
+                  {client.email && <p className={`${ds.footnote} text-[#8e8e93] truncate`}>{client.email}</p>}
+                  {!client.email && client.phone && <p className={`${ds.footnote} text-[#8e8e93] truncate`}>{client.phone}</p>}
+                </div>
+              </button>
+            ))
           )}
         </div>
       </div>
