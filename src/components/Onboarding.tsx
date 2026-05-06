@@ -13,6 +13,7 @@ import CurrencySelect from './CurrencySelect';
 import { CountryData } from '../lib/countryData';
 import { Currency } from '../lib/currency';
 import { getSampleInvoiceData } from '../lib/sampleData';
+import { ds } from '../lib/designSystem';
 
 interface OnboardingState {
   step: 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -369,33 +370,32 @@ export function Onboarding() {
     setIsLoading(false);
   };
 
+  const totalSteps = 7;
+
   return (
-    <div className="min-h-screen bg-white flex flex-col p-6">
-      <div className="flex flex-col items-center">
-        <img
-          src="/Quotelo.png"
-          alt="Quotelo"
-          className="w-32 h-32 sm:w-36 sm:h-36 mb-4 mt-2"
-        />
-        <div className="flex justify-center gap-2 pb-8">
-          <div className={`w-2 h-2 rounded-full ${state.step >= 1 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 2 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 3 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 4 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 5 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 6 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-          <div className={`w-2 h-2 rounded-full ${state.step >= 7 ? 'bg-orange-500' : 'bg-gray-300'}`}></div>
-        </div>
+    <div className="min-h-screen bg-white flex flex-col px-6 pt-12 pb-10">
+
+      {/* Step indicator */}
+      <div className="flex gap-2 justify-center mb-10">
+        {Array.from({ length: totalSteps }).map((_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i < state.step ? 'bg-[#f97316] w-6' : 'bg-[#e5e5ea] w-3'
+            }`}
+          />
+        ))}
       </div>
 
       {state.step === 1 && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 1: Upload your logo
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Professionalize your brand identity.
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <Upload className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Upload your logo</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Professionalize your brand identity.</p>
+          </div>
 
           <input
             ref={fileInputRef}
@@ -408,120 +408,122 @@ export function Onboarding() {
           <button
             onClick={handleFileSelect}
             disabled={isLoading}
-            className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-12 flex flex-col items-center justify-center border-2 border-dashed border-orange-200 mb-8 hover:border-orange-300 transition-colors disabled:opacity-50"
+            className={`bg-[#fff7ed] ${ds.radiusXl} p-12 flex flex-col items-center justify-center border-2 border-dashed border-[#fed7aa] mb-8 ${ds.transition} hover:border-[#f97316] disabled:opacity-50`}
           >
             {state.logoUrl ? (
               <>
                 <img src={state.logoUrl} alt="Logo preview" className="w-24 h-24 object-contain rounded-xl mb-4" />
-                <p className="text-gray-600 font-medium">Logo uploaded!</p>
-                <p className="text-gray-400 text-sm">Tap to change</p>
+                <p className={`${ds.callout} text-black font-semibold`}>Logo uploaded!</p>
+                <p className={`${ds.footnote} text-[#8e8e93]`}>Tap to change</p>
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-md mb-4">
+                <div className={`w-16 h-16 bg-white ${ds.radiusLg} flex items-center justify-center ${ds.shadow2} mb-4`}>
                   {isLoading ? (
-                    <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-4 border-[#f97316] border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <Upload className="w-8 h-8 text-orange-500" strokeWidth={2} />
+                    <Upload className="w-8 h-8 text-[#f97316]" strokeWidth={1.5} />
                   )}
                 </div>
-                <p className="text-gray-600 font-medium">
-                  {isLoading ? 'Uploading...' : 'Tap to configure'}
+                <p className={`${ds.callout} text-black font-semibold`}>
+                  {isLoading ? 'Uploading...' : 'Tap to upload'}
                 </p>
-                <p className="text-gray-400 text-sm">(Optional)</p>
+                <p className={`${ds.footnote} text-[#8e8e93]`}>(Optional)</p>
               </>
             )}
           </button>
 
           {uploadSuccess && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 flex items-center gap-2">
-              <Check className="w-5 h-5 text-green-600" />
-              <span className="text-green-700 text-sm font-medium">Logo uploaded successfully!</span>
+            <div className="bg-[#d1fae5] border border-[#6ee7b7] rounded-xl p-3 mb-4 flex items-center gap-2">
+              <Check className="w-5 h-5 text-[#065f46]" />
+              <span className={`${ds.footnote} text-[#065f46] font-semibold`}>Logo uploaded successfully!</span>
             </div>
           )}
 
-          <div className="mt-auto pt-4 flex items-center justify-center gap-2 text-gray-500">
-            <Shield className="w-4 h-4" strokeWidth={2} />
-            <span className="text-sm">Trusted by freelancers worldwide</span>
+          <div className="mt-auto pt-4 flex items-center justify-center gap-2 text-[#8e8e93]">
+            <Shield className="w-4 h-4" strokeWidth={1.5} />
+            <span className={ds.footnote}>Trusted by freelancers worldwide</span>
           </div>
         </div>
       )}
 
       {state.step === 2 && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 2: Profile Details
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Tell us about yourself.
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <Shield className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Profile Details</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Tell us about yourself.</p>
+          </div>
 
           <div className="space-y-4 mb-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name <span className="text-orange-500">*</span>
+              <label className={`block ${ds.footnote} font-semibold text-black mb-2`}>
+                Full Name <span className="text-[#f97316]">*</span>
               </label>
               <input
                 type="text"
                 value={state.fullName}
                 onChange={(e) => setState(prev => ({ ...prev, fullName: e.target.value, errors: { ...prev.errors, fullName: undefined } }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className={ds.input}
                 placeholder="Enter your full name"
               />
               {state.errors.fullName && (
-                <p className="text-red-500 text-sm mt-1">{state.errors.fullName}</p>
+                <p className={`${ds.footnote} text-red-500 mt-1`}>{state.errors.fullName}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email <span className="text-orange-500">*</span>
+              <label className={`block ${ds.footnote} font-semibold text-black mb-2`}>
+                Email <span className="text-[#f97316]">*</span>
               </label>
               <input
                 type="email"
                 value={state.email}
                 onChange={(e) => setState(prev => ({ ...prev, email: e.target.value, errors: { ...prev.errors, email: undefined } }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className={ds.input}
                 placeholder="your@email.com"
               />
               {state.errors.email && (
-                <p className="text-red-500 text-sm mt-1">{state.errors.email}</p>
+                <p className={`${ds.footnote} text-red-500 mt-1`}>{state.errors.email}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className={`block ${ds.footnote} font-semibold text-black mb-2`}>
                 Phone (Optional)
               </label>
               <input
                 type="tel"
                 value={state.phone}
                 onChange={(e) => setState(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className={ds.input}
                 placeholder="+1 234 567 8900"
               />
             </div>
           </div>
 
-          <div className="mt-auto pt-4 flex items-center justify-center gap-2 text-gray-500">
-            <Shield className="w-4 h-4" strokeWidth={2} />
-            <span className="text-sm">Your data is encrypted and secure</span>
+          <div className="mt-auto pt-4 flex items-center justify-center gap-2 text-[#8e8e93]">
+            <Shield className="w-4 h-4" strokeWidth={1.5} />
+            <span className={ds.footnote}>Your data is encrypted and secure</span>
           </div>
         </div>
       )}
 
       {state.step === 3 && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 3: Business Category
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Help us personalize your experience
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <FileText className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Business Category</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Help us personalize your experience.</p>
+          </div>
 
           {state.errors.industryGroup && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
-              <span className="text-red-700 text-sm font-medium">{state.errors.industryGroup}</span>
+              <span className={`${ds.footnote} text-red-700 font-semibold`}>{state.errors.industryGroup}</span>
             </div>
           )}
 
@@ -534,12 +536,13 @@ export function Onboarding() {
 
       {state.step === 4 && state.industryGroup && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 4: Industry Type
-          </h1>
-          <p className="text-gray-500 mb-8">
-            What best describes your business? (Optional)
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <Sparkles className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Industry Type</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>What best describes your business?</p>
+          </div>
 
           <IndustryTypeSelector
             selectedGroup={state.industryGroup}
@@ -552,27 +555,28 @@ export function Onboarding() {
 
       {state.step === 5 && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 5: Business Details
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Set up your business information.
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <FileText className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Business Details</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Set up your business information.</p>
+          </div>
 
           <div className="space-y-4 mb-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Business Name <span className="text-orange-500">*</span>
+              <label className={`block ${ds.footnote} font-semibold text-black mb-2`}>
+                Business Name <span className="text-[#f97316]">*</span>
               </label>
               <input
                 type="text"
                 value={state.businessName}
                 onChange={(e) => setState(prev => ({ ...prev, businessName: e.target.value, errors: { ...prev.errors, businessName: undefined } }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className={ds.input}
                 placeholder="Enter your business name"
               />
               {state.errors.businessName && (
-                <p className="text-red-500 text-sm mt-1">{state.errors.businessName}</p>
+                <p className={`${ds.footnote} text-red-500 mt-1`}>{state.errors.businessName}</p>
               )}
             </div>
 
@@ -584,7 +588,7 @@ export function Onboarding() {
                 required
               />
               {state.errors.country && (
-                <p className="text-red-500 text-sm mt-1">{state.errors.country}</p>
+                <p className={`${ds.footnote} text-red-500 mt-1`}>{state.errors.country}</p>
               )}
             </div>
 
@@ -595,7 +599,7 @@ export function Onboarding() {
                 label="Default Currency"
                 required
               />
-              <p className="text-xs text-gray-500 mt-2">
+              <p className={`${ds.footnote} text-[#8e8e93] mt-2`}>
                 Auto-updates based on selected country, but you can change it manually.
               </p>
             </div>
@@ -605,12 +609,13 @@ export function Onboarding() {
 
       {state.step === 6 && (
         <div className="flex-1 flex flex-col">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Step 6: Create Signature
-          </h1>
-          <p className="text-gray-500 mb-8">
-            Draw your signature with your finger or mouse.
-          </p>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <Check className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
+            </div>
+            <h1 className={`${ds.title1} text-black mb-3`}>Create Signature</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Draw your signature with your finger or mouse.</p>
+          </div>
 
           <div className="flex-1 flex items-center justify-center mb-8 px-2">
             <SignaturePad onSave={handleSignatureSave} />
@@ -620,32 +625,25 @@ export function Onboarding() {
 
       {state.step === 7 && (
         <div className="flex-1 flex flex-col">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-white" strokeWidth={3} />
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
+              <Sparkles className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              You're all set!
-            </h1>
-            <p className="text-gray-600 mb-2">
-              Create your first invoice now
-            </p>
-            <p className="text-sm text-gray-500">
-              Get started with one of these quick options
-            </p>
+            <h1 className={`${ds.title1} text-black mb-3`}>You're all set!</h1>
+            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Create your first invoice now.</p>
           </div>
 
           <div className="space-y-4 mb-6">
             <button
               onClick={handleVoiceDemo}
-              className="w-full bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-6 flex items-center gap-4 shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className={`w-full bg-[#f97316] text-white ${ds.radiusLg} p-6 flex items-center gap-4 ${ds.shadowOrange} ${ds.transition} ${ds.press}`}
             >
-              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
-                <Mic className="w-7 h-7 text-white" strokeWidth={2.5} />
+              <div className={`w-14 h-14 bg-white/20 ${ds.radiusMd} flex items-center justify-center flex-shrink-0`}>
+                <Mic className="w-7 h-7 text-white" strokeWidth={1.5} />
               </div>
               <div className="text-left flex-1">
-                <h3 className="font-bold text-lg mb-1">Try Voice Demo</h3>
-                <p className="text-orange-50 text-sm">
+                <h3 className={`${ds.headline} text-white mb-1`}>Try Voice Demo</h3>
+                <p className={`${ds.footnote} text-white/70`}>
                   Speak your invoice details and watch the magic happen
                 </p>
               </div>
@@ -653,14 +651,14 @@ export function Onboarding() {
 
             <button
               onClick={handleGenerateSampleInvoice}
-              className="w-full bg-white border-2 border-gray-200 text-gray-900 rounded-2xl p-6 flex items-center gap-4 shadow-sm hover:shadow-md transition-all hover:border-orange-300 hover:scale-[1.02] active:scale-[0.98]"
+              className={`w-full bg-white border border-[#e5e5ea] text-black ${ds.radiusLg} p-6 flex items-center gap-4 ${ds.shadow1} ${ds.transition} ${ds.press}`}
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText className="w-7 h-7 text-orange-600" strokeWidth={2.5} />
+              <div className={`w-14 h-14 bg-[#fff7ed] ${ds.radiusMd} flex items-center justify-center flex-shrink-0`}>
+                <FileText className="w-7 h-7 text-[#f97316]" strokeWidth={1.5} />
               </div>
               <div className="text-left flex-1">
-                <h3 className="font-bold text-lg mb-1">Generate Sample Invoice</h3>
-                <p className="text-gray-600 text-sm">
+                <h3 className={`${ds.headline} text-black mb-1`}>Generate Sample Invoice</h3>
+                <p className={`${ds.footnote} text-[#8e8e93]`}>
                   See a pre-filled invoice you can customize
                 </p>
               </div>
@@ -669,15 +667,10 @@ export function Onboarding() {
 
           <button
             onClick={handleSkipStep7}
-            className="text-center py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors font-medium"
+            className={`${ds.callout} text-[#8e8e93] text-center py-3 ${ds.transition}`}
           >
             Skip for now
           </button>
-
-          <div className="mt-auto pt-6 flex items-center justify-center gap-2 text-gray-400">
-            <Sparkles className="w-4 h-4" strokeWidth={2} />
-            <span className="text-sm">Your journey starts here</span>
-          </div>
         </div>
       )}
 
@@ -692,11 +685,11 @@ export function Onboarding() {
             handleContinueStep6
           }
           disabled={isLoading || (state.step === 3 && !state.industryGroup) || (state.step === 6 && !state.signatureDataUrl)}
-          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-8 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50"
+          className={`${ds.btnPrimary} w-full text-center mt-4 disabled:opacity-50`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Saving...</span>
             </div>
           ) : (
