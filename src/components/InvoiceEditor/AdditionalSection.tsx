@@ -1,4 +1,5 @@
 import { FileText, CreditCard, MessageSquare, RefreshCw } from 'lucide-react';
+import { ds } from '../../lib/designSystem';
 import type { Document, Business } from '../../lib/types';
 
 interface AdditionalSectionProps {
@@ -22,11 +23,12 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
 
   return (
     <div className="pt-4 space-y-4">
+      {/* Notes */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-gray-500" />
-            <label className="text-sm font-medium text-gray-700">Notes</label>
+            <MessageSquare className="w-4 h-4 text-[#8e8e93]" />
+            <label className={`${ds.callout} font-semibold text-black`}>Notes</label>
           </div>
         </div>
         <textarea
@@ -34,20 +36,21 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
           onChange={(e) => onUpdate({ notes: e.target.value })}
           rows={3}
           placeholder="Add any additional notes for the client (e.g., 'Thank you for your business!')"
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors resize-none text-sm"
+          className={`${ds.input} resize-none`}
         />
       </div>
 
+      {/* Terms & Conditions */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-gray-500" />
-            <label className="text-sm font-medium text-gray-700">Terms & Conditions</label>
+            <FileText className="w-4 h-4 text-[#8e8e93]" />
+            <label className={`${ds.callout} font-semibold text-black`}>Terms & Conditions</label>
           </div>
           {business?.default_terms_conditions && (
             <button
               onClick={handleLoadDefaultTerms}
-              className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700"
+              className={`flex items-center gap-1 ${ds.footnote} text-[#f97316] font-semibold ${ds.transition}`}
             >
               <RefreshCw className="w-3 h-3" />
               Load Default
@@ -59,20 +62,21 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
           onChange={(e) => onUpdate({ terms_conditions: e.target.value })}
           rows={4}
           placeholder="Enter your terms and conditions..."
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors resize-none text-sm"
+          className={`${ds.input} resize-none`}
         />
       </div>
 
+      {/* Payment Instructions */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-gray-500" />
-            <label className="text-sm font-medium text-gray-700">Payment Instructions</label>
+            <CreditCard className="w-4 h-4 text-[#8e8e93]" />
+            <label className={`${ds.callout} font-semibold text-black`}>Payment Instructions</label>
           </div>
           {business?.payment_instructions && (
             <button
               onClick={handleLoadDefaultPayment}
-              className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700"
+              className={`flex items-center gap-1 ${ds.footnote} text-[#f97316] font-semibold ${ds.transition}`}
             >
               <RefreshCw className="w-3 h-3" />
               Load Default
@@ -84,7 +88,7 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
           onChange={(e) => onUpdate({ payment_details: e.target.value })}
           rows={4}
           placeholder="Bank details, payment links, or other payment instructions..."
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors resize-none text-sm"
+          className={`${ds.input} resize-none`}
         />
         {business && (business.bank_name || business.bank_account_number) && (
           <button
@@ -96,7 +100,7 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
               ].filter(Boolean).join('\n');
               onUpdate({ payment_details: bankDetails });
             }}
-            className="mt-2 flex items-center gap-1 text-xs text-gray-500 hover:text-orange-600"
+            className={`mt-2 flex items-center gap-1 ${ds.footnote} text-[#8e8e93] hover:text-[#f97316] ${ds.transition}`}
           >
             <CreditCard className="w-3 h-3" />
             Insert bank details from profile
@@ -104,17 +108,18 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
         )}
       </div>
 
+      {/* Footer Message */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <MessageSquare className="w-4 h-4 text-gray-500" />
-          <label className="text-sm font-medium text-gray-700">Footer Message</label>
+          <MessageSquare className="w-4 h-4 text-[#8e8e93]" />
+          <label className={`${ds.callout} font-semibold text-black`}>Footer Message</label>
         </div>
         <input
           type="text"
           value={document.footer_message || ''}
           onChange={(e) => onUpdate({ footer_message: e.target.value })}
           placeholder="e.g., 'Thank you for your business!'"
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-colors text-sm"
+          className={ds.input}
         />
       </div>
     </div>

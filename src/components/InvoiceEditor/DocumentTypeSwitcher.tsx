@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FileText, Receipt, ClipboardList, AlertTriangle } from 'lucide-react';
+import { ds } from '../../lib/designSystem';
 
 interface DocumentTypeSwitcherProps {
   currentType: string;
@@ -36,21 +37,21 @@ export function DocumentTypeSwitcher({ currentType, onChange, showToast }: Docum
 
   return (
     <>
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <label className="text-sm font-medium text-gray-700 mb-3 block">Document Type</label>
-        <div className="flex gap-2">
+      <div className="bg-white rounded-xl pt-2">
+        <p className={`${ds.caption} text-[#8e8e93] mb-3 px-1`}>Document Type</p>
+        <div className="bg-[#f2f2f7] rounded-xl p-1 flex">
           {documentTypes.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => handleTypeSelect(key)}
-              className={`flex-1 flex flex-col items-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+              className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-lg ${ds.transition} ${
                 currentType === key
-                  ? 'border-orange-500 bg-orange-50 text-orange-600'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                  ? 'bg-white text-black shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
+                  : 'text-[#8e8e93]'
               }`}
             >
-              <Icon className="w-5 h-5" />
-              <span className="text-sm font-medium">{label}</span>
+              <Icon className="w-4 h-4" />
+              <span className="text-[13px] font-semibold">{label}</span>
             </button>
           ))}
         </div>
@@ -60,25 +61,25 @@ export function DocumentTypeSwitcher({ currentType, onChange, showToast }: Docum
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <div className="w-10 h-10 bg-[#fff3e8] rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-[#f97316]" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900">Change Document Type?</h3>
+              <h3 className={`${ds.title3} text-black`}>Change Document Type?</h3>
             </div>
-            <p className="text-gray-600 mb-6">
-              Changing the document type from <strong>{currentType}</strong> to{' '}
-              <strong>{pendingType}</strong> may affect status tracking and certain field labels.
+            <p className={`${ds.callout} text-[#8e8e93] mb-6`}>
+              Changing the document type from <strong className="text-black">{currentType}</strong> to{' '}
+              <strong className="text-black">{pendingType}</strong> may affect status tracking and certain field labels.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowWarning(false)}
-                className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50"
+                className={`flex-1 ${ds.btnSecondary} py-3 text-[15px]`}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmChange}
-                className="flex-1 py-2 px-4 bg-gradient-to-b from-orange-400 via-orange-500 to-orange-600 text-white rounded-lg font-medium"
+                className={`flex-1 ${ds.btnPrimary} py-3 text-[15px]`}
               >
                 Change Type
               </button>
