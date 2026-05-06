@@ -615,6 +615,19 @@ export const db = {
     return data || [];
   },
 
+  async getUserDocumentCount(userId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('[DB] Error counting user documents:', error);
+      return 0;
+    }
+    return count || 0;
+  },
+
   async getClientInvoiceCount(clientId: string, userId: string): Promise<number> {
     const { count, error } = await supabase
       .from('documents')

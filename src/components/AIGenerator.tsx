@@ -1,5 +1,5 @@
-import { ChevronLeft, Mic, Send, Loader2, User, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ChevronLeft, Mic, Loader2, User, X, Check } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { generateDocumentFromAI } from '../lib/ai';
 import { useVoiceInput } from '../hooks/useVoiceInput';
@@ -8,17 +8,19 @@ import { ClientPickerModal } from './ClientPickerModal';
 import { Client } from '../lib/types';
 import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
 import { ds } from '../lib/designSystem';
+import { useEffect } from 'react';
 
 const DOCUMENT_TYPES = ['Invoice', 'Tax Invoice', 'Proforma Invoice'];
 const DOCUMENT_TYPE_KEYS = ['documentType.invoice', 'documentType.taxInvoice', 'documentType.proformaInvoice'] as const;
 
 export function AIGenerator() {
   const { selectedDocumentType, setSelectedDocumentType, setCurrentScreen, business, setInvoiceDraft, setSelectedTemplateKey, t, authUser, selectedClient, setSelectedClient } = useApp();
-  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [defaultTemplate, setDefaultTemplate] = useState<string>('invoice-minimal');
   const [showClientPicker, setShowClientPicker] = useState(false);
+
+  const shouldSendRef = useRef(false);
 
   useEffect(() => {
     const loadDefaultTemplate = async () => {
@@ -34,18 +36,21 @@ export function AIGenerator() {
 
   const { isListening, isTranscribing, isSupported, recordingTime, startListening, stopListening } = useVoiceInput({
     onResult: (transcript) => {
-      setInputValue(transcript);
-      setTimeout(() => {
+      if (shouldSendRef.current) {
         handleSendWithTranscript(transcript);
-      }, 100);
+      }
     },
     onError: (errorMessage) => {
-      setError(errorMessage);
+      if (shouldSendRef.current) {
+        setError(errorMessage);
+      }
     },
   });
 
   const formatRecordingTime = (seconds: number) => {
-    return `${seconds}s`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
   const handleSendWithTranscript = async (transcript: string) => {
@@ -53,7 +58,6 @@ export function AIGenerator() {
 
     setIsLoading(true);
     setError(null);
-
     setInvoiceDraft(null);
 
     const requestStartTime = getCurrentTimestamp();
@@ -109,19 +113,22 @@ export function AIGenerator() {
     }
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isLoading) return;
-    await handleSendWithTranscript(inputValue);
-  };
-
   const handleMicClick = () => {
-    if (isListening) {
-      stopListening();
-    } else {
+    if (!isListening && !isTranscribing && !isLoading) {
+      shouldSendRef.current = false;
       setError(null);
-      setInputValue('');
       startListening();
     }
+  };
+
+  const handleVoiceConfirm = () => {
+    shouldSendRef.current = true;
+    stopListening();
+  };
+
+  const handleVoiceCancel = () => {
+    shouldSendRef.current = false;
+    stopListening();
   };
 
   const handleClientSelected = (client: Client | null) => {
@@ -136,8 +143,6 @@ export function AIGenerator() {
     setCurrentScreen('clients');
   };
 
-  const isBusy = isLoading || isListening || isTranscribing;
-
   return (
     <div className={`min-h-screen ${ds.bg} flex flex-col`}>
       {/* Sub-screen header */}
@@ -150,7 +155,7 @@ export function AIGenerator() {
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4 pb-32">
 
         {/* Description */}
         <p className={`${ds.callout} text-[#8e8e93]`}>{t('ai.description')}</p>
@@ -220,7 +225,7 @@ export function AIGenerator() {
           </div>
         )}
 
-        {/* State display */}
+        {/* Center state display */}
         <div className="flex flex-col items-center py-8 gap-6">
           {isLoading ? (
             <div className="text-center animate-slide-up">
@@ -230,36 +235,9 @@ export function AIGenerator() {
             </div>
           ) : isTranscribing ? (
             <div className="text-center animate-slide-up">
-              <div className="flex items-center justify-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1 h-8 bg-[#f97316] rounded-full"
-                    style={{ animation: `wave 1s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}
-                  />
-                ))}
-              </div>
-              <p className={`${ds.headline} text-black mb-1`}>Processing...</p>
-              <p className={`${ds.callout} text-[#8e8e93]`}>Converting speech to text</p>
-            </div>
-          ) : isListening ? (
-            <div className="text-center animate-slide-up">
-              <div className="flex items-center justify-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-12 bg-[#ef4444] rounded-full"
-                    style={{ animation: `wave 0.8s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}
-                  />
-                ))}
-              </div>
-              <p className={`${ds.headline} text-black mb-1`}>Listening...</p>
-              <div className="flex items-center justify-center gap-2">
-                <p className={`${ds.callout} text-[#8e8e93]`}>Recording</p>
-                <span className="bg-[#ef4444] text-white text-[11px] font-bold rounded-full px-2 py-0.5">
-                  {formatRecordingTime(recordingTime)} / 30s
-                </span>
-              </div>
+              <Loader2 className="w-8 h-8 text-[#f97316] mx-auto mb-3 animate-spin" strokeWidth={2.5} />
+              <p className={`${ds.headline} text-black mb-1`}>Converting speech...</p>
+              <p className={`${ds.callout} text-[#8e8e93]`}>Processing your recording</p>
             </div>
           ) : (
             <div className="text-center animate-slide-up">
@@ -268,29 +246,13 @@ export function AIGenerator() {
             </div>
           )}
 
-          {/* Mic button */}
-          <div className="relative">
-            {isListening && (
-              <>
-                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-30" style={{ animation: 'ripple 2s ease-out infinite' }} />
-                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-20" style={{ animation: 'ripple 2s ease-out infinite 0.5s' }} />
-                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-10" style={{ animation: 'ripple 2s ease-out infinite 1s' }} />
-              </>
-            )}
-            {!isListening && !isLoading && !isTranscribing && (
-              <div className="absolute inset-0 bg-[#f97316] rounded-full opacity-20" style={{ animation: 'mic-pulse 2s ease-in-out infinite' }} />
-            )}
+          {/* Mic button — hidden while recording (pill takes over) */}
+          {!isListening && (
             <button
               onClick={handleMicClick}
               disabled={isLoading || isTranscribing || !isSupported}
-              className={`relative w-24 h-24 flex items-center justify-center rounded-full ${ds.transition} ${ds.press} disabled:opacity-50 ${
-                isListening
-                  ? 'bg-[#ef4444] shadow-[0_8px_24px_rgba(239,68,68,0.4)]'
-                  : isLoading || isTranscribing
-                  ? 'bg-[#8e8e93] cursor-not-allowed'
-                  : `bg-[#f97316] ${ds.shadowOrange}`
-              }`}
-              aria-label={isListening ? t('ai.stopRecording') : t('ai.startVoiceInput')}
+              className={`relative w-24 h-24 flex items-center justify-center rounded-full ${ds.transition} ${ds.press} disabled:opacity-50 bg-[#f97316] ${ds.shadowOrange}`}
+              aria-label={t('ai.startVoiceInput')}
             >
               {isLoading || isTranscribing ? (
                 <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={2.5} />
@@ -298,42 +260,55 @@ export function AIGenerator() {
                 <Mic className="w-10 h-10 text-white" strokeWidth={2.5} />
               )}
             </button>
-          </div>
-        </div>
-
-        {/* Divider + text input */}
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1 h-px bg-[#e5e5ea]" />
-            <p className={`${ds.caption} text-[#c7c7cc]`}>or type</p>
-            <div className="flex-1 h-px bg-[#e5e5ea]" />
-          </div>
-          <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex items-center gap-3 px-4 py-2.5">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !isBusy && handleSend()}
-              placeholder={t('ai.placeholder')}
-              disabled={isBusy}
-              className="flex-1 text-[15px] text-black placeholder:text-[#c7c7cc] focus:outline-none bg-transparent disabled:opacity-50"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!inputValue.trim() || isBusy}
-              className={`w-9 h-9 rounded-full flex items-center justify-center ${ds.press} ${ds.transition} flex-shrink-0 ${
-                inputValue.trim() && !isBusy
-                  ? `bg-[#f97316] ${ds.shadowOrange}`
-                  : 'bg-[#e5e5ea]'
-              }`}
-              aria-label={t('ai.sendMessage')}
-            >
-              <Send className={`w-4 h-4 ${inputValue.trim() && !isBusy ? 'text-white' : 'text-[#c7c7cc]'}`} />
-            </button>
-          </div>
+          )}
         </div>
 
       </div>
+
+      {/* Voice recording pill overlay — Claude-style */}
+      {isListening && (
+        <div className="fixed bottom-6 left-4 right-4 z-50">
+          <div className="bg-[#f97316] rounded-2xl px-4 py-3 flex items-center gap-3 shadow-[0_8px_32px_rgba(249,115,22,0.45)]">
+            {/* Cancel */}
+            <button
+              onClick={handleVoiceCancel}
+              className={`w-12 h-12 bg-[rgba(0,0,0,0.18)] rounded-full flex items-center justify-center flex-shrink-0 ${ds.press} ${ds.transition}`}
+              aria-label="Cancel recording"
+            >
+              <X className="w-5 h-5 text-white" strokeWidth={2.5} />
+            </button>
+
+            {/* Waveform + timer */}
+            <div className="flex-1 flex items-center gap-2">
+              <div className="flex items-end gap-[3px] flex-1 h-8">
+                {[...Array(24)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-[3px] bg-white rounded-full"
+                    style={{
+                      height: '4px',
+                      animation: `voiceWave 1.1s ease-in-out infinite`,
+                      animationDelay: `${i * 0.045}s`,
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-white font-semibold text-sm tabular-nums flex-shrink-0">
+                {formatRecordingTime(recordingTime)}
+              </span>
+            </div>
+
+            {/* Confirm */}
+            <button
+              onClick={handleVoiceConfirm}
+              className={`w-12 h-12 bg-white rounded-full flex items-center justify-center flex-shrink-0 ${ds.press} ${ds.transition}`}
+              aria-label="Confirm recording"
+            >
+              <Check className="w-5 h-5 text-[#f97316]" strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {showClientPicker && (
         <ClientPickerModal

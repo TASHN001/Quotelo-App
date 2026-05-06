@@ -74,12 +74,12 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className={styles.logoContainer || 'w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center flex-shrink-0'}>
+          <div className={styles.logoContainer || 'flex items-center justify-center flex-shrink-0'}>
             {data.business.logoUrl ? (
               <img
                 src={data.business.logoUrl}
                 alt={data.business.name}
-                className={styles.logo || 'w-full h-full object-contain'}
+                style={{ height: '48px', width: 'auto', objectFit: 'contain', display: 'block' }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -334,23 +334,9 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               <p className={styles.footerLabel || 'text-xs font-semibold text-gray-500 uppercase mb-2'}>
                 Payment Terms
               </p>
-              <div className="space-y-1">
-                {data.paymentTerms.dueType && (
-                  <p className={styles.footerText || 'text-sm text-gray-700'}>
-                    {data.paymentTerms.dueType === 'on_receipt' && 'Payment due on receipt'}
-                    {data.paymentTerms.dueType === 'net_7' && 'Payment due within 7 days (Net 7)'}
-                    {data.paymentTerms.dueType === 'net_14' && 'Payment due within 14 days (Net 14)'}
-                    {data.paymentTerms.dueType === 'net_30' && 'Payment due within 30 days (Net 30)'}
-                    {data.paymentTerms.dueType === 'custom' && data.paymentTerms.customDays &&
-                      `Payment due within ${data.paymentTerms.customDays} days`}
-                  </p>
-                )}
-                {data.paymentTerms.latePaymentNotice && (
-                  <p className={styles.footerText || 'text-sm text-gray-600 italic'}>
-                    {data.paymentTerms.latePaymentNotice}
-                  </p>
-                )}
-              </div>
+              <p className={`${styles.footerText || 'text-sm text-gray-700'} whitespace-pre-line`}>
+                {data.paymentTerms}
+              </p>
             </div>
           )}
 

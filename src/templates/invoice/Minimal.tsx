@@ -11,8 +11,8 @@ export function MinimalInvoice({ data }: MinimalInvoiceProps) {
       data={data}
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
-        header: 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900 gap-4',
-        logoContainer: 'w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center flex-shrink-0',
+        header: 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900 gap-4',
+        logoContainer: 'flex items-center justify-center flex-shrink-0',
         invoiceTitle: 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900',
         invoiceNumber: 'text-xs sm:text-sm text-gray-600 font-medium',
         metaRow: 'grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8',

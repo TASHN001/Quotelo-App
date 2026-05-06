@@ -236,7 +236,7 @@ export interface InvoiceData {
   notes?: string;
   paymentDetails?: PaymentDetails;
   paymentInstructions?: string;
-  paymentTerms?: PaymentTerms;
+  paymentTerms?: string;
   footer?: string;
   signatureDataUrl?: string;
 }

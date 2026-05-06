@@ -79,7 +79,12 @@ export function DocumentPreview() {
 
     setIsSaving(true);
 
-    const invoiceNumber = `INV-${getCurrentTimestamp()}`;
+    const abbr = (business.business_name || 'INV')
+      .replace(/\s/g, '')
+      .substring(0, 3)
+      .toUpperCase();
+    const count = await db.getUserDocumentCount(authUser.id);
+    const invoiceNumber = `INV/${abbr}${String(count + 1).padStart(3, '0')}`;
 
     const lineItems = invoiceDraft.items.map(item => ({
       name: item.description,
@@ -88,11 +93,6 @@ export function DocumentPreview() {
       taxRate: 0,
       lineTotal: item.total
     }));
-
-    const paymentTerms = {
-      dueType: 'net_30' as const,
-      latePaymentNotice: 'Late payments may incur fees or result in service suspension.'
-    };
 
     const result = await db.saveInvoiceWithLineItems(
       authUser.id,
@@ -112,7 +112,6 @@ export function DocumentPreview() {
         total: invoiceDraft.total,
         currency: selectedClient?.client_currency || business.default_currency,
         notes: invoiceDraft.notes || undefined,
-        paymentTerms: JSON.stringify(paymentTerms),
         footerMessage: 'Thank you for your business!',
         templateKey: selectedTemplateKey || undefined,
         clientId: selectedClient?.id

@@ -11,8 +11,8 @@ export function ModernInvoice({ data }: ModernInvoiceProps) {
       data={data}
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
-        header: 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 gap-4',
-        logoContainer: 'w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex-shrink-0',
+        header: 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 gap-4',
+        logoContainer: 'flex items-center justify-center flex-shrink-0',
         invoiceTitle: 'text-3xl sm:text-5xl md:text-6xl font-bold text-orange-600',
         invoiceNumber: 'text-xs sm:text-sm text-gray-600 font-medium',
         metaRow: 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8',

@@ -251,8 +251,7 @@ export function EditableInvoiceLayout({
         </div>
       </div>
 
-      {(data.paymentDetails || data.paymentInstructions || data.paymentTerms || data.notes || data.invoice.reference) && (
-        <div className={styles.footer || 'space-y-6 mt-8'}>
+      <div className={styles.footer || 'space-y-6 mt-8'}>
           {document.reference && (
             <div>
               <p className={styles.footerLabel || 'text-xs font-semibold text-gray-500 uppercase mb-1'}>
@@ -266,19 +265,28 @@ export function EditableInvoiceLayout({
             </div>
           )}
 
-          {document.payment_terms && (
-            <div>
-              <p className={styles.footerLabel || 'text-xs font-semibold text-gray-500 uppercase mb-2'}>
-                Payment Terms
-              </p>
+          <div>
+            <p className={styles.footerLabel || 'text-xs font-semibold text-gray-500 uppercase mb-2'}>
+              Payment Terms
+            </p>
+            {document.payment_terms ? (
               <EditableField
                 value={document.payment_terms}
                 onSave={async (value) => onUpdate('payment_terms', value)}
                 className={styles.footerText || 'text-sm text-gray-700'}
+                placeholder="Type any payment details here..."
                 multiline
               />
-            </div>
-          )}
+            ) : (
+              <p
+                data-pdf-hide
+                className="text-sm text-[#c7c7cc] cursor-text"
+                onClick={() => onUpdate('payment_terms', '')}
+              >
+                Type any payment details here...
+              </p>
+            )}
+          </div>
 
           {document.notes && (
             <div>
@@ -293,8 +301,7 @@ export function EditableInvoiceLayout({
               />
             </div>
           )}
-        </div>
-      )}
+      </div>
 
       {data.footer && (
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">

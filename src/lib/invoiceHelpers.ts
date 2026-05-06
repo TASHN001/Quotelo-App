@@ -1,6 +1,32 @@
 import type { InvoiceData, InvoiceDraft, Business, Address, Client } from './types';
 import { getCurrentDate, formatDate as formatDateUtil, addDays as addDaysUtil } from './dateUtils';
 
+function formatPaymentTermsString(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  if (raw.trimStart().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(raw);
+      const parts: string[] = [];
+      const dueLabels: Record<string, string> = {
+        on_receipt: 'Payment due on receipt',
+        net_7: 'Payment due within 7 days (Net 7)',
+        net_14: 'Payment due within 14 days (Net 14)',
+        net_30: 'Payment due within 30 days (Net 30)',
+      };
+      if (parsed.dueType) {
+        parts.push(parsed.customDays
+          ? `Payment due within ${parsed.customDays} days`
+          : (dueLabels[parsed.dueType] || parsed.dueType));
+      }
+      if (parsed.latePaymentNotice) parts.push(parsed.latePaymentNotice);
+      return parts.join('\n') || undefined;
+    } catch {
+      return raw;
+    }
+  }
+  return raw;
+}
+
 function formatBusinessAddress(business: Business): Address | undefined {
   const address: Address = {};
 
@@ -170,12 +196,7 @@ export function normalizeDocumentData(
     };
   }
 
-  let parsedPaymentTerms;
-  try {
-    parsedPaymentTerms = paymentTerms ? JSON.parse(paymentTerms) : undefined;
-  } catch {
-    parsedPaymentTerms = undefined;
-  }
+  const formattedPaymentTerms = formatPaymentTermsString(paymentTerms);
 
   return {
     documentType: documentType || 'Invoice',
@@ -212,10 +233,7 @@ export function normalizeDocumentData(
     notes,
     paymentDetails: parsedPaymentDetails,
     paymentInstructions: business?.payment_instructions,
-    paymentTerms: parsedPaymentTerms || {
-      dueType: 'net_30',
-      latePaymentNotice: 'Late payments may incur fees or result in service suspension.'
-    },
+    paymentTerms: formattedPaymentTerms,
     footer: footerMessage || 'Thank you for your business!',
     signatureDataUrl
   };

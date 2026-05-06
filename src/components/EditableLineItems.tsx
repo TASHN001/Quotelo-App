@@ -198,6 +198,7 @@ export function EditableLineItems({ items, currency, onUpdate, styles = {} }: Ed
         </table>
 
         <button
+          data-pdf-hide
           onClick={addLineItem}
           className="mt-2 flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-semibold px-2 py-1 hover:bg-orange-50 rounded transition-colors"
         >
