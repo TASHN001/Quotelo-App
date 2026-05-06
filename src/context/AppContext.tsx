@@ -261,7 +261,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     await loadDocuments(userId);
 
-    console.log('[App] User data loaded, staying on splash screen');
+    console.log('[App] User data loaded, navigating to correct screen');
+    if (!profile.eula_accepted) {
+      setCurrentScreen('eula');
+    } else if (!profile.onboarding_complete) {
+      setCurrentScreen('onboarding');
+    } else {
+      setCurrentScreen('home');
+    }
   };
 
   const initializeAuthenticatedUser = async (userId: string) => {
