@@ -115,8 +115,10 @@ export function Chat() {
           >
             <Send className={`w-4 h-4 ${inputValue.trim() ? 'text-white' : 'text-[#c7c7cc]'}`} />
           </button>
-          <button className={`w-9 h-9 bg-[#f2f2f7] rounded-full flex items-center justify-center ${ds.press} ${ds.transition} flex-shrink-0`}>
-            <Mic className="w-4 h-4 text-[#8e8e93]" />
+          <button
+            className={`w-9 h-9 bg-[#f97316] rounded-full flex items-center justify-center ${ds.shadowOrange} ${ds.press} ${ds.transition} flex-shrink-0`}
+          >
+            <Mic className="w-4 h-4 text-white" />
           </button>
         </div>
       </div>
