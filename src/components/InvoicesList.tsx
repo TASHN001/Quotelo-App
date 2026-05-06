@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, FileText, Home as HomeIcon, User, Plus } from 'lucide-react';
+import { FileText, Plus, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { isOverdue, calculateDocumentStatus } from '../lib/statusManager';
 import { getCurrentDate } from '../lib/dateUtils';
+import { ds, statusBadge } from '../lib/designSystem';
 import type { Document } from '../lib/types';
 
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'outstanding' | 'paid-this-month';
@@ -170,115 +171,73 @@ export function InvoicesList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className={`min-h-screen ${ds.bg} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading invoices...</p>
+          <div className="w-16 h-16 border-4 border-[#f97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#8e8e93]">Loading invoices...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col pb-24">
-      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-3 mb-4">
+    <div className={`min-h-screen ${ds.bg} flex flex-col pb-28`}>
+      <div className="px-4 pt-14 pb-4">
+
+        <div className="flex items-end justify-between mb-5">
+          <h1 className={`${ds.title1} text-black`}>Invoices</h1>
           <button
-            onClick={() => setCurrentScreen('dashboard')}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onClick={() => setCurrentScreen('ai-generator')}
+            className={`w-9 h-9 bg-[#f97316] rounded-full flex items-center justify-center ${ds.shadowOrange} ${ds.press} ${ds.transition} mb-1`}
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" strokeWidth={2} />
+            <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
           </button>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{filterTitle}</h1>
         </div>
 
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by client or invoice number..."
-            className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border-0 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {(['all', 'draft', 'sent', 'paid', 'overdue'] as FilterType[]).map((filter) => (
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+          {(['all', 'draft', 'sent', 'paid', 'overdue'] as const).map(f => (
             <button
-              key={filter}
-              onClick={() => handleFilterChange(filter)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                activeFilter === filter
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+              key={f}
+              onClick={() => handleFilterChange(f)}
+              className={`px-3 py-1.5 rounded-full text-[12px] font-bold whitespace-nowrap ${ds.transition} ${
+                activeFilter === f ? 'bg-[#f97316] text-white' : 'bg-[#e5e5ea] text-[#8e8e93]'
               }`}
             >
-              {filter.charAt(0).toUpperCase() + filter.slice(1)}
+              {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="flex-1 overflow-auto p-4 sm:p-6">
         {filteredDocuments.length === 0 ? (
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 text-center">
-            <FileText className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 mb-2">No invoices found</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500">
-              {searchQuery ? 'Try a different search term' : 'Create an invoice to get started'}
-            </p>
+          <div className={`${ds.card} p-10 text-center`}>
+            <FileText className="w-10 h-10 text-[#c7c7cc] mx-auto mb-3" />
+            <p className={`${ds.callout} text-[#8e8e93]`}>No {activeFilter !== 'all' ? activeFilter : ''} invoices</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {filteredDocuments.map((doc) => (
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            {filteredDocuments.map((doc, idx) => (
               <button
                 key={doc.id}
                 onClick={() => handleInvoiceClick(doc.id)}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left"
+                className={`w-full flex items-center gap-3 px-4 py-3 ${ds.transition} ${ds.press} ${
+                  idx < filteredDocuments.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+                }`}
               >
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 dark:text-white truncate">{doc.client_name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{doc.document_number}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{formatDate(doc.created_at)}</p>
+                <div className="flex-1 text-left min-w-0">
+                  <p className={`${ds.headline} text-black truncate`}>{doc.client_name}</p>
+                  <p className={`${ds.footnote} text-[#8e8e93]`}>{doc.document_number} · {formatDate(doc.created_at)}</p>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="font-bold text-gray-900 dark:text-white mb-1">{formatCurrency(doc.total)}</p>
-                  {getStatusBadge(doc)}
+                <div className="text-right flex-shrink-0 flex items-center gap-2">
+                  <div>
+                    <p className={`${ds.callout} ${ds.numeric} text-black`}>{formatCurrency(doc.total)}</p>
+                    <span className={statusBadge(calculateDocumentStatus(doc) as 'draft' | 'sent' | 'paid' | 'overdue' | 'viewed')}>{calculateDocumentStatus(doc).charAt(0).toUpperCase() + calculateDocumentStatus(doc).slice(1)}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[#c7c7cc] flex-shrink-0" />
                 </div>
               </button>
             ))}
           </div>
         )}
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
-        <div className="flex items-center justify-around relative">
-          <button
-            onClick={() => setCurrentScreen('home')}
-            className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500"
-          >
-            <HomeIcon className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Home</span>
-          </button>
-
-          <div className="relative">
-            <button
-              onClick={() => setCurrentScreen('ai-generator')}
-              className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg absolute -top-8 left-1/2 -translate-x-1/2"
-            >
-              <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-            </button>
-          </div>
-
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500"
-          >
-            <User className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Profile</span>
-          </button>
-        </div>
       </div>
     </div>
   );
