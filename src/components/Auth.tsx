@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { FileText, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { auth } from '../lib/auth';
 import { useApp } from '../context/AppContext';
-import { designSystem as ds } from '../lib/designSystem';
+import { ds } from '../lib/designSystem';
 
 type AuthMode = 'signin' | 'signup' | 'reset';
 
@@ -117,211 +117,112 @@ export function Auth() {
   };
 
   return (
-    <div className={`min-h-screen ${ds.surfaces.base.light} ${ds.surfaces.base.dark} flex flex-col p-6 ${ds.transition.base}`}>
-      <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full">
-        <div className="text-center mb-8">
-          <img
-            src="/Quotelo_Logo.png"
-            alt="Quotelo Logo"
-            className="w-40 h-40 sm:w-44 sm:h-44 mx-auto mb-4 drop-shadow-md"
-          />
-          <h1 className={`${ds.typography.h2} text-gray-900 dark:text-white mb-2`}>
-            {mode === 'reset' ? 'Reset Password' : 'Welcome to Quotelo'}
-          </h1>
-          <p className={`${ds.typography.body} text-gray-500 dark:text-gray-400`}>
-            {mode === 'signin' && 'Sign in to your account'}
-            {mode === 'signup' && 'Create your account'}
-            {mode === 'reset' && "Enter your email to reset your password"}
-          </p>
+    <div className="min-h-screen bg-white flex flex-col px-6 pt-16 pb-10">
+      {/* App icon */}
+      <div className="mb-8">
+        <div className={`w-14 h-14 bg-[#f97316] ${ds.radiusLg} flex items-center justify-center ${ds.shadowOrange} mb-6`}>
+          <FileText className="w-7 h-7 text-white" strokeWidth={2} />
         </div>
+        <h1 className={`${ds.title1} text-black mb-1`}>
+          {mode === 'signin' ? 'Welcome back' : mode === 'signup' ? 'Create account' : 'Reset password'}
+        </h1>
+        <p className={`${ds.callout} text-[#8e8e93]`}>
+          {mode === 'signin' ? 'Sign in to Quotelo' : mode === 'signup' ? 'Start billing in seconds' : 'We\'ll email you a reset link'}
+        </p>
+      </div>
 
-        {connStatus === 'checking' && (
-          <div className="flex items-center justify-center gap-2 mb-4 text-gray-400 text-xs">
-            <div className="w-2 h-2 rounded-full bg-gray-300 animate-pulse"></div>
-            <span>Checking connection...</span>
-          </div>
-        )}
-        {connStatus === 'ok' && (
-          <div className="flex items-center justify-center gap-2 mb-4 text-green-600 text-xs">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span>Connected to Quotelo servers</span>
-          </div>
-        )}
-        {connStatus === 'error' && (
-          <div className="mb-4 bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs text-orange-800">
-            <p className="font-semibold mb-1">Connection error</p>
-            <p>Unable to reach Quotelo servers. Please check your internet connection and try again.</p>
-          </div>
-        )}
-
-        {mode !== 'reset' && (
-          <div className={`flex ${ds.radius.lg} ${ds.input.base} ${ds.input.dark} ${ds.input.shadow} ${ds.input.darkShadow} p-1 mb-6`}>
-            <button
-              onClick={() => {
-                setMode('signin');
-                setError('');
-                setSuccessMessage('');
-              }}
-              className={`flex-1 py-3 ${ds.radius.md} font-semibold ${ds.transition.spring} active:scale-95 ${
-                mode === 'signin'
-                  ? `${ds.button.secondary.base} ${ds.button.secondary.dark} text-gray-900 dark:text-white ${ds.elevation[2]}`
-                  : 'text-gray-600 dark:text-gray-400'
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => {
-                setMode('signup');
-                setError('');
-                setSuccessMessage('');
-              }}
-              className={`flex-1 py-3 ${ds.radius.md} font-semibold ${ds.transition.spring} active:scale-95 ${
-                mode === 'signup'
-                  ? `${ds.button.secondary.base} ${ds.button.secondary.dark} text-gray-900 dark:text-white ${ds.elevation[2]}`
-                  : 'text-gray-600 dark:text-gray-400'
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
-        )}
-
-        <form onSubmit={mode === 'signin' ? handleSignIn : mode === 'signup' ? handleSignUp : handlePasswordReset} className="space-y-4">
-          {mode === 'signup' && (
-            <div>
-              <label className={`block ${ds.typography.bodySmall} font-medium text-gray-700 dark:text-gray-300 mb-2`}>
-                Full Name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                </div>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className={`w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 ${ds.input.base} ${ds.input.dark} text-gray-900 dark:text-white ${ds.radius.md} focus:outline-none ${ds.input.shadow} ${ds.input.darkShadow} ${ds.input.focus} ${ds.input.darkFocus} ${ds.transition.base}`}
-                  placeholder="Enter your full name"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-          )}
-
+      <form onSubmit={mode === 'signin' ? handleSignIn : mode === 'signup' ? handleSignUp : handlePasswordReset} className="flex flex-col gap-4 flex-1">
+        {mode === 'signup' && (
           <div>
-            <label className={`block ${ds.typography.bodySmall} font-medium text-gray-700 dark:text-gray-300 mb-2`}>
-              Email
-            </label>
+            <label className={`${ds.caption} text-[#8e8e93] block mb-1.5`}>Full Name</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-              </div>
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8e8e93]" />
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 ${ds.input.base} ${ds.input.dark} text-gray-900 dark:text-white ${ds.radius.md} focus:outline-none ${ds.input.shadow} ${ds.input.darkShadow} ${ds.input.focus} ${ds.input.darkFocus} ${ds.transition.base}`}
-                placeholder="Enter your email"
-                disabled={isLoading}
+                type="text"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                placeholder="Tash"
+                className={`${ds.input} pl-10`}
               />
             </div>
           </div>
+        )}
 
-          {mode !== 'reset' && (
-            <div>
-              <label className={`block ${ds.typography.bodySmall} font-medium text-gray-700 dark:text-gray-300 mb-2`}>
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full pl-12 pr-12 py-3 border border-gray-300 dark:border-gray-600 ${ds.input.base} ${ds.input.dark} text-gray-900 dark:text-white ${ds.radius.md} focus:outline-none ${ds.input.shadow} ${ds.input.darkShadow} ${ds.input.focus} ${ds.input.darkFocus} ${ds.transition.base}`}
-                  placeholder="Enter your password"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={`absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 ${ds.transition.base}`}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div className={`${ds.badge.error.bg} ${ds.badge.error.darkBg} border border-red-200 dark:border-red-800 ${ds.radius.md} p-3 ${ds.badge.error.shadow} ${ds.badge.error.darkShadow}`}>
-              <p className={`${ds.badge.error.text} ${ds.badge.error.darkText} ${ds.typography.bodySmall}`}>{error}</p>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className={`${ds.badge.success.bg} ${ds.badge.success.darkBg} border border-green-200 dark:border-green-800 ${ds.radius.md} p-3 ${ds.badge.success.shadow} ${ds.badge.success.darkShadow}`}>
-              <p className={`${ds.badge.success.text} ${ds.badge.success.darkText} ${ds.typography.bodySmall}`}>{successMessage}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full ${ds.button.primary.base} ${ds.button.primary.hover} ${ds.button.primary.active} text-white py-4 ${ds.radius.lg} font-semibold text-lg ${ds.button.primary.shadow} ${ds.button.primary.hoverShadow} ${ds.button.primary.activeShadow} ${ds.transition.spring} disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]`}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Please wait...</span>
-              </div>
-            ) : mode === 'signin' ? (
-              'Sign In'
-            ) : mode === 'signup' ? (
-              'Create Account'
-            ) : (
-              'Send Reset Link'
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          {mode === 'signin' && (
-            <>
-              <button
-                onClick={() => {
-                  setMode('reset');
-                  setError('');
-                  setSuccessMessage('');
-                }}
-                className={`${ds.typography.body} text-orange-600 dark:text-orange-400 font-medium hover:text-orange-700 dark:hover:text-orange-500 ${ds.transition.base}`}
-              >
-                Forgot password?
-              </button>
-            </>
-          )}
-
-          {mode === 'reset' && (
-            <button
-              onClick={() => {
-                setMode('signin');
-                setError('');
-                setSuccessMessage('');
-              }}
-              className={`${ds.typography.body} text-orange-600 dark:text-orange-400 font-medium hover:text-orange-700 dark:hover:text-orange-500 ${ds.transition.base}`}
-            >
-              Back to sign in
-            </button>
-          )}
+        <div>
+          <label className={`${ds.caption} text-[#8e8e93] block mb-1.5`}>Email</label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8e8e93]" />
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+              className={`${ds.input} pl-10`}
+            />
+          </div>
         </div>
+
+        {mode !== 'reset' && (
+          <div>
+            <label className={`${ds.caption} text-[#8e8e93] block mb-1.5`}>Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8e8e93]" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                className={`${ds.input} pl-10 pr-10`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e93]"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <p className="text-[#ff3b30] text-[14px] font-medium">{error}</p>
+        )}
+        {successMessage && (
+          <p className="text-[#34c759] text-[14px] font-medium">{successMessage}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`${ds.btnPrimary} w-full mt-2 flex items-center justify-center gap-2`}
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Link'
+          )}
+        </button>
+      </form>
+
+      <div className="mt-6 flex flex-col gap-3 items-center">
+        {mode === 'signin' && (
+          <>
+            <button onClick={() => setMode('reset')} className={`${ds.callout} text-[#8e8e93]`}>
+              Forgot password? <span className="text-[#f97316] font-semibold">Reset</span>
+            </button>
+            <button onClick={() => setMode('signup')} className={`${ds.callout} text-[#8e8e93]`}>
+              No account? <span className="text-[#f97316] font-semibold">Create one</span>
+            </button>
+          </>
+        )}
+        {(mode === 'signup' || mode === 'reset') && (
+          <button onClick={() => setMode('signin')} className={`${ds.callout} text-[#8e8e93]`}>
+            Already have an account? <span className="text-[#f97316] font-semibold">Sign in</span>
+          </button>
+        )}
       </div>
     </div>
   );
