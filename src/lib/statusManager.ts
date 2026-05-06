@@ -59,8 +59,6 @@ export function getStatusLabel(document: Document): string {
 export function getStatusColor(document: Document): {
   bg: string;
   text: string;
-  darkBg: string;
-  darkText: string;
 } {
   const status = calculateDocumentStatus(document);
 
@@ -68,37 +66,27 @@ export function getStatusColor(document: Document): {
     case 'paid':
       return {
         bg: 'bg-green-100',
-        text: 'text-green-700',
-        darkBg: 'dark:bg-green-900/30',
-        darkText: 'dark:text-green-400'
+        text: 'text-green-700'
       };
     case 'sent':
       return {
         bg: 'bg-blue-100',
-        text: 'text-blue-700',
-        darkBg: 'dark:bg-blue-900/30',
-        darkText: 'dark:text-blue-400'
+        text: 'text-blue-700'
       };
     case 'overdue':
       return {
         bg: 'bg-red-100',
-        text: 'text-red-700',
-        darkBg: 'dark:bg-red-900/30',
-        darkText: 'dark:text-red-400'
+        text: 'text-red-700'
       };
     case 'cancelled':
       return {
         bg: 'bg-gray-100',
-        text: 'text-gray-600',
-        darkBg: 'dark:bg-gray-700',
-        darkText: 'dark:text-gray-400'
+        text: 'text-gray-600'
       };
     default:
       return {
         bg: 'bg-gray-100',
-        text: 'text-gray-700',
-        darkBg: 'dark:bg-gray-700',
-        darkText: 'dark:text-gray-300'
+        text: 'text-gray-700'
       };
   }
 }

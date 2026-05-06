@@ -340,33 +340,33 @@ export function DashboardOverview() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <div className="bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20 shadow-sm">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="bg-white p-4 border-b border-gray-200 sticky top-0 z-20 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setCurrentScreen('home')}
-              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" strokeWidth={2} />
+              <ArrowLeft className="w-5 h-5 text-gray-700" strokeWidth={2} />
             </button>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 onClick={() => setShowDatePicker(!showDatePicker)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 {DATE_RANGE_OPTIONS.find(o => o.key === dateRange)?.label}
                 <ChevronDown className="w-4 h-4" />
@@ -374,15 +374,15 @@ export function DashboardOverview() {
               {showDatePicker && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowDatePicker(false)} />
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-20 overflow-hidden">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-20 overflow-hidden">
                     {DATE_RANGE_OPTIONS.map(option => (
                       <button
                         key={option.key}
                         onClick={() => { setDateRange(option.key); setShowDatePicker(false); }}
                         className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
                           dateRange === option.key
-                            ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            ? 'bg-orange-50 text-orange-600'
+                            : 'text-gray-700 hover:bg-gray-50'
                         }`}
                       >
                         {option.label}
@@ -394,9 +394,9 @@ export function DashboardOverview() {
             </div>
             <button
               onClick={() => setCurrentScreen('app-settings')}
-              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" strokeWidth={2} />
+              <Settings className="w-5 h-5 text-gray-600" strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -405,35 +405,35 @@ export function DashboardOverview() {
       <div className="flex-1 overflow-auto p-4 pb-8">
         <div className="grid grid-cols-2 gap-3 mb-6">
           <KPICard
-            icon={<Send className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
-            iconBg="bg-blue-100 dark:bg-blue-900/30"
+            icon={<Send className="w-5 h-5 text-blue-600" />}
+            iconBg="bg-blue-100"
             label="Invoices Sent"
             value={metrics.invoicesSent.toString()}
           />
           <KPICard
-            icon={<Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />}
-            iconBg="bg-amber-100 dark:bg-amber-900/30"
+            icon={<Clock className="w-5 h-5 text-amber-600" />}
+            iconBg="bg-amber-100"
             label="Outstanding"
             value={metrics.outstandingInvoices.toString()}
           />
           <KPICard
-            icon={<CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />}
-            iconBg="bg-green-100 dark:bg-green-900/30"
+            icon={<CheckCircle className="w-5 h-5 text-green-600" />}
+            iconBg="bg-green-100"
             label="Total Revenue"
             value={formatCurrency(metrics.totalRevenue)}
             isLarge
           />
           <KPICard
-            icon={<AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />}
-            iconBg="bg-red-100 dark:bg-red-900/30"
+            icon={<AlertCircle className="w-5 h-5 text-red-600" />}
+            iconBg="bg-red-100"
             label="Outstanding Amount"
             value={formatCurrency(metrics.outstandingAmount)}
             isLarge
           />
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Revenue Over Time</h3>
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Revenue Over Time</h3>
           {revenueChartData.length > 0 ? (
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
@@ -444,7 +444,7 @@ export function DashboardOverview() {
                       <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} interval="preserveStartEnd" />
                   <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} tickFormatter={formatShortCurrency} />
                   <Tooltip
@@ -456,15 +456,15 @@ export function DashboardOverview() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
+            <div className="h-48 flex items-center justify-center text-gray-400 text-sm">
               No revenue data for this period
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Invoice Status</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Invoice Status</h3>
             {statusDistribution.length > 0 ? (
               <div className="h-40 flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
@@ -490,7 +490,7 @@ export function DashboardOverview() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-40 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
+              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
                 No data available
               </div>
             )}
@@ -498,14 +498,14 @@ export function DashboardOverview() {
               {statusDistribution.map(item => (
                 <div key={item.name} className="flex items-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">{item.name} ({item.value})</span>
+                  <span className="text-xs text-gray-600">{item.name} ({item.value})</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Top Clients by Revenue</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Clients by Revenue</h3>
             {clientRevenueData.length > 0 ? (
               <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
@@ -522,33 +522,33 @@ export function DashboardOverview() {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-40 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
+              <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
                 No revenue data
               </div>
             )}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">Performance</h3>
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Performance</h3>
           <div className="grid grid-cols-2 gap-3">
             <MetricCard
-              icon={<DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />}
+              icon={<DollarSign className="w-4 h-4 text-green-600" />}
               label="Avg Invoice Value"
               value={formatCurrency(metrics.averageInvoiceValue)}
             />
             <MetricCard
-              icon={<Percent className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+              icon={<Percent className="w-4 h-4 text-blue-600" />}
               label="Collection Rate"
               value={`${metrics.collectionRate.toFixed(1)}%`}
             />
             <MetricCard
-              icon={<Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />}
+              icon={<Calendar className="w-4 h-4 text-purple-600" />}
               label="Avg Payment Time"
               value={`${metrics.averagePaymentTime} days`}
             />
             <MetricCard
-              icon={<AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />}
+              icon={<AlertCircle className="w-4 h-4 text-red-600" />}
               label="Overdue Rate"
               value={`${metrics.overdueRate.toFixed(1)}%`}
             />
@@ -556,33 +556,33 @@ export function DashboardOverview() {
         </div>
 
         {recentActivity.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">Recent Activity</h3>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Recent Activity</h3>
             <div className="space-y-3">
               {recentActivity.map((activity, index) => (
                 <button
                   key={`${activity.id}-${activity.type}`}
                   onClick={() => handleActivityClick(activity.id)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left"
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    activity.type === 'paid' ? 'bg-green-100 dark:bg-green-900/30' :
-                    activity.type === 'overdue' ? 'bg-red-100 dark:bg-red-900/30' :
-                    'bg-blue-100 dark:bg-blue-900/30'
+                    activity.type === 'paid' ? 'bg-green-100' :
+                    activity.type === 'overdue' ? 'bg-red-100' :
+                    'bg-blue-100'
                   }`}>
-                    {activity.type === 'paid' ? <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" /> :
-                     activity.type === 'overdue' ? <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" /> :
-                     <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
+                    {activity.type === 'paid' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
+                     activity.type === 'overdue' ? <AlertCircle className="w-4 h-4 text-red-600" /> :
+                     <FileText className="w-4 h-4 text-blue-600" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{activity.clientName}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-sm font-medium text-gray-900 truncate">{activity.clientName}</p>
+                    <p className="text-xs text-gray-500">
                       {activity.type === 'paid' ? 'Payment received' : activity.type === 'overdue' ? 'Invoice overdue' : 'Invoice created'}
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(activity.amount)}</p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(activity.date)}</p>
+                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(activity.amount)}</p>
+                    <p className="text-xs text-gray-400">{formatDate(activity.date)}</p>
                   </div>
                 </button>
               ))}
@@ -590,22 +590,22 @@ export function DashboardOverview() {
           </div>
         )}
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
           >
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Advanced Analytics</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Advanced Analytics</span>
             {showAdvanced ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
           </button>
           {showAdvanced && (
             <div className="p-4 pt-0 space-y-6">
               <div>
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Revenue by Month ({new Date().getFullYear()})</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Revenue by Month ({new Date().getFullYear()})</h4>
                 <div className="h-40">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={monthlyRevenueData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                       <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} />
                       <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} tickFormatter={formatShortCurrency} />
                       <Tooltip
@@ -619,11 +619,11 @@ export function DashboardOverview() {
               </div>
 
               <div>
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Invoices Created vs Paid</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Invoices Created vs Paid</h4>
                 <div className="h-40">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={createdVsPaidData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" className="dark:stroke-gray-700" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                       <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} />
                       <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickLine={false} axisLine={false} />
                       <Tooltip contentStyle={{ backgroundColor: 'rgba(255,255,255,0.95)', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
@@ -636,13 +636,13 @@ export function DashboardOverview() {
               </div>
 
               {projectedRevenue && (
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl p-4 border border-orange-100 dark:border-orange-800/30">
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">Projected Revenue This Month</h4>
+                    <TrendingUp className="w-4 h-4 text-orange-600" />
+                    <h4 className="text-sm font-medium text-gray-900">Projected Revenue This Month</h4>
                   </div>
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{formatCurrency(projectedRevenue.projected)}</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-2xl font-bold text-orange-600">{formatCurrency(projectedRevenue.projected)}</p>
+                  <p className="text-xs text-gray-600 mt-1">
                     Based on {formatCurrency(projectedRevenue.dailyAverage)}/day average ({formatCurrency(projectedRevenue.current)} earned so far)
                   </p>
                 </div>
@@ -657,26 +657,26 @@ export function DashboardOverview() {
 
 function KPICard({ icon, iconBg, label, value, subtext, isLarge }: { icon: React.ReactNode; iconBg: string; label: string; value: string; subtext?: string; isLarge?: boolean }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
       <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center mb-3`}>
         {icon}
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1">{label}</p>
-      <p className={`font-bold text-gray-900 dark:text-white ${isLarge ? 'text-lg' : 'text-2xl'} truncate`}>{value}</p>
-      {subtext && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{subtext}</p>}
+      <p className="text-xs text-gray-500 font-medium mb-1">{label}</p>
+      <p className={`font-bold text-gray-900 ${isLarge ? 'text-lg' : 'text-2xl'} truncate`}>{value}</p>
+      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
     </div>
   );
 }
 
 function MetricCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-      <div className="w-8 h-8 bg-white dark:bg-gray-600 rounded-lg flex items-center justify-center shadow-sm">
+    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-        <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{value}</p>
+        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-sm font-bold text-gray-900 truncate">{value}</p>
       </div>
     </div>
   );

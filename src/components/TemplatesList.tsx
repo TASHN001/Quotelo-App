@@ -129,28 +129,28 @@ export function TemplatesList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading templates...</p>
+          <p className="text-gray-600">Loading templates...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col pb-24 transition-colors">
-      <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 shadow-sm">
+    <div className="min-h-screen bg-white flex flex-col pb-24 transition-colors">
+      <div className="bg-white p-4 sm:p-6 border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-2 sm:gap-4">
           <button
             onClick={() => setCurrentScreen('home')}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0"
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" strokeWidth={2} />
+            <ArrowLeft className="w-5 h-5 text-gray-700" strokeWidth={2} />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-white">Templates</h1>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <h1 className="text-base sm:text-xl font-bold text-gray-900">Templates</h1>
+            <p className="text-xs sm:text-sm text-gray-600">
               {favoriteCount > 0 ? `${favoriteCount} favorite${favoriteCount !== 1 ? 's' : ''}` : 'Choose your invoice style'}
             </p>
           </div>
@@ -160,7 +160,7 @@ export function TemplatesList() {
       <div className="flex-1 overflow-auto p-6">
         <div className="space-y-8">
           <div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
               Your Templates
             </h2>
             <div className="space-y-6">
@@ -170,8 +170,8 @@ export function TemplatesList() {
 
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <Briefcase className="w-5 h-5 text-gray-700 dark:text-gray-300" strokeWidth={2} />
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              <Briefcase className="w-5 h-5 text-gray-700" strokeWidth={2} />
+              <h2 className="text-lg font-bold text-gray-900">
                 Industry Templates
               </h2>
             </div>
@@ -182,11 +182,11 @@ export function TemplatesList() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
         <div className="flex items-center justify-around relative">
           <button
             onClick={() => setCurrentScreen('home')}
-            className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500"
+            className="flex flex-col items-center gap-1 text-gray-400"
           >
             <HomeIcon className="w-6 h-6" strokeWidth={2} />
             <span className="text-xs font-medium">Home</span>
@@ -203,7 +203,7 @@ export function TemplatesList() {
 
           <button
             onClick={() => setCurrentScreen('profile')}
-            className="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500"
+            className="flex flex-col items-center gap-1 text-gray-400"
           >
             <User className="w-6 h-6" strokeWidth={2} />
             <span className="text-xs font-medium">Profile</span>

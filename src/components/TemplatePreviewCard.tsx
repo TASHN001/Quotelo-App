@@ -48,7 +48,7 @@ export function TemplatePreviewCard({
   const scaledHeight = INVOICE_HEIGHT * scale;
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden relative">
+    <div className="w-full bg-white rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden relative">
       <button
         onClick={isComingSoon ? undefined : onClick}
         className={`w-full text-left ${isComingSoon ? 'cursor-not-allowed' : 'cursor-pointer'}`}
@@ -56,7 +56,7 @@ export function TemplatePreviewCard({
       >
         <div
           ref={containerRef}
-          className="relative bg-gray-100 dark:bg-gray-700 overflow-hidden"
+          className="relative bg-gray-100 overflow-hidden"
           style={{ height: scaledHeight }}
         >
           <div
@@ -95,7 +95,7 @@ export function TemplatePreviewCard({
         <div className="p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{name}</h3>
+              <h3 className="text-lg font-bold text-gray-900">{name}</h3>
               {isDefault && (
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center gap-1">
                   <Check className="w-3 h-3" strokeWidth={2} />
@@ -116,12 +116,12 @@ export function TemplatePreviewCard({
               )}
             </div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{description}</p>
+          <p className="text-sm text-gray-600 mb-3">{description}</p>
 
           {!isComingSoon && !isDefault && onSetDefault && (
             <button
               onClick={onSetDefault}
-              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-semibold text-sm transition-colors"
+              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm transition-colors"
             >
               Set as Default
             </button>
