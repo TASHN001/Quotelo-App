@@ -1,41 +1,35 @@
-import { ArrowLeft, Sun, Check } from 'lucide-react';
+import { ChevronLeft, Sun, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 
 export function AppearanceScreen() {
   const { setCurrentScreen } = useApp();
 
   return (
-    <div className="min-h-screen bg-white flex flex-col transition-colors">
-      <div className="sticky top-0 bg-white border-b border-gray-200 z-10">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button
-            onClick={() => setCurrentScreen('app-settings')}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-700" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 absolute left-1/2 transform -translate-x-1/2">
-            Appearance
-          </h1>
-          <div className="w-10"></div>
-        </div>
+    <div className={`min-h-screen ${ds.bg}`}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black`}>Appearance</h1>
       </div>
 
-      <div className="flex-1 p-6">
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-gray-700 mb-3">Theme</h2>
-          <div className="w-full bg-white border border-gray-200 rounded-2xl p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-500 shadow-sm">
-                  <Sun className="w-6 h-6 text-white" strokeWidth={2} />
+      <div className="px-4 flex flex-col gap-4 pb-10">
+        <div>
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>THEME</p>
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#007aff]">
+                  <Sun className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
                 <div className="text-left">
-                  <div className="font-semibold text-gray-900">Light</div>
-                  <div className="text-sm text-gray-500">Light mode theme</div>
+                  <p className={`${ds.callout} text-black`}>Light</p>
+                  <p className={`${ds.footnote} text-[#8e8e93]`}>Light mode theme</p>
                 </div>
               </div>
-              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full bg-[#007aff] flex items-center justify-center">
                 <Check className="w-4 h-4 text-white" strokeWidth={3} />
               </div>
             </div>

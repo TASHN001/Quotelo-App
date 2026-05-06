@@ -1,5 +1,6 @@
-import { ArrowLeft, ChevronRight, Palette, Lock, Globe, DollarSign, Bell, Shield, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Palette, Lock, Globe, DollarSign, Bell, Shield, FileText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 
 const SETTINGS_ITEMS = [
   { icon: Palette, labelKey: 'settings.appearance', screen: 'appearance-settings', color: 'text-blue-500' },
@@ -18,71 +19,50 @@ export function AppSettingsScreen() {
   const { setCurrentScreen, t } = useApp();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col transition-colors">
-      <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10 shadow-sm">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
-            {t('settings.title')}
-          </h1>
-          <div className="w-10"></div>
-        </div>
+    <div className={`min-h-screen ${ds.bg}`}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black`}>{t('settings.title')}</h1>
       </div>
 
-      <div className="flex-1 p-5 space-y-6">
+      <div className="px-4 flex flex-col gap-4 pb-10">
         <div>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 px-1">
-            General
-          </p>
-          <div className="space-y-2">
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>GENERAL</p>
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             {SETTINGS_ITEMS.map((item, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentScreen(item.screen)}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors shadow-sm"
+                className={`w-full flex items-center justify-between px-4 py-3 ${ds.transition} ${ds.press} ${
+                  index < SETTINGS_ITEMS.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+                }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-50 dark:bg-gray-700 rounded-xl flex items-center justify-center shadow-sm">
-                      <item.icon className={`w-5 h-5 ${item.color}`} strokeWidth={2} />
-                    </div>
-                    <span className="font-medium text-gray-900 dark:text-white">{t(item.labelKey as any)}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" strokeWidth={2} />
-                </div>
+                <span className={`${ds.callout} text-black`}>{t(item.labelKey as any)}</span>
+                <ChevronRight className="w-4 h-4 text-[#c7c7cc]" strokeWidth={2} />
               </button>
             ))}
           </div>
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3 px-1">
-            Legal
-          </p>
-          <div className="space-y-2">
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>LEGAL</p>
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             {LEGAL_ITEMS.map((item, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentScreen(item.screen)}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors shadow-sm"
+                className={`w-full flex items-center justify-between px-4 py-3 ${ds.transition} ${ds.press} ${
+                  index < LEGAL_ITEMS.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+                }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-50 dark:bg-gray-700 rounded-xl flex items-center justify-center shadow-sm">
-                      <item.icon className={`w-5 h-5 ${item.color}`} strokeWidth={2} />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-gray-900 dark:text-white text-sm">{item.label}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.description}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" strokeWidth={2} />
+                <div className="text-left">
+                  <p className={`${ds.callout} text-black`}>{item.label}</p>
+                  <p className={`${ds.footnote} text-[#8e8e93]`}>{item.description}</p>
                 </div>
+                <ChevronRight className="w-4 h-4 text-[#c7c7cc]" strokeWidth={2} />
               </button>
             ))}
           </div>

@@ -1,6 +1,7 @@
-import { ArrowLeft, Check } from 'lucide-react';
+import { ChevronLeft, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { CURRENCIES } from '../lib/currency';
+import { ds } from '../lib/designSystem';
 
 export function CurrencyScreen() {
   const { setCurrentScreen, currency, updateCurrency, t } = useApp();
@@ -10,48 +11,37 @@ export function CurrencyScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col transition-colors">
-      <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-10">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button
-            onClick={() => setCurrentScreen('app-settings')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
-            {t('currency.title')}
-          </h1>
-          <div className="w-10"></div>
-        </div>
+    <div className={`min-h-screen ${ds.bg}`}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black`}>{t('currency.title')}</h1>
       </div>
 
-      <div className="flex-1 p-6">
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          {t('currency.selectCurrency')}
-        </p>
-
-        <div className="space-y-3">
-          {CURRENCIES.map((curr) => (
+      <div className="px-4 flex flex-col gap-4 pb-10">
+        <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          {CURRENCIES.map((curr, index) => (
             <button
               key={curr.code}
               onClick={() => handleCurrencyChange(curr.code)}
-              className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+              className={`w-full flex items-center justify-between px-4 py-3 ${ds.transition} ${ds.press} ${
+                index < CURRENCIES.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+              }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl w-8 text-center">{curr.symbol}</span>
                 <div className="text-left">
-                  <div className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span className="text-2xl">{curr.symbol}</span>
-                    <span>{curr.code}</span>
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{curr.name}</div>
+                  <p className={`${ds.callout} text-black`}>{curr.code}</p>
+                  <p className={`${ds.footnote} text-[#8e8e93]`}>{curr.name}</p>
                 </div>
-                {currency === curr.code && (
-                  <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-white" strokeWidth={3} />
-                  </div>
-                )}
               </div>
+              {currency === curr.code && (
+                <div className="w-6 h-6 bg-[#f97316] rounded-full flex items-center justify-center">
+                  <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                </div>
+              )}
             </button>
           ))}
         </div>

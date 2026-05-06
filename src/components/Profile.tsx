@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { ChevronRight, Plus, Home as HomeIcon, User, CreditCard, Settings, Shield, LogOut, X, Pen, Building, Scale, FileCheck } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Plus, Home as HomeIcon, User, CreditCard, Settings, Shield, LogOut, X, Pen, Building, Scale, FileCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SignaturePad } from './SignaturePad';
 import { EditBusinessModal } from './EditBusinessModal';
 import { db } from '../lib/database';
 import type { Business } from '../lib/types';
-import { designSystem as ds } from '../lib/designSystem';
+import { ds } from '../lib/designSystem';
 
 const MENU_ITEMS = [
   { icon: Building, labelKey: 'profile.businessIdentity', color: 'text-orange-500' },
@@ -187,77 +187,84 @@ export function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col pb-24 transition-colors">
-      <div className="p-6">
-        <div className="text-center mb-8 pt-4">
-          {business?.logo_url ? (
-            <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 rounded-full overflow-hidden bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
-                <img src={business.logo_url} alt="Business logo" className="w-full h-full object-contain p-1" />
+    <div className={`min-h-screen ${ds.bg} pb-28`}>
+      <div className="px-4 pt-14">
+
+        <h1 className={`${ds.title1} text-black mb-5`}>Profile</h1>
+
+        {/* Business identity card */}
+        <div className={`bg-white rounded-[20px] p-5 ${ds.shadow1} mb-5`}>
+          <div className="flex items-center gap-4">
+            {business?.logo_url ? (
+              <img src={business.logo_url} alt="" className="w-14 h-14 rounded-2xl object-contain bg-[#f2f2f7] p-1" />
+            ) : (
+              <div className="w-14 h-14 rounded-2xl bg-[#f2f2f7] flex items-center justify-center">
+                <span className={`${ds.title2} text-[#3c3c43]`}>{business?.name?.charAt(0) ?? business?.business_name?.charAt(0) ?? '?'}</span>
               </div>
+            )}
+            <div>
+              <p className={`${ds.headline} text-black`}>{business?.name ?? business?.business_name ?? 'Your Business'}</p>
+              <p className={`${ds.footnote} text-[#8e8e93]`}>{business?.industry ?? ''}</p>
             </div>
-          ) : (
-            <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-5xl">
-                  {business?.business_name?.charAt(0) || 'B'}
-                </span>
-              </div>
-            </div>
-          )}
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {business?.business_name || 'Your Business'}
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
-            {dbUserProfile?.email || ''}
-          </p>
-          <div className="inline-block">
-            <span className="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-              {dbUserProfile?.plan_tier === 'pro' ? t('profile.proMember') : t('profile.freeMember')}
-            </span>
           </div>
         </div>
 
-        <div className="space-y-3 mb-6">
-          {MENU_ITEMS.map((item, index) => renderMenuItem(item, index))}
-        </div>
-
-        <div className="mb-6">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 px-1">
-            Legal
-          </p>
-          <div className="space-y-3">
-            {LEGAL_ITEMS.map((item, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentScreen(item.screen)}
-                className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white dark:bg-gray-700 rounded-xl flex items-center justify-center shadow-sm">
-                      <item.icon className={`w-6 h-6 ${item.color}`} strokeWidth={2} />
-                    </div>
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {item.label.startsWith('profile.') ? t(item.label as any) : item.label}
-                    </span>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" strokeWidth={2} />
-                </div>
-              </button>
-            ))}
+        {/* Settings sections */}
+        {[
+          {
+            label: 'ACCOUNT',
+            rows: [
+              { title: 'Profile & Business', screen: 'profile-data' },
+              { title: 'Change Password',    screen: 'change-password' },
+            ],
+          },
+          {
+            label: 'PREFERENCES',
+            rows: [
+              { title: 'Appearance',  screen: 'appearance-settings' },
+              { title: 'Language',    screen: 'language-settings' },
+              { title: 'Currency',    screen: 'currency-settings' },
+              { title: 'Reminders',   screen: 'reminder-settings' },
+            ],
+          },
+          {
+            label: 'ABOUT',
+            rows: [
+              { title: 'Data & Privacy',    screen: 'data-privacy' },
+              { title: 'Terms of Service',  screen: 'terms' },
+              { title: 'License Agreement', screen: 'eula-view' },
+            ],
+          },
+        ].map(section => (
+          <div key={section.label} className="mb-4">
+            <p className={`${ds.caption} text-[#8e8e93] mb-2`}>{section.label}</p>
+            <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              {section.rows.map(({ title, screen }, idx, arr) => (
+                <button
+                  key={screen}
+                  onClick={() => setCurrentScreen(screen as any)}
+                  className={`w-full flex items-center justify-between px-4 py-3 ${ds.transition} ${ds.press} ${
+                    idx < arr.length - 1 ? 'border-b border-[#f2f2f7]' : ''
+                  }`}
+                >
+                  <span className={`${ds.callout} text-black`}>{title}</span>
+                  <ChevronRight className="w-4 h-4 text-[#c7c7cc]" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
 
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+        {/* Sign Out */}
+        <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] mt-2 mb-6">
           <button
             onClick={() => setShowSignOutModal(true)}
-            className="w-full bg-white dark:bg-gray-800 border-2 border-orange-500 text-orange-600 dark:text-orange-500 py-4 rounded-2xl font-semibold text-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center justify-center gap-2"
+            className={`w-full px-4 py-3 text-[#ff3b30] font-semibold text-[15px] text-left ${ds.transition}`}
           >
-            <LogOut className="w-5 h-5" strokeWidth={2} />
-            {t('profile.signOut')}
+            Sign Out
           </button>
         </div>
+
       </div>
 
       {showSignatureModal && (

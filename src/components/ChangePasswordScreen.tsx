@@ -1,7 +1,8 @@
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { auth } from '../lib/auth';
+import { ds } from '../lib/designSystem';
 
 export function ChangePasswordScreen() {
   const { setCurrentScreen, t, showToast } = useApp();
@@ -74,148 +75,110 @@ export function ChangePasswordScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col transition-colors">
-      <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-10">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button
-            onClick={() => setCurrentScreen('app-settings')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
-            {t('changePassword.title')}
-          </h1>
-          <div className="w-10"></div>
-        </div>
+    <div className={`min-h-screen ${ds.bg}`}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black`}>{t('changePassword.title')}</h1>
       </div>
 
-      <div className="flex-1 p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('changePassword.currentPassword')}
-            </label>
-            <div className="relative">
-              <input
-                type={showCurrentPassword ? 'text' : 'password'}
-                value={currentPassword}
-                onChange={(e) => {
-                  setCurrentPassword(e.target.value);
-                  if (errors.currentPassword) {
-                    setErrors({ ...errors, currentPassword: undefined });
-                  }
-                }}
-                disabled={isLoading}
-                className={`w-full px-4 py-3 pr-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white border ${
-                  errors.currentPassword
-                    ? 'border-red-500 dark:border-red-500'
-                    : 'border-gray-200 dark:border-gray-700'
-                } focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-colors`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
-                {showCurrentPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+      <div className="px-4 flex flex-col gap-4 pb-10">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            {/* Current Password */}
+            <div className="px-4 py-3 border-b border-[#f2f2f7]">
+              <label className={`${ds.footnote} text-[#8e8e93] block mb-1`}>
+                {t('changePassword.currentPassword')}
+              </label>
+              <div className="relative">
+                <input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => {
+                    setCurrentPassword(e.target.value);
+                    if (errors.currentPassword) setErrors({ ...errors, currentPassword: undefined });
+                  }}
+                  disabled={isLoading}
+                  className={`${ds.input} pr-12 ${errors.currentPassword ? 'ring-2 ring-[#ff3b30]' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e93]"
+                >
+                  {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.currentPassword && (
+                <p className={`mt-1 ${ds.footnote} text-[#ff3b30]`}>{errors.currentPassword}</p>
+              )}
             </div>
-            {errors.currentPassword && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                {errors.currentPassword}
-              </p>
-            )}
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('changePassword.newPassword')}
-            </label>
-            <div className="relative">
-              <input
-                type={showNewPassword ? 'text' : 'password'}
-                value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value);
-                  if (errors.newPassword) {
-                    setErrors({ ...errors, newPassword: undefined });
-                  }
-                }}
-                disabled={isLoading}
-                className={`w-full px-4 py-3 pr-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white border ${
-                  errors.newPassword
-                    ? 'border-red-500 dark:border-red-500'
-                    : 'border-gray-200 dark:border-gray-700'
-                } focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-colors`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
-                {showNewPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+            {/* New Password */}
+            <div className="px-4 py-3 border-b border-[#f2f2f7]">
+              <label className={`${ds.footnote} text-[#8e8e93] block mb-1`}>
+                {t('changePassword.newPassword')}
+              </label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
+                  }}
+                  disabled={isLoading}
+                  className={`${ds.input} pr-12 ${errors.newPassword ? 'ring-2 ring-[#ff3b30]' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e93]"
+                >
+                  {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.newPassword && (
+                <p className={`mt-1 ${ds.footnote} text-[#ff3b30]`}>{errors.newPassword}</p>
+              )}
             </div>
-            {errors.newPassword && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                {errors.newPassword}
-              </p>
-            )}
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('changePassword.confirmPassword')}
-            </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  if (errors.confirmPassword) {
-                    setErrors({ ...errors, confirmPassword: undefined });
-                  }
-                }}
-                disabled={isLoading}
-                className={`w-full px-4 py-3 pr-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white border ${
-                  errors.confirmPassword
-                    ? 'border-red-500 dark:border-red-500'
-                    : 'border-gray-200 dark:border-gray-700'
-                } focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-colors`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+            {/* Confirm Password */}
+            <div className="px-4 py-3">
+              <label className={`${ds.footnote} text-[#8e8e93] block mb-1`}>
+                {t('changePassword.confirmPassword')}
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                  }}
+                  disabled={isLoading}
+                  className={`${ds.input} pr-12 ${errors.confirmPassword ? 'ring-2 ring-[#ff3b30]' : ''}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e93]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className={`mt-1 ${ds.footnote} text-[#ff3b30]`}>{errors.confirmPassword}</p>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                {errors.confirmPassword}
-              </p>
-            )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`${ds.btnPrimary} w-full text-center disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isLoading ? t('changePassword.updating') : t('changePassword.submit')}
           </button>
