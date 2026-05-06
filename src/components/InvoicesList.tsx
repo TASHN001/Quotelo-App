@@ -123,43 +123,6 @@ export function InvoicesList() {
     setCurrentScreen('invoice-detail');
   };
 
-  const getStatusBadge = (doc: Document) => {
-    const status = calculateDocumentStatus(doc);
-
-    switch (status) {
-      case 'paid':
-        return (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-            Paid
-          </span>
-        );
-      case 'sent':
-        return (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-            Sent
-          </span>
-        );
-      case 'overdue':
-        return (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
-            Overdue
-          </span>
-        );
-      case 'draft':
-        return (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-            Draft
-          </span>
-        );
-      default:
-        return (
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
-            {status}
-          </span>
-        );
-    }
-  };
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
