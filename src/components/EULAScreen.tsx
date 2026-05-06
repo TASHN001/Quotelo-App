@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { Shield, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { designSystem as ds } from '../lib/designSystem';
+import { ds } from '../lib/designSystem';
 
 interface EULAScreenProps {
   viewOnly?: boolean;
@@ -35,39 +35,26 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
   const scrollHint = !hasScrolledToBottom;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-5 py-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
-        {viewOnly && (
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="text-gray-600 dark:text-gray-300 text-xl font-light">←</span>
-          </button>
-        )}
-        <div className="flex items-center gap-3 flex-1">
-          <div className={`w-10 h-10 bg-gradient-to-b from-orange-400 via-orange-500 to-orange-600 ${ds.radius.md} flex items-center justify-center shadow-[0_3px_8px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.3)] flex-shrink-0`}>
-            <Shield className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
-              End User License Agreement
-            </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Quotelo — Last updated: March 2025</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Sub-screen header */}
+      <div className="flex items-center gap-4 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black flex-1`}>End User License Agreement</h1>
       </div>
 
+      {/* Scrollable body */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-5 py-6 relative"
+        className="flex-1 overflow-y-auto px-6 pb-8 relative"
         style={{ scrollBehavior: 'smooth' }}
       >
-        <div className="max-w-2xl mx-auto space-y-6 pb-4">
+        <div className={`${ds.body} text-[#3c3c43] leading-relaxed`}>
 
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-            <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+            <p className="text-sm text-amber-800 font-medium">
               Please read this agreement carefully before using Quotelo. By creating an account or using the platform, you agree to the terms below.
             </p>
           </div>
@@ -225,25 +212,26 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
 
           <Section title="12. Contact Information">
             <p>If you have any questions about this Agreement, please contact us at:</p>
-            <div className="mt-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-sm">
-              <p className="font-semibold text-gray-900 dark:text-white">Quotelo Legal</p>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">legal@quotelo.com</p>
-              <p className="text-gray-600 dark:text-gray-400">Republic of South Africa</p>
+            <div className="mt-3 bg-[#f2f2f7] rounded-lg p-4 text-sm">
+              <p className="font-semibold text-black">Quotelo Legal</p>
+              <p className="text-[#3c3c43] mt-1">legal@quotelo.com</p>
+              <p className="text-[#3c3c43]">Republic of South Africa</p>
             </div>
           </Section>
 
         </div>
 
         {scrollHint && (
-          <div className="fixed bottom-28 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 shadow-md pointer-events-none">
-            <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 animate-bounce" />
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Scroll to read</span>
+          <div className="fixed bottom-28 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e5ea] rounded-full px-4 py-2 shadow-md pointer-events-none">
+            <ChevronDown className="w-4 h-4 text-[#8e8e93] animate-bounce" />
+            <span className="text-xs text-[#8e8e93] font-medium">Scroll to read</span>
           </div>
         )}
       </div>
 
+      {/* Accept CTA — only when !viewOnly */}
       {!viewOnly && (
-        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-5 py-5 space-y-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+        <div className="px-6 pb-10 pt-4 bg-white border-t border-[#f2f2f7] space-y-4">
           <label className="flex items-start gap-3 cursor-pointer group">
             <div className="relative mt-0.5 flex-shrink-0">
               <input
@@ -256,8 +244,8 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
                 onClick={() => setAgreed(prev => !prev)}
                 className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 cursor-pointer ${
                   agreed
-                    ? 'bg-orange-500 border-orange-500 shadow-[0_2px_6px_rgba(249,115,22,0.4)]'
-                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 group-hover:border-orange-400'
+                    ? 'bg-[#f97316] border-[#f97316] shadow-[0_2px_6px_rgba(249,115,22,0.4)]'
+                    : 'border-[#c7c7cc] bg-white group-hover:border-[#f97316]'
                 }`}
               >
                 {agreed && (
@@ -267,19 +255,19 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
                 )}
               </div>
             </div>
-            <span className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+            <span className="text-sm text-[#3c3c43] leading-relaxed">
               I have read and agree to the{' '}
-              <span className="font-semibold text-gray-900 dark:text-white">End User License Agreement</span>
+              <span className="font-semibold text-black">End User License Agreement</span>
             </span>
           </label>
 
           <button
             onClick={handleAccept}
             disabled={!agreed || isSubmitting}
-            className={`w-full py-4 px-6 rounded-2xl font-semibold text-base transition-all duration-200 ${
+            className={`w-full text-center transition-all duration-200 ${
               agreed && !isSubmitting
-                ? `${ds.button.primary.base} ${ds.button.primary.shadow} ${ds.button.primary.hoverShadow} text-white active:scale-[0.98]`
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                ? `${ds.btnPrimary}`
+                : 'bg-[#f2f2f7] text-[#c7c7cc] rounded-2xl px-6 py-4 font-semibold text-[17px] cursor-not-allowed'
             }`}
           >
             {isSubmitting ? 'Processing...' : 'Accept & Continue'}
@@ -287,20 +275,9 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
 
           <button
             onClick={handleDecline}
-            className="w-full py-3 text-center text-sm text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors font-medium"
+            className="w-full py-3 text-center text-sm text-[#8e8e93] hover:text-red-600 transition-colors font-medium"
           >
             Decline — Sign out
-          </button>
-        </div>
-      )}
-
-      {viewOnly && (
-        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-5 py-4">
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className={`w-full py-3 px-6 rounded-2xl font-semibold text-base ${ds.button.primary.base} ${ds.button.primary.shadow} text-white active:scale-[0.98] transition-all duration-200`}
-          >
-            Close
           </button>
         </div>
       )}
@@ -310,9 +287,9 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
-      <h2 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-3">{title}</h2>
-      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{children}</div>
+    <div className="bg-[#f2f2f7] rounded-xl p-5 mb-4">
+      <h2 className="text-sm font-bold text-black uppercase tracking-wide mb-3">{title}</h2>
+      <div className="text-sm text-[#3c3c43] leading-relaxed">{children}</div>
     </div>
   );
 }
@@ -320,16 +297,16 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-4">
-      <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">{title}</h3>
-      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{children}</div>
+      <h3 className="text-sm font-semibold text-black mb-1.5">{title}</h3>
+      <div className="text-sm text-[#3c3c43] leading-relaxed">{children}</div>
     </div>
   );
 }
 
 function Li({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0" />
+    <li className="flex items-start gap-2 text-sm text-[#3c3c43]">
+      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#f97316] flex-shrink-0" />
       <span>{children}</span>
     </li>
   );

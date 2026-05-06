@@ -1,35 +1,30 @@
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 import { dataPrivacySections } from '../content/dataPrivacy';
 
 export function DataPrivacyScreen() {
   const { setCurrentScreen } = useApp();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col transition-colors">
-      <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 z-10">
-        <div className="flex items-center justify-between px-4 py-4">
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
-            Data & Privacy
-          </h1>
-          <div className="w-10"></div>
-        </div>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Sub-screen header */}
+      <div className="flex items-center gap-4 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.title2} text-black flex-1`}>Data &amp; Privacy</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-6 py-8 max-w-2xl mx-auto">
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto px-6 pb-8">
+        <div className={`${ds.body} text-[#3c3c43] leading-relaxed`}>
           {dataPrivacySections.map((section, index) => (
-            <div key={index} className="mb-8 last:mb-0">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+            <div key={index} className="bg-[#f2f2f7] rounded-xl p-5 mb-4">
+              <h2 className="text-sm font-bold text-black uppercase tracking-wide mb-3">
                 {section.title}
               </h2>
-              <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm text-[#3c3c43] leading-relaxed">
                 {section.body}
               </p>
             </div>

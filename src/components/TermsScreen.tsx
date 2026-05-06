@@ -1,38 +1,27 @@
-import { ArrowLeft, Scale } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { designSystem as ds } from '../lib/designSystem';
+import { ds } from '../lib/designSystem';
 
 export function TermsScreen() {
   const { setCurrentScreen } = useApp();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-5 py-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
-        <button
-          onClick={() => setCurrentScreen('profile')}
-          className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Sub-screen header */}
+      <div className="flex items-center gap-4 px-4 pt-12 pb-4">
+        <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
         </button>
-        <div className="flex items-center gap-3 flex-1">
-          <div className={`w-10 h-10 bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 ${ds.radius.md} flex items-center justify-center shadow-[0_3px_8px_rgba(59,130,246,0.3),inset_0_1px_0_rgba(255,255,255,0.3)] flex-shrink-0`}>
-            <Scale className="w-5 h-5 text-white" strokeWidth={2} />
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
-              Terms & Conditions
-            </h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Quotelo — Last updated: March 2025</p>
-          </div>
-        </div>
+        <h1 className={`${ds.title2} text-black flex-1`}>Terms &amp; Conditions</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6">
-        <div className="max-w-2xl mx-auto space-y-6 pb-8">
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto px-6 pb-8">
+        <div className={`${ds.body} text-[#3c3c43] leading-relaxed`}>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-            <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
-              These Terms & Conditions govern your use of the Quotelo platform. Please read them carefully before using the Service.
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <p className="text-sm text-blue-800 font-medium">
+              These Terms &amp; Conditions govern your use of the Quotelo platform. Please read them carefully before using the Service.
             </p>
           </div>
 
@@ -177,23 +166,14 @@ export function TermsScreen() {
 
           <Section title="17. Contact">
             <p>For questions about these Terms, please contact us:</p>
-            <div className="mt-3 bg-gray-100 dark:bg-gray-700/50 rounded-lg p-4 text-sm">
-              <p className="font-semibold text-gray-900 dark:text-white">Quotelo Legal</p>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">legal@quotelo.com</p>
-              <p className="text-gray-600 dark:text-gray-400">Republic of South Africa</p>
+            <div className="mt-3 bg-[#f2f2f7] rounded-lg p-4 text-sm">
+              <p className="font-semibold text-black">Quotelo Legal</p>
+              <p className="text-[#3c3c43] mt-1">legal@quotelo.com</p>
+              <p className="text-[#3c3c43]">Republic of South Africa</p>
             </div>
           </Section>
 
         </div>
-      </div>
-
-      <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-5 py-4">
-        <button
-          onClick={() => setCurrentScreen('profile')}
-          className={`w-full py-3 px-6 rounded-2xl font-semibold text-base bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600 text-white shadow-[0_4px_12px_rgba(59,130,246,0.3)] active:scale-[0.98] transition-all duration-200`}
-        >
-          Close
-        </button>
       </div>
     </div>
   );
@@ -201,9 +181,9 @@ export function TermsScreen() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
-      <h2 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-3">{title}</h2>
-      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{children}</div>
+    <div className="bg-[#f2f2f7] rounded-xl p-5 mb-4">
+      <h2 className="text-sm font-bold text-black uppercase tracking-wide mb-3">{title}</h2>
+      <div className="text-sm text-[#3c3c43] leading-relaxed">{children}</div>
     </div>
   );
 }
@@ -211,16 +191,16 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Subsection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-4">
-      <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">{title}</h3>
-      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{children}</div>
+      <h3 className="text-sm font-semibold text-black mb-1.5">{title}</h3>
+      <div className="text-sm text-[#3c3c43] leading-relaxed">{children}</div>
     </div>
   );
 }
 
 function Li({ children }: { children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+    <li className="flex items-start gap-2 text-sm text-[#3c3c43]">
+      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#f97316] flex-shrink-0" />
       <span>{children}</span>
     </li>
   );
