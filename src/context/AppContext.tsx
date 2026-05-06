@@ -13,6 +13,7 @@ interface LocalUserProfile {
 
 interface Invoice {
   id: string;
+  invoiceNumber: string;
   companyName: string;
   amount: number;
   status: string;
@@ -296,6 +297,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const docs = await db.getUserDocuments(userId, 5);
     const invoices: Invoice[] = docs.map(doc => ({
       id: doc.id,
+      invoiceNumber: doc.document_number || '',
       companyName: doc.client_name,
       amount: doc.total,
       status: doc.status,

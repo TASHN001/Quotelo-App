@@ -46,13 +46,18 @@ export function Home() {
   });
 
   const unpaidTotal = recentInvoices
-    .filter(inv => inv.status !== 'paid' && !isInvoiceOverdue(inv))
+    .filter(inv => inv.status !== 'paid')
     .reduce((sum, inv) => sum + inv.amount, 0);
 
   const unpaidCount = recentInvoices.filter(inv => inv.status !== 'paid').length;
 
+  const now = new Date();
   const paidThisMonth = recentInvoices
-    .filter(inv => inv.status === 'paid')
+    .filter(inv => {
+      if (inv.status !== 'paid') return false;
+      const d = new Date(inv.date || '');
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    })
     .reduce((sum, inv) => sum + inv.amount, 0);
 
   function getGreeting() {
