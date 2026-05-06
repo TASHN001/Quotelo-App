@@ -60,7 +60,7 @@ export const ds = {
 
   tabBar: [
     'bg-[rgba(242,242,247,0.92)] backdrop-blur-xl',
-    'border-t border-[rgba(0,0,0,0.12)]',
+    'border-t-[0.5px] border-[rgba(0,0,0,0.12)]',
   ].join(' '),
 
   // --- Sub-screen header icon button ---

@@ -32,7 +32,10 @@ export function BottomTabBar() {
   const active = activeTab();
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 ${ds.tabBar} pb-safe`}>
+    <div
+      className={`fixed bottom-0 left-0 right-0 ${ds.tabBar}`}
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
       <div className="flex items-center justify-around pt-2 pb-4">
         {TABS.map(({ id, label, Icon }) => {
           const isActive = active === id;
@@ -40,7 +43,8 @@ export function BottomTabBar() {
             <button
               key={id}
               onClick={() => setCurrentScreen(id)}
-              className={`flex flex-col items-center gap-1 flex-1 ${ds.transition}`}
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex flex-col items-center gap-1 flex-1 ${ds.transition} ${ds.press}`}
             >
               <Icon
                 className="w-6 h-6"
