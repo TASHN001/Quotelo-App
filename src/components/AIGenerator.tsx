@@ -1,4 +1,4 @@
-import { ArrowLeft, Mic, Send, Loader2, User, X } from 'lucide-react';
+import { ChevronLeft, Mic, Send, Loader2, User, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { generateDocumentFromAI } from '../lib/ai';
@@ -7,6 +7,7 @@ import { db } from '../lib/database';
 import { ClientPickerModal } from './ClientPickerModal';
 import { Client } from '../lib/types';
 import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
+import { ds } from '../lib/designSystem';
 
 const DOCUMENT_TYPES = ['Invoice', 'Tax Invoice', 'Proforma Invoice'];
 const DOCUMENT_TYPE_KEYS = ['documentType.invoice', 'documentType.taxInvoice', 'documentType.proformaInvoice'] as const;
@@ -138,72 +139,67 @@ export function AIGenerator() {
   const isBusy = isLoading || isListening || isTranscribing;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col transition-colors">
-      <div className="p-6 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => setCurrentScreen('home')}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" strokeWidth={2} />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('ai.title')}</h1>
-        </div>
+    <div className={`min-h-screen ${ds.bg} flex flex-col`}>
+      {/* Sub-screen header */}
+      <div className="flex items-center gap-3 px-4 pt-12 pb-3 bg-[#f2f2f7]">
+        <button onClick={() => setCurrentScreen('home')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <h1 className={`${ds.headline} text-black flex-1 text-center`}>{t('ai.title')}</h1>
+        <div className="w-8" />
+      </div>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-6">
-          {t('ai.description')}
-        </p>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
 
+        {/* Description */}
+        <p className={`${ds.callout} text-[#8e8e93]`}>{t('ai.description')}</p>
+
+        {/* Client card */}
         {selectedClient && (
-          <div className="mb-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-xl p-4 border border-orange-200 dark:border-orange-800">
+          <div className={`bg-white rounded-xl p-4 ${ds.shadow1}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-[#f97316] rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                    {selectedClient.name}
-                  </p>
+                  <p className={`${ds.callout} font-semibold text-black truncate`}>{selectedClient.name}</p>
                   {selectedClient.email && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      {selectedClient.email}
-                    </p>
+                    <p className={`${ds.footnote} text-[#8e8e93] truncate`}>{selectedClient.email}</p>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => setShowClientPicker(true)}
-                  className="px-3 py-1.5 bg-white dark:bg-gray-800 text-orange-600 dark:text-orange-400 rounded-lg text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className={`px-3 py-1.5 bg-[#f2f2f7] text-[#f97316] rounded-lg ${ds.footnote} font-semibold ${ds.transition} ${ds.press}`}
                 >
                   Change
                 </button>
                 <button
                   onClick={() => setSelectedClient(null)}
-                  className="w-8 h-8 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className={`w-8 h-8 bg-[#f2f2f7] rounded-full flex items-center justify-center ${ds.transition} ${ds.press}`}
                 >
-                  <X className="w-4 h-4 text-gray-600 dark:text-gray-400" strokeWidth={2} />
+                  <X className="w-4 h-4 text-[#8e8e93]" strokeWidth={2} />
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        <div className="mb-6">
-          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 tracking-wider mb-3">
-            {t('ai.switchDocument')}
-          </p>
-
-          <div className="flex gap-2 overflow-x-auto pb-2">
+        {/* Document type selector */}
+        <div>
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>{t('ai.switchDocument')}</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {DOCUMENT_TYPES.map((type, index) => (
               <button
                 key={type}
                 onClick={() => setSelectedDocumentType(type)}
-                className={`px-6 py-3 rounded-full font-medium whitespace-nowrap transition-all ${
+                className={`px-5 py-2 rounded-full font-semibold whitespace-nowrap ${ds.transition} ${ds.press} ${ds.footnote} ${
                   selectedDocumentType === type
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-[#f97316] text-white shadow-[0_4px_12px_rgba(249,115,22,0.25)]'
+                    : 'bg-white text-[#8e8e93] shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
                 }`}
               >
                 {t(DOCUMENT_TYPE_KEYS[index])}
@@ -212,115 +208,107 @@ export function AIGenerator() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-2xl p-5 border border-orange-200 dark:border-orange-800">
-          <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-            {t('ai.examplePrompt')}
-          </p>
+        {/* Example prompt hint */}
+        <div className="bg-white rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <p className={`${ds.callout} text-[#8e8e93] italic`}>{t('ai.examplePrompt')}</p>
         </div>
-      </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        {/* Error / follow-up */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl max-w-md w-full">
-            <p className="text-sm text-red-600 dark:text-red-400 text-center">{error}</p>
+          <div className="bg-[#fee2e2] rounded-xl px-4 py-3">
+            <p className={`${ds.callout} text-[#991b1b] text-center`}>{error}</p>
           </div>
         )}
 
-        <div className="text-center mb-12">
+        {/* State display */}
+        <div className="flex flex-col items-center py-8 gap-6">
           {isLoading ? (
-            <div className="animate-slide-up">
-              <Loader2 className="w-8 h-8 text-orange-500 mx-auto mb-3 animate-spin" strokeWidth={2.5} />
-              <p className="text-xl font-bold text-gray-900 dark:text-white mb-2">Processing your invoice...</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Our AI is extracting the details</p>
+            <div className="text-center animate-slide-up">
+              <Loader2 className="w-8 h-8 text-[#f97316] mx-auto mb-3 animate-spin" strokeWidth={2.5} />
+              <p className={`${ds.headline} text-black mb-1`}>Processing your invoice...</p>
+              <p className={`${ds.callout} text-[#8e8e93]`}>Our AI is extracting the details</p>
             </div>
           ) : isTranscribing ? (
-            <div className="animate-slide-up">
+            <div className="text-center animate-slide-up">
               <div className="flex items-center justify-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-1 h-8 bg-orange-500 rounded-full"
-                    style={{
-                      animation: `wave 1s ease-in-out infinite`,
-                      animationDelay: `${i * 0.1}s`
-                    }}
+                    className="w-1 h-8 bg-[#f97316] rounded-full"
+                    style={{ animation: `wave 1s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}
                   />
                 ))}
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white mb-2">Processing...</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Converting speech to text</p>
+              <p className={`${ds.headline} text-black mb-1`}>Processing...</p>
+              <p className={`${ds.callout} text-[#8e8e93]`}>Converting speech to text</p>
             </div>
           ) : isListening ? (
-            <div className="animate-slide-up">
+            <div className="text-center animate-slide-up">
               <div className="flex items-center justify-center gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-1.5 h-12 bg-red-500 rounded-full"
-                    style={{
-                      animation: `wave 0.8s ease-in-out infinite`,
-                      animationDelay: `${i * 0.1}s`
-                    }}
+                    className="w-1.5 h-12 bg-[#ef4444] rounded-full"
+                    style={{ animation: `wave 0.8s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}
                   />
                 ))}
               </div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white mb-2">Listening...</p>
+              <p className={`${ds.headline} text-black mb-1`}>Listening...</p>
               <div className="flex items-center justify-center gap-2">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Recording</p>
-                <div className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+                <p className={`${ds.callout} text-[#8e8e93]`}>Recording</p>
+                <span className="bg-[#ef4444] text-white text-[11px] font-bold rounded-full px-2 py-0.5">
                   {formatRecordingTime(recordingTime)} / 30s
-                </div>
+                </span>
               </div>
             </div>
           ) : (
-            <div className="animate-slide-up">
-              <p className="text-xl font-bold text-gray-900 dark:text-white mb-2">Tap to speak</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Describe your invoice naturally</p>
+            <div className="text-center animate-slide-up">
+              <p className={`${ds.headline} text-black mb-1`}>Tap to speak</p>
+              <p className={`${ds.callout} text-[#8e8e93]`}>Describe your invoice naturally</p>
             </div>
           )}
-        </div>
 
-        <div className="relative mb-12">
-          {isListening && (
-            <>
-              <div className="absolute inset-0 bg-red-400 rounded-full" style={{ animation: 'ripple 2s ease-out infinite' }} />
-              <div className="absolute inset-0 bg-red-400 rounded-full" style={{ animation: 'ripple 2s ease-out infinite 0.5s' }} />
-              <div className="absolute inset-0 bg-red-400 rounded-full" style={{ animation: 'ripple 2s ease-out infinite 1s' }} />
-            </>
-          )}
-
-          {!isListening && !isLoading && !isTranscribing && (
-            <div className="absolute inset-0 bg-orange-300 rounded-full opacity-30" style={{ animation: 'mic-pulse 2s ease-in-out infinite' }} />
-          )}
-
-          <button
-            onClick={handleMicClick}
-            disabled={isLoading || isTranscribing || !isSupported}
-            className={`relative w-24 h-24 flex items-center justify-center rounded-full transition-all disabled:opacity-50 transform hover:scale-105 active:scale-95 ${
-              isListening
-                ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-2xl shadow-red-500/50'
-                : isLoading || isTranscribing
-                ? 'bg-gradient-to-br from-gray-400 to-gray-500 text-white shadow-lg cursor-not-allowed'
-                : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-2xl shadow-orange-500/30'
-            }`}
-            aria-label={isListening ? t('ai.stopRecording') : t('ai.startVoiceInput')}
-          >
-            {isLoading || isTranscribing ? (
-              <Loader2 className="w-10 h-10 animate-spin" strokeWidth={2.5} />
-            ) : (
-              <Mic className="w-10 h-10" strokeWidth={2.5} />
+          {/* Mic button */}
+          <div className="relative">
+            {isListening && (
+              <>
+                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-30" style={{ animation: 'ripple 2s ease-out infinite' }} />
+                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-20" style={{ animation: 'ripple 2s ease-out infinite 0.5s' }} />
+                <div className="absolute inset-0 bg-[#ef4444] rounded-full opacity-10" style={{ animation: 'ripple 2s ease-out infinite 1s' }} />
+              </>
             )}
-          </button>
+            {!isListening && !isLoading && !isTranscribing && (
+              <div className="absolute inset-0 bg-[#f97316] rounded-full opacity-20" style={{ animation: 'mic-pulse 2s ease-in-out infinite' }} />
+            )}
+            <button
+              onClick={handleMicClick}
+              disabled={isLoading || isTranscribing || !isSupported}
+              className={`relative w-24 h-24 flex items-center justify-center rounded-full ${ds.transition} ${ds.press} disabled:opacity-50 ${
+                isListening
+                  ? 'bg-[#ef4444] shadow-[0_8px_24px_rgba(239,68,68,0.4)]'
+                  : isLoading || isTranscribing
+                  ? 'bg-[#8e8e93] cursor-not-allowed'
+                  : `bg-[#f97316] ${ds.shadowOrange}`
+              }`}
+              aria-label={isListening ? t('ai.stopRecording') : t('ai.startVoiceInput')}
+            >
+              {isLoading || isTranscribing ? (
+                <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={2.5} />
+              ) : (
+                <Mic className="w-10 h-10 text-white" strokeWidth={2.5} />
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="w-full max-w-md">
+        {/* Divider + text input */}
+        <div>
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">or type</p>
-            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
+            <div className="flex-1 h-px bg-[#e5e5ea]" />
+            <p className={`${ds.caption} text-[#c7c7cc]`}>or type</p>
+            <div className="flex-1 h-px bg-[#e5e5ea]" />
           </div>
-
-          <div className="flex items-center gap-3">
+          <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex items-center gap-3 px-4 py-2.5">
             <input
               type="text"
               value={inputValue}
@@ -328,23 +316,23 @@ export function AIGenerator() {
               onKeyDown={(e) => e.key === 'Enter' && !isBusy && handleSend()}
               placeholder={t('ai.placeholder')}
               disabled={isBusy}
-              className="flex-1 h-12 px-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-all"
+              className="flex-1 text-[15px] text-black placeholder:text-[#c7c7cc] focus:outline-none bg-transparent disabled:opacity-50"
             />
-
             <button
               onClick={handleSend}
               disabled={!inputValue.trim() || isBusy}
-              className={`w-12 h-12 flex items-center justify-center rounded-xl transition-all transform hover:scale-105 active:scale-95 ${
+              className={`w-9 h-9 rounded-full flex items-center justify-center ${ds.press} ${ds.transition} flex-shrink-0 ${
                 inputValue.trim() && !isBusy
-                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600'
+                  ? `bg-[#f97316] ${ds.shadowOrange}`
+                  : 'bg-[#e5e5ea]'
               }`}
               aria-label={t('ai.sendMessage')}
             >
-              <Send className="w-5 h-5" strokeWidth={2} />
+              <Send className={`w-4 h-4 ${inputValue.trim() && !isBusy ? 'text-white' : 'text-[#c7c7cc]'}`} />
             </button>
           </div>
         </div>
+
       </div>
 
       {showClientPicker && (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Download, Share2, MessageCircle, Home as HomeIcon, User, Plus, CheckCircle, Copy, CreditCard as Edit3 } from 'lucide-react';
+import { ChevronLeft, Download, Share2, MessageCircle, Home as HomeIcon, User, Plus, CheckCircle, Copy, CreditCard as Edit3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { getTemplate } from '../templates';
@@ -15,6 +15,7 @@ import {
   canUseNativeShare
 } from '../lib/shareUtils';
 import { calculateDocumentStatus, getStatusLabel, getStatusColor } from '../lib/statusManager';
+import { ds, statusBadge } from '../lib/designSystem';
 import { EditableInvoiceLayout } from './EditableInvoiceLayout';
 import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
 import type { LineItem } from './EditableLineItems';
@@ -342,10 +343,10 @@ export function InvoiceDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className={`min-h-screen ${ds.bg} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading invoice...</p>
+          <div className="w-16 h-16 border-4 border-[#f97316] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className={`${ds.callout} text-[#8e8e93]`}>Loading invoice...</p>
         </div>
       </div>
     );
@@ -353,12 +354,9 @@ export function InvoiceDetail() {
 
   if (!document) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-        <p className="text-gray-600 mb-4">Invoice not found</p>
-        <button
-          onClick={() => setCurrentScreen('home')}
-          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
-        >
+      <div className={`min-h-screen ${ds.bg} flex flex-col items-center justify-center p-6`}>
+        <p className={`${ds.callout} text-[#8e8e93] mb-4`}>Invoice not found</p>
+        <button onClick={() => setCurrentScreen('home')} className={ds.btnPrimary}>
           Back to Home
         </button>
       </div>
@@ -433,163 +431,170 @@ export function InvoiceDetail() {
   const statusLabel = getStatusLabel(document);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col pb-24">
-      <div className="bg-white p-4 sm:p-6 border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            onClick={() => setCurrentScreen('home')}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-700" strokeWidth={2} />
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">Invoice {document.document_number}</h1>
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-xs sm:text-sm text-gray-600 truncate">
-                {document.client_name} • {new Date(document.created_at).toLocaleDateString()}
-              </p>
-              <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${statusColors.bg} ${statusColors.text} ${statusColors.darkBg} ${statusColors.darkText}`}>
-                {statusLabel}
-              </span>
+    <div className={`min-h-screen ${ds.bg} pb-28`}>
+      {/* Sub-screen header */}
+      <div className="flex items-center justify-between px-4 pt-12 pb-4 bg-[#f2f2f7]">
+        <button onClick={() => setCurrentScreen('home')} className={ds.headerIconBtn}>
+          <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
+        </button>
+        <p className={`${ds.headline} text-black`}>{document.document_number}</p>
+        <button
+          onClick={() => setCurrentScreen('invoice-editor')}
+          className={`${ds.headerIconBtn} bg-[#f97316] border-[#f97316]`}
+        >
+          <Edit3 className="w-4 h-4 text-white" />
+        </button>
+      </div>
+
+      <div className="px-4 flex flex-col gap-3 pt-3">
+        {/* Hero card */}
+        <div className={`bg-white rounded-[20px] p-5 ${ds.shadow1}`}>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className={`${ds.title2} text-black ${ds.numeric}`}>{formatCurrency(document.total)}</p>
+              <p className={`${ds.footnote} text-[#8e8e93] mt-0.5`}>{document.client_name}</p>
             </div>
+            <span className={statusBadge(currentStatus as 'draft' | 'sent' | 'paid' | 'overdue' | 'viewed')}>
+              {statusLabel}
+            </span>
           </div>
+
+          {/* Progress bar */}
+          {(() => {
+            const progressSteps = ['Draft', 'Sent', 'Viewed', 'Paid'];
+            const activeIdx = Math.max(0, progressSteps.findIndex(s => s.toLowerCase() === currentStatus));
+            return (
+              <>
+                <div className="flex gap-1.5">
+                  {progressSteps.map((_, i) => (
+                    <div key={i} className={`flex-1 h-1 rounded-full ${i <= activeIdx ? 'bg-[#f97316]' : 'bg-[#e5e5ea]'}`} />
+                  ))}
+                </div>
+                <div className="flex justify-between mt-1.5">
+                  {progressSteps.map((s, i) => (
+                    <span key={s} className={`text-[10px] font-bold ${i <= activeIdx ? 'text-[#f97316]' : 'text-[#c7c7cc]'}`}>{s}</span>
+                  ))}
+                </div>
+              </>
+            );
+          })()}
+        </div>
+
+        {/* Details grouped card */}
+        <div>
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>DETAILS</p>
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            {[
+              { label: 'Client',     value: document.client_name },
+              { label: 'Issue date', value: document.issue_date },
+              { label: 'Due date',   value: document.due_date },
+              { label: 'Subtotal',   value: formatCurrency(document.subtotal) },
+              ...(document.tax_total > 0 ? [{ label: 'Tax', value: formatCurrency(document.tax_total) }] : []),
+              { label: 'Total',      value: formatCurrency(document.total) },
+            ].map(({ label, value }, idx, arr) => (
+              <div key={label} className={`flex items-center justify-between px-4 py-3 ${idx < arr.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
+                <span className={`${ds.callout} text-[#8e8e93]`}>{label}</span>
+                <span className={`${ds.callout} font-semibold text-black`}>{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Invoice preview */}
+        <div>
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>PREVIEW</p>
+          <div ref={invoiceRef} className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-x-hidden">
+            <EditableInvoiceLayout
+              data={invoiceData}
+              document={document}
+              lineItems={lineItems}
+              onUpdate={handleUpdateField}
+              onUpdateLineItems={handleUpdateLineItems}
+              styles={templateStyles}
+            />
+          </div>
+        </div>
+
+        {/* Primary action row */}
+        <div className="flex gap-3 mt-1">
           <button
-            onClick={() => setCurrentScreen('invoice-editor')}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-medium hover:shadow-lg transition-all"
+            onClick={handleExportPDF}
+            disabled={isExporting}
+            className={`flex-1 ${ds.btnSecondary} flex items-center justify-center gap-2 disabled:opacity-50`}
           >
-            <Edit3 className="w-4 h-4" />
-            <span className="hidden sm:inline">Edit</span>
+            {isExporting ? (
+              <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Download className="w-5 h-5" strokeWidth={2} />
+            )}
+            <span>{isExporting ? 'Generating...' : 'Export PDF'}</span>
+          </button>
+          <button
+            onClick={handleShare}
+            disabled={isSharing}
+            className={`flex-1 ${ds.btnPrimary} flex items-center justify-center gap-2 disabled:opacity-50`}
+          >
+            {isSharing ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Share2 className="w-5 h-5" strokeWidth={2} />
+            )}
+            <span>{isSharing ? 'Sharing...' : 'Share'}</span>
+          </button>
+        </div>
+
+        {/* Secondary actions */}
+        <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <button
+            onClick={handleWhatsAppShare}
+            disabled={isWhatsAppSharing}
+            className="w-full px-4 py-3 flex items-center gap-3 border-b border-[#f2f2f7] disabled:opacity-50"
+          >
+            <MessageCircle className="w-5 h-5 text-[#25d366]" strokeWidth={2} />
+            <span className={`${ds.callout} font-semibold text-black`}>
+              {isWhatsAppSharing ? 'Opening WhatsApp...' : 'Share via WhatsApp'}
+            </span>
+          </button>
+          {currentStatus !== 'paid' && currentStatus !== 'cancelled' && (
+            <button
+              onClick={handleMarkAsPaid}
+              disabled={isMarkingPaid}
+              className="w-full px-4 py-3 flex items-center gap-3 border-b border-[#f2f2f7] disabled:opacity-50"
+            >
+              <CheckCircle className="w-5 h-5 text-[#34c759]" strokeWidth={2} />
+              <span className={`${ds.callout} font-semibold text-black`}>
+                {isMarkingPaid ? 'Marking...' : 'Mark as Paid'}
+              </span>
+            </button>
+          )}
+          <button
+            onClick={handleDuplicate}
+            disabled={isDuplicating}
+            className="w-full px-4 py-3 flex items-center gap-3 disabled:opacity-50"
+          >
+            <Copy className="w-5 h-5 text-[#007aff]" strokeWidth={2} />
+            <span className={`${ds.callout} font-semibold text-black`}>
+              {isDuplicating ? 'Duplicating...' : 'Duplicate Invoice'}
+            </span>
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-0 sm:p-4 md:p-6">
-        <div ref={invoiceRef} className="max-w-4xl mx-auto bg-white sm:rounded-xl sm:shadow-xl overflow-x-hidden mb-4 sm:mb-6">
-          <EditableInvoiceLayout
-            data={invoiceData}
-            document={document}
-            lineItems={lineItems}
-            onUpdate={handleUpdateField}
-            onUpdateLineItems={handleUpdateLineItems}
-            styles={templateStyles}
-          />
-        </div>
-
-        <div className="max-w-4xl mx-auto space-y-3 sm:space-y-4 px-4 sm:px-0">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            <button
-              onClick={handleExportPDF}
-              disabled={isExporting}
-              className="bg-white border-2 border-gray-200 text-gray-900 py-4 px-6 rounded-xl font-semibold hover:border-gray-300 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isExporting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <>
-                  <Download className="w-5 h-5" strokeWidth={2} />
-                  <span>Export PDF</span>
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleWhatsAppShare}
-              disabled={isWhatsAppSharing}
-              className="bg-white border-2 border-green-500 text-green-600 py-4 px-6 rounded-xl font-semibold hover:bg-green-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isWhatsAppSharing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sharing...</span>
-                </>
-              ) : (
-                <>
-                  <MessageCircle className="w-5 h-5" strokeWidth={2} />
-                  <span>WhatsApp</span>
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleShare}
-              disabled={isSharing}
-              className="bg-white border-2 border-orange-500 text-orange-600 py-4 px-6 rounded-xl font-semibold hover:bg-orange-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSharing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sharing...</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-5 h-5" strokeWidth={2} />
-                  <span>Share</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {currentStatus !== 'paid' && currentStatus !== 'cancelled' && (
-              <button
-                onClick={handleMarkAsPaid}
-                disabled={isMarkingPaid}
-                className="bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isMarkingPaid ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Marking...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" strokeWidth={2} />
-                    <span>Mark as Paid</span>
-                  </>
-                )}
-              </button>
-            )}
-
-            <button
-              onClick={handleDuplicate}
-              disabled={isDuplicating}
-              className={`bg-white border-2 border-blue-500 text-blue-600 py-4 px-6 rounded-xl font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                currentStatus === 'paid' || currentStatus === 'cancelled' ? 'sm:col-span-2' : ''
-              }`}
-            >
-              {isDuplicating ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Duplicating...</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-5 h-5" strokeWidth={2} />
-                  <span>Duplicate Invoice</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      {/* Tab bar */}
+      <div className={`fixed bottom-0 left-0 right-0 ${ds.tabBar} px-6 py-4`}>
         <div className="flex items-center justify-around relative">
           <button
             onClick={() => setCurrentScreen('home')}
-            className="flex flex-col items-center gap-1 text-gray-400"
+            className="flex flex-col items-center gap-1 text-[#8e8e93]"
           >
             <HomeIcon className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Home</span>
+            <span className="text-[10px] font-medium">Home</span>
           </button>
 
           <div className="relative">
             <button
               onClick={() => setCurrentScreen('ai-generator')}
-              className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg absolute -top-8 left-1/2 -translate-x-1/2"
+              className={`w-14 h-14 bg-[#f97316] rounded-full flex items-center justify-center ${ds.shadowOrange} absolute -top-8 left-1/2 -translate-x-1/2`}
             >
               <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
             </button>
@@ -597,10 +602,10 @@ export function InvoiceDetail() {
 
           <button
             onClick={() => setCurrentScreen('profile')}
-            className="flex flex-col items-center gap-1 text-gray-400"
+            className="flex flex-col items-center gap-1 text-[#8e8e93]"
           >
             <User className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Profile</span>
+            <span className="text-[10px] font-medium">Profile</span>
           </button>
         </div>
       </div>
