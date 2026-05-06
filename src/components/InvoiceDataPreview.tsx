@@ -1,5 +1,6 @@
 import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Edit } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 
 export function InvoiceDataPreview() {
   const { invoiceDraft, setCurrentScreen, selectedClient, formatCurrency } = useApp();
@@ -166,7 +167,7 @@ export function InvoiceDataPreview() {
           </button>
           <button
             onClick={handleLooksGood}
-            className="flex-1 h-14 flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform active:scale-95"
+            className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95`}
           >
             Looks Good
             <ArrowRight className="w-5 h-5" strokeWidth={2.5} />

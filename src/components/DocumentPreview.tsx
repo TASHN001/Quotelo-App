@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { ds } from '../lib/designSystem';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { getTemplate, getMockInvoiceData } from '../templates';
@@ -158,7 +159,7 @@ export function DocumentPreview() {
           <button
             onClick={handleSaveInvoice}
             disabled={isSaving || !invoiceDraft}
-            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow text-sm sm:text-base flex-shrink-0 disabled:opacity-50"
+            className={`px-4 sm:px-6 py-2 sm:py-3 ${ds.btnPrimary} text-sm sm:text-base flex-shrink-0 disabled:opacity-50`}
           >
             {isSaving ? (
               <div className="flex items-center gap-2">

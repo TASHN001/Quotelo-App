@@ -636,7 +636,7 @@ export function DashboardOverview() {
               </div>
 
               {projectedRevenue && (
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
+                <div className="bg-[#fff7ed] rounded-xl p-4 border border-orange-100">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="w-4 h-4 text-orange-600" />
                     <h4 className="text-sm font-medium text-gray-900">Projected Revenue This Month</h4>

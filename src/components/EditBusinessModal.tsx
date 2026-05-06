@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Upload, Loader } from 'lucide-react';
+import { ds } from '../lib/designSystem';
 import { Business } from '../lib/types';
 import { storage } from '../lib/storage';
 import { INDUSTRY_CATEGORIES, IndustryGroup, getIndustryTypes } from '../lib/industryData';
@@ -196,7 +197,7 @@ export function EditBusinessModal({ business, onClose, onSave, userId }: EditBus
                   />
                 </div>
               ) : (
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 bg-[#f97316] rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-2xl">
                     {formData.business_name.charAt(0) || 'B'}
                   </span>
@@ -502,7 +503,7 @@ export function EditBusinessModal({ business, onClose, onSave, userId }: EditBus
           <button
             onClick={handleSave}
             disabled={!isValid || isSaving || isUploadingLogo}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex-1 ${ds.btnPrimary} py-3 disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>

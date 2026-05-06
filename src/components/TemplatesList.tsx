@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Home as HomeIcon, User, Briefcase } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 import { TemplatePreviewCard } from './TemplatePreviewCard';
 import { MinimalInvoice } from '../templates/invoice/Minimal';
 import { ModernInvoice } from '../templates/invoice/Modern';
@@ -182,7 +183,7 @@ export function TemplatesList() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4">
+      <div className="sticky bottom-0 bg-white border-t border-[#f2f2f7] px-6 py-4">
         <div className="flex items-center justify-around relative">
           <button
             onClick={() => setCurrentScreen('home')}
@@ -195,7 +196,7 @@ export function TemplatesList() {
           <div className="relative">
             <button
               onClick={() => setCurrentScreen('ai-generator')}
-              className="w-14 h-14 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg absolute -top-8 left-1/2 -translate-x-1/2"
+              className="w-14 h-14 bg-[#f97316] rounded-full flex items-center justify-center shadow-lg absolute -top-8 left-1/2 -translate-x-1/2"
             >
               <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
             </button>

@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { CURRENCIES } from '../lib/currency';
 import type { Client } from '../lib/types';
+import { ds } from '../lib/designSystem';
 
 interface ClientFormProps {
   isOpen: boolean;
@@ -241,7 +242,7 @@ export function ClientForm({ isOpen, onClose, client, onSave }: ClientFormProps)
           <button
             onClick={handleSubmit}
             disabled={isSaving}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow disabled:opacity-50"
+            className={`flex-1 px-6 py-3 ${ds.btnPrimary} disabled:opacity-50`}
           >
             {isSaving ? (
               <div className="flex items-center justify-center gap-2">

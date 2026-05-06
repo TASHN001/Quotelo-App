@@ -84,7 +84,7 @@ export function Chat() {
             </div>
           ) : (
             <div key={message.id} className="max-w-[80%] self-end">
-              <div className="bg-[#f97316] rounded-xl rounded-br-[4px] px-4 py-3 shadow-[0_4px_12px_rgba(249,115,22,0.25)]">
+              <div className="bg-[#007aff] rounded-xl rounded-br-[4px] px-4 py-3 shadow-[0_4px_12px_rgba(0,122,255,0.25)]">
                 <p className={`${ds.callout} text-white leading-relaxed`}>{message.content}</p>
               </div>
             </div>

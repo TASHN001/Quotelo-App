@@ -389,7 +389,7 @@ export function Profile() {
               <button
                 onClick={confirmSignOut}
                 disabled={isSigningOut}
-                className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow disabled:opacity-50"
+                className={`flex-1 ${ds.btnPrimary} py-3 disabled:opacity-50`}
               >
                 {isSigningOut ? t('modal.signingOut') : t('profile.signOut')}
               </button>

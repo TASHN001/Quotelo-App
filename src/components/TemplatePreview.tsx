@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 import { MinimalInvoice } from '../templates/invoice/Minimal';
 import { ModernInvoice } from '../templates/invoice/Modern';
 import { getSampleInvoiceData, TEMPLATE_METADATA } from '../lib/sampleData';
@@ -57,7 +58,7 @@ export function TemplatePreview() {
           <p className="text-gray-600 mb-4">Template not found</p>
           <button
             onClick={() => setCurrentScreen('templates-list')}
-            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className={`px-6 py-3 ${ds.btnPrimary}`}
           >
             Back to Templates
           </button>
@@ -93,7 +94,7 @@ export function TemplatePreview() {
         <button
           onClick={handleSelectTemplate}
           disabled={isSelecting}
-          className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className={`w-full ${ds.btnPrimary} py-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
         >
           {isSelecting ? (
             <>

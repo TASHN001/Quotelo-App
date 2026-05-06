@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Download, Share2, MessageCircle, Home as HomeIcon, User, Plus, CheckCircle, Copy, CreditCard as Edit3 } from 'lucide-react';
+import { ChevronLeft, Download, Share2, MessageCircle, CheckCircle, Copy, CreditCard as Edit3 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { getTemplate } from '../templates';
@@ -580,35 +580,6 @@ export function InvoiceDetail() {
         </div>
       </div>
 
-      {/* Tab bar */}
-      <div className={`fixed bottom-0 left-0 right-0 ${ds.tabBar} px-6 py-4`}>
-        <div className="flex items-center justify-around relative">
-          <button
-            onClick={() => setCurrentScreen('home')}
-            className="flex flex-col items-center gap-1 text-[#8e8e93]"
-          >
-            <HomeIcon className="w-6 h-6" strokeWidth={2} />
-            <span className="text-[10px] font-medium">Home</span>
-          </button>
-
-          <div className="relative">
-            <button
-              onClick={() => setCurrentScreen('ai-generator')}
-              className={`w-14 h-14 bg-[#f97316] rounded-full flex items-center justify-center ${ds.shadowOrange} absolute -top-8 left-1/2 -translate-x-1/2`}
-            >
-              <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-            </button>
-          </div>
-
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="flex flex-col items-center gap-1 text-[#8e8e93]"
-          >
-            <User className="w-6 h-6" strokeWidth={2} />
-            <span className="text-[10px] font-medium">Profile</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

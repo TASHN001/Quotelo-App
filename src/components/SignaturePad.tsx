@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Undo2, Redo2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ds } from '../lib/designSystem';
 
 interface SignaturePadProps {
   onSave?: (dataUrl: string, setAsDefault: boolean, includeAutomatically: boolean) => void;
@@ -284,7 +285,7 @@ export function SignaturePad({
       <button
         onClick={handleSave}
         disabled={isEmpty}
-        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`w-full ${ds.btnPrimary} py-3 disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         Save Signature
       </button>

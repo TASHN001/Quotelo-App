@@ -183,8 +183,8 @@ export function ReminderSettingsScreen() {
                   <p className={`${ds.footnote} text-[#8e8e93]`}>{option.description}</p>
                 </div>
                 {settings.reminder_frequency === option.value && (
-                  <div className="w-6 h-6 bg-[#f97316] rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full" />
+                  <div className="w-6 h-6 bg-[#fff7ed] rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-[#c2410c] rounded-full" />
                   </div>
                 )}
               </button>
