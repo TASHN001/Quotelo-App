@@ -375,7 +375,7 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
         <img
           src={AI_BADGE_LOGO}
           alt="Logo"
-          className="h-8 object-contain"
+          className="h-5 object-contain"
           onError={(e) => {
             e.currentTarget.style.display = 'none';
           }}

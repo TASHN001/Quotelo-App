@@ -41,7 +41,7 @@ interface OnboardingState {
 }
 
 export function Onboarding() {
-  const { setCurrentScreen, dbUserProfile, business, refreshProfile, setDraftDocumentData } = useApp();
+  const { setCurrentScreen, dbUserProfile, business, refreshProfile, setDraftDocumentData, setSelectedTemplateKey } = useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getUserId = async (): Promise<string | null> => {
@@ -335,6 +335,7 @@ export function Onboarding() {
     console.log('[Onboarding] Step 7: Generating sample invoice...');
     const sampleData = getSampleInvoiceData();
     setDraftDocumentData(sampleData);
+    setSelectedTemplateKey('invoice-minimal');
     setCurrentScreen('document-preview');
   };
 

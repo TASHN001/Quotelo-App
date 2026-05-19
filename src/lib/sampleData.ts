@@ -6,14 +6,14 @@ export function getSampleInvoiceData(): InvoiceData {
       name: 'Your Business Name',
       email: 'hello@yourbusiness.com',
       phone: '+1 234 567 8900',
-      address: '123 Business Street, City',
+      address: { street: '123 Business Street', city: 'City', postalCode: '', country: '' },
       logoUrl: undefined
     },
     client: {
       name: 'Recipient Name',
       email: 'client@email.com',
       phone: undefined,
-      address: 'Client Company'
+      address: { street: 'Client Company', city: '', postalCode: '', country: '' }
     },
     invoice: {
       number: 'INV-000001',

@@ -144,10 +144,10 @@ export function normalizeInvoiceDraft(
     notes: draft?.notes || undefined,
     paymentDetails,
     paymentInstructions: business?.payment_instructions,
-    paymentTerms: {
+    paymentTerms: formatPaymentTermsString(JSON.stringify({
       dueType: 'net_30',
       latePaymentNotice: 'Late payments may incur fees or result in service suspension.'
-    },
+    })),
     footer: 'Thank you for your business!',
     signatureDataUrl
   };

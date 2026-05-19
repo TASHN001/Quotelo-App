@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, FileDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { ClientForm } from './ClientForm';
 import { ds, statusBadge } from '../lib/designSystem';
+import { downloadBlob } from '../lib/shareUtils';
 import type { Client, Document } from '../lib/types';
 
 export function ClientDetails() {
@@ -53,6 +54,75 @@ export function ClientDetails() {
     setCurrentScreen('ai-generator');
   };
 
+  const handleDownloadStatement = async () => {
+    if (!client || documents.length === 0) return;
+
+    const d = window.document;
+    const container = d.createElement('div');
+    Object.assign(container.style, { position: 'absolute', left: '-9999px', fontFamily: 'sans-serif', padding: '40px', maxWidth: '700px' });
+
+    const h1 = d.createElement('h1');
+    h1.textContent = 'Customer Statement';
+    Object.assign(h1.style, { fontSize: '24px', fontWeight: '700', marginBottom: '4px' });
+    container.appendChild(h1);
+
+    const sub = d.createElement('p');
+    sub.textContent = `Client: ${client.name}   •   Generated ${new Date().toLocaleDateString('en-ZA')}`;
+    Object.assign(sub.style, { color: '#888', marginBottom: '24px' });
+    container.appendChild(sub);
+
+    const table = d.createElement('table');
+    Object.assign(table.style, { width: '100%', borderCollapse: 'collapse' });
+
+    const thead = d.createElement('thead');
+    const headRow = d.createElement('tr');
+    Object.assign(headRow.style, { background: '#f97316', color: 'white' });
+    ['Invoice', 'Issued', 'Due', 'Amount', 'Status'].forEach((label, i) => {
+      const th = d.createElement('th');
+      th.textContent = label;
+      Object.assign(th.style, { padding: '10px 12px', textAlign: i === 3 ? 'right' : 'left', fontWeight: '600' });
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = d.createElement('tbody');
+    documents.forEach(doc => {
+      const tr = d.createElement('tr');
+      const cells: [string, 'left' | 'right'][] = [
+        [doc.document_number, 'left'],
+        [doc.issue_date, 'left'],
+        [doc.due_date, 'left'],
+        [doc.total.toLocaleString('en-ZA', { style: 'currency', currency: doc.currency || 'ZAR' }), 'right'],
+        [doc.status, 'left'],
+      ];
+      cells.forEach(([val, align]) => {
+        const td = d.createElement('td');
+        td.textContent = val;
+        Object.assign(td.style, { padding: '8px 12px', borderBottom: '1px solid #f2f2f7', textAlign: align });
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    d.body.appendChild(container);
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      const blob = await html2pdf().set({
+        margin: 10,
+        filename: `Statement-${client.name}.pdf`,
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      }).from(container).outputPdf('blob');
+      downloadBlob(blob as Blob, `Statement-${client.name}.pdf`);
+    } finally {
+      d.body.removeChild(container);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={`min-h-screen ${ds.bg} flex items-center justify-center`}>
@@ -88,12 +158,23 @@ export function ClientDetails() {
           <h1 className={`${ds.title2} text-black truncate`}>{client?.name || 'Client'}</h1>
           <p className={`${ds.footnote} text-[#8e8e93]`}>{client?.company_name}</p>
         </div>
-        <button
-          onClick={handleCreateInvoice}
-          className={`px-3 py-2 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.transition} ${ds.press} ${ds.shadowOrange}`}
-        >
-          + Invoice
-        </button>
+        <div className="flex items-center gap-2">
+          {documents.length > 0 && (
+            <button
+              onClick={handleDownloadStatement}
+              className={`p-2 bg-white rounded-xl border border-[#e5e5ea] ${ds.transition} ${ds.press}`}
+              title="Download Statement"
+            >
+              <FileDown className="w-4 h-4 text-[#3c3c43]" />
+            </button>
+          )}
+          <button
+            onClick={handleCreateInvoice}
+            className={`px-3 py-2 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.transition} ${ds.press} ${ds.shadowOrange}`}
+          >
+            + Invoice
+          </button>
+        </div>
       </div>
 
       <div className="px-4 flex flex-col gap-4">

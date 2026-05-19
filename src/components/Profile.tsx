@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Plus, Home as HomeIcon, User, CreditCard, Settings, Shield, LogOut, X, Pen, Building, Scale, FileCheck } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Plus, Home as HomeIcon, User, CreditCard, Settings, Shield, LogOut, X, Pen, Building, Scale, FileCheck, Star, Zap, Mail } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { SignaturePad } from './SignaturePad';
 import { EditBusinessModal } from './EditBusinessModal';
@@ -21,13 +21,36 @@ const LEGAL_ITEMS = [
 ];
 
 export function Profile() {
-  const { business, dbUserProfile, setCurrentScreen, handleSignOut, showToast, refreshProfile, t } = useApp();
+  const { business, dbUserProfile, setCurrentScreen, handleSignOut, showToast, refreshProfile, t, authUser } = useApp();
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showEditBusinessModal, setShowEditBusinessModal] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [isSendingFeedback, setIsSendingFeedback] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedbackRating || !authUser) return;
+    setIsSendingFeedback(true);
+    try {
+      const { supabase } = await import('../lib/supabase');
+      await supabase.from('feedback').insert({
+        user_id: authUser.id,
+        rating: feedbackRating,
+        message: feedbackMessage.trim() || null,
+      });
+      setFeedbackSent(true);
+      showToast('Thank you for your feedback!', 'success');
+    } catch {
+      showToast('Failed to send feedback. Please try again.', 'error');
+    } finally {
+      setIsSendingFeedback(false);
+    }
+  };
 
   const confirmSignOut = async () => {
     setIsSigningOut(true);
@@ -254,6 +277,87 @@ export function Profile() {
             </div>
           </div>
         ))}
+
+        {/* Upgrade Plan */}
+        <div className="mb-4">
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>PLAN</p>
+          <div className="bg-white rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-[#fff7ed] rounded-xl flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-[#f97316]" strokeWidth={2} />
+                </div>
+                <div>
+                  <p className={`${ds.callout} text-black font-semibold`}>Free Plan</p>
+                  <p className={`${ds.footnote} text-[#8e8e93]`}>Upgrade for unlimited invoices</p>
+                </div>
+              </div>
+              <button
+                onClick={() => showToast('Upgrade coming soon!', 'info')}
+                className={`px-4 py-2 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.shadowOrange} ${ds.press} ${ds.transition}`}
+              >
+                Upgrade
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Feedback */}
+        <div className="mb-4">
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>FEEDBACK</p>
+          <div className="bg-white rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            {feedbackSent ? (
+              <div className="text-center py-2">
+                <Star className="w-8 h-8 text-[#f97316] mx-auto mb-2" fill="#f97316" />
+                <p className={`${ds.callout} text-black font-semibold`}>Thank you!</p>
+                <p className={`${ds.footnote} text-[#8e8e93] mt-1`}>Your feedback helps us improve.</p>
+              </div>
+            ) : (
+              <>
+                <p className={`${ds.callout} text-black font-semibold mb-3`}>Rate Quotelo</p>
+                <div className="flex gap-2 mb-3">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      onClick={() => setFeedbackRating(star)}
+                      className={`${ds.press} ${ds.transition}`}
+                    >
+                      <Star
+                        className="w-7 h-7"
+                        strokeWidth={1.5}
+                        fill={star <= feedbackRating ? '#f97316' : 'transparent'}
+                        color={star <= feedbackRating ? '#f97316' : '#c7c7cc'}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={e => setFeedbackMessage(e.target.value)}
+                  placeholder="Tell us what you think... (optional)"
+                  rows={3}
+                  className={`${ds.input} resize-none text-sm mb-3`}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleFeedbackSubmit}
+                    disabled={!feedbackRating || isSendingFeedback}
+                    className={`flex-1 py-2.5 bg-[#f97316] text-white rounded-xl ${ds.callout} font-semibold ${ds.shadowOrange} ${ds.press} ${ds.transition} disabled:opacity-40`}
+                  >
+                    {isSendingFeedback ? 'Sending...' : 'Send Feedback'}
+                  </button>
+                  <a
+                    href="mailto:support@quotelo.app?subject=Feedback"
+                    className={`flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#f2f2f7] text-[#3c3c43] rounded-xl ${ds.callout} font-semibold ${ds.press} ${ds.transition}`}
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </a>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Sign Out */}
         <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] mt-2 mb-6">

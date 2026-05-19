@@ -23,7 +23,7 @@ export function ProfileDataScreen() {
   };
 
   return (
-    <div className={`min-h-screen ${ds.bg}`}>
+    <div className={`h-screen overflow-y-auto ${ds.bg}`}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-12 pb-4">
         <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>

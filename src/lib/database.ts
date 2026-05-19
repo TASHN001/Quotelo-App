@@ -577,7 +577,7 @@ export const db = {
       .from('clients')
       .select('*')
       .eq('user_id', userId)
-      .order('updated_at', { ascending: false });
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('[DB] Error fetching clients:', error);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Download, Share2, MessageCircle, CheckCircle, Copy, CreditCard as Edit3 } from 'lucide-react';
+import { ChevronLeft, Download, Share2, MessageCircle, CheckCircle, Copy, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { getTemplate } from '../templates';
@@ -20,6 +20,7 @@ import { EditableInvoiceLayout } from './EditableInvoiceLayout';
 import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
 import type { LineItem } from './EditableLineItems';
 import type { Document, DocumentLineItem, InvoiceData } from '../lib/types';
+import type { Currency } from '../lib/currency';
 
 export function InvoiceDetail() {
   const { setCurrentScreen, business, savedDocumentId, setSavedDocumentId, dbUserProfile, formatCurrency, showToast, authUser } = useApp();
@@ -203,7 +204,7 @@ export function InvoiceDetail() {
       const shareMessage = createInvoiceShareMessage(
         invoiceData,
         business?.business_name,
-        formatCurrency(0).replace('0', '').trim()
+        (document.currency || business?.default_currency || 'ZAR') as Currency
       );
 
       if (canUseNativeShare()) {
@@ -268,19 +269,21 @@ export function InvoiceDetail() {
       const filename = getInvoiceFilename(document.document_number);
       const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
 
-      const uploadResult = await storage.uploadPDF(pdfBlob, filename, authUser.id);
-
-      if (uploadResult.error || !uploadResult.url) {
-        throw new Error(uploadResult.error || 'Failed to upload PDF');
-      }
-
       const shareMessage = createInvoiceShareMessage(
         invoiceData,
         business?.business_name,
-        formatCurrency(0).replace('0', '').trim()
+        (document.currency || business?.default_currency || 'ZAR') as Currency
       );
 
-      const whatsappMessage = `${shareMessage}\n\nDownload PDF: ${uploadResult.url}`;
+      let whatsappMessage = shareMessage;
+      try {
+        const uploadResult = await storage.uploadPDF(pdfBlob, filename, authUser.id);
+        if (uploadResult.url && !uploadResult.error) {
+          whatsappMessage = `${shareMessage}\n\nDownload PDF: ${uploadResult.url}`;
+        }
+      } catch {
+        // proceed without PDF link
+      }
 
       openWhatsApp(whatsappMessage, document.client_phone);
       showToast('Opening WhatsApp...', 'success');
@@ -440,9 +443,10 @@ export function InvoiceDetail() {
         <p className={`${ds.headline} text-black`}>{document.document_number}</p>
         <button
           onClick={() => setCurrentScreen('invoice-editor')}
-          className={`${ds.headerIconBtn} bg-[#f97316] border-[#f97316]`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.shadowOrange} ${ds.press} ${ds.transition}`}
         >
-          <Edit3 className="w-4 h-4 text-white" />
+          <Pencil className="w-3.5 h-3.5" strokeWidth={2.5} />
+          Edit
         </button>
       </div>
 

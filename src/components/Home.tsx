@@ -17,6 +17,7 @@ export function Home() {
   const { userProfile, recentInvoices, isLoading, setCurrentScreen, setSavedDocumentId, setDraftDocumentData, formatCurrency, showToast, setSelectedClient } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const [menuOpenAbove, setMenuOpenAbove] = useState(false);
   const [showClientPicker, setShowClientPicker] = useState(false);
 
   const isInvoiceOverdue = (invoice: any) => {
@@ -271,7 +272,7 @@ export function Home() {
                       </span>
                     </div>
                     <button
-                      onClick={e => { e.stopPropagation(); setActiveMenuId(activeMenuId === invoice.id ? null : invoice.id); }}
+                      onClick={e => { e.stopPropagation(); const rect = (e.currentTarget as HTMLElement).getBoundingClientRect(); setMenuOpenAbove(rect.bottom > window.innerHeight - 150); setActiveMenuId(activeMenuId === invoice.id ? null : invoice.id); }}
                       className={`p-1.5 rounded-lg ${ds.transition} flex-shrink-0`}
                     >
                       <MoreVertical className="w-4 h-4 text-[#c7c7cc]" />
@@ -281,7 +282,7 @@ export function Home() {
                   {activeMenuId === invoice.id && (
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setActiveMenuId(null)} />
-                      <div className={`absolute right-3 top-full mt-1 w-44 bg-white ${ds.radiusMd} ${ds.shadow3} z-20 overflow-hidden border border-[#e5e5ea]`}>
+                      <div className={`absolute right-3 ${menuOpenAbove ? 'bottom-full mb-1' : 'top-full mt-1'} w-44 bg-white ${ds.radiusMd} ${ds.shadow3} z-20 overflow-hidden border border-[#e5e5ea]`}>
                         {[
                           { label: 'View',         icon: Eye,         action: () => handleInvoiceClick(invoice.id) },
                           { label: 'Share',         icon: Share2,      action: (e: React.MouseEvent) => handleShare(invoice.id, e) },
