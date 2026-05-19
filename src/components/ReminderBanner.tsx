@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { ds } from '../lib/designSystem';
 import type { Document, UserReminderSettings, InvoiceReminder, OverdueInvoice } from '../lib/types';
-import { getOverdueInvoices, shouldSuggestReminder, generateReminderMessage, getReminderType } from '../lib/reminderSystem';
+import { getOverdueInvoices, shouldSuggestReminder, generateReminderMessage, getReminderType, playReminderBeep } from '../lib/reminderSystem';
 import { getOverdueDays } from '../lib/statusManager';
 import { openWhatsApp } from '../lib/shareUtils';
 import { getCurrentDate } from '../lib/dateUtils';
@@ -20,6 +20,12 @@ export function ReminderBanner() {
   useEffect(() => {
     loadData();
   }, [authUser]);
+
+  useEffect(() => {
+    if (!isLoading && overdueInvoices.length > 0 && !dismissed) {
+      playReminderBeep();
+    }
+  }, [isLoading, overdueInvoices.length, dismissed]);
 
   const loadData = async () => {
     if (!authUser) {

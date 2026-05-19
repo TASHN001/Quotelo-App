@@ -61,12 +61,59 @@ function getNextDayOfWeek(dayName: string, fromDate?: string): string {
   return targetDate.toISOString().split('T')[0];
 }
 
+function parseCalendarDate(input: string): string | null {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input.trim())) return input.trim();
+
+  const months: Record<string, number> = {
+    january:0, february:1, march:2, april:3, may:4, june:5,
+    july:6, august:7, september:8, october:9, november:10, december:11,
+    jan:0, feb:1, mar:2, apr:3, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11
+  };
+
+  const lower = input.toLowerCase().trim();
+  const patterns = [
+    /^([a-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s+(\d{4}))?$/,
+    /^(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]+)(?:\s+(\d{4}))?$/,
+  ];
+
+  for (const pattern of patterns) {
+    const m = lower.match(pattern);
+    if (!m) continue;
+    let monthStr: string, dayStr: string, yearStr: string | undefined;
+    if (isNaN(parseInt(m[1]))) {
+      monthStr = m[1]; dayStr = m[2]; yearStr = m[3];
+    } else {
+      dayStr = m[1]; monthStr = m[2]; yearStr = m[3];
+    }
+    const monthIndex = months[monthStr];
+    if (monthIndex === undefined) continue;
+    const day = parseInt(dayStr, 10);
+    const currentYear = new Date().getFullYear();
+    let year = yearStr ? parseInt(yearStr, 10) : currentYear;
+    const candidate = new Date(year, monthIndex, day);
+    if (!yearStr && candidate < new Date()) year = currentYear + 1;
+    return new Date(year, monthIndex, day).toISOString().split('T')[0];
+  }
+  return null;
+}
+
 function parseDueDate(dueDateInfo: string | null, issueDate: string): string {
   if (!dueDateInfo) {
     return addDaysToDate(issueDate, 7);
   }
 
-  const lowerInfo = dueDateInfo.toLowerCase();
+  const trimmed = dueDateInfo.trim();
+
+  // ISO date returned directly by AI
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Named calendar date e.g. "May 28", "28 June", "June 1st 2026"
+  const calendarDate = parseCalendarDate(trimmed);
+  if (calendarDate) return calendarDate;
+
+  const lowerInfo = trimmed.toLowerCase();
 
   if (lowerInfo.includes('tomorrow')) {
     return addDaysToDate(issueDate, 1);
@@ -174,7 +221,7 @@ Extraction rules:
    - If user provides multiple items with individual amounts, create multiple items
    - Remove currency symbols (R, $, etc.) and return numeric values only
    - Never invent items not mentioned in the prompt
-4. dueDateInfo: Extract due date information as natural language (e.g., "Friday", "tomorrow", "7 days", "next Monday")
+4. dueDateInfo: Extract due date. For specific calendar dates (e.g., "May 28", "the 28th", "June 1st", "28 May 2026"), return ISO format YYYY-MM-DD. For relative terms use natural language (e.g., "Friday", "tomorrow", "7 days", "next Monday"). Return null if no date mentioned.
 5. taxRate: Extract tax rate as decimal (e.g., 15% becomes 0.15). Default to 0 if not mentioned
 6. notes: Any additional notes or payment terms mentioned
 7. complete: Set to true if you have enough information to generate the invoice. Set to false if critical information is missing or ambiguous

@@ -8,7 +8,7 @@ import { SmartSuggestions } from './SmartSuggestions';
 import { Client, Document } from '../lib/types';
 import { db } from '../lib/database';
 import { isOverdue as checkOverdue } from '../lib/statusManager';
-import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
+import { getCurrentDate } from '../lib/dateUtils';
 import { ds, statusBadge } from '../lib/designSystem';
 
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
@@ -94,8 +94,11 @@ export function Home() {
       return;
     }
 
-    const timestamp = getCurrentTimestamp().toString().slice(-6);
-    const newDocNumber = `${invoice.invoiceNumber}-COPY-${timestamp}`;
+    const originalDoc = await db.getDocument(invoiceId);
+    const newDocNumber = await db.getNextDocumentNumber(
+      localStorage.getItem('quotelo_user_id') || '',
+      originalDoc?.client_id ?? null
+    );
 
     const result = await db.duplicateDocument(invoiceId, newDocNumber);
 
@@ -188,6 +191,27 @@ export function Home() {
         <SmartSuggestions />
         <ReminderBanner />
 
+        {/* Quick Actions */}
+        <div className="mb-4">
+          <p className={`${ds.caption} text-[#8e8e93] mb-2`}>QUICK ACTIONS</p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setCurrentScreen('dashboard')}
+              className={`${ds.card} p-4 text-left ${ds.transition} ${ds.press}`}
+            >
+              <p className={`${ds.headline} text-black mb-0.5`}>Dashboard</p>
+              <p className={`${ds.footnote} text-[#8e8e93]`}>Overview & stats</p>
+            </button>
+            <button
+              onClick={() => setCurrentScreen('templates-list')}
+              className={`${ds.card} p-4 text-left ${ds.transition} ${ds.press}`}
+            >
+              <p className={`${ds.headline} text-black mb-0.5`}>Templates</p>
+              <p className={`${ds.footnote} text-[#8e8e93]`}>Invoice styles</p>
+            </button>
+          </div>
+        </div>
+
         {/* Recent invoices */}
         <div className="mb-4">
           <p className={`${ds.caption} text-[#8e8e93] mb-2`}>RECENT INVOICES</p>
@@ -227,9 +251,12 @@ export function Home() {
             <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
               {filteredInvoices.map((invoice, idx) => (
                 <div key={invoice.id} className="relative">
-                  <button
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleInvoiceClick(invoice.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 ${ds.transition} ${ds.press} ${
+                    onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleInvoiceClick(invoice.id); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 cursor-pointer ${ds.transition} ${ds.press} ${
                       idx < filteredInvoices.length - 1 ? 'border-b border-[#f2f2f7]' : ''
                     }`}
                   >
@@ -249,7 +276,7 @@ export function Home() {
                     >
                       <MoreVertical className="w-4 h-4 text-[#c7c7cc]" />
                     </button>
-                  </button>
+                  </div>
 
                   {activeMenuId === invoice.id && (
                     <>

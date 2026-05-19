@@ -642,6 +642,26 @@ export const db = {
     return count || 0;
   },
 
+  async getNextDocumentNumber(userId: string, clientId?: string | null): Promise<string> {
+    let query = supabase
+      .from('documents')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    if (clientId) {
+      query = query.eq('client_id', clientId);
+    }
+
+    const { count, error } = await query;
+
+    if (error) {
+      console.error('[DB] Error counting documents for number generation:', error);
+      return `INV-${Date.now().toString().slice(-6)}`;
+    }
+
+    return `INV-${String((count || 0) + 1).padStart(3, '0')}`;
+  },
+
   async createClient(
     userId: string,
     businessId: string | undefined,

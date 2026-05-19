@@ -108,3 +108,33 @@ export function groupRemindersByUrgency(invoices: OverdueInvoice[]): {
     medium: invoices.filter(inv => inv.overdueDays >= 3 && inv.overdueDays < 7)
   };
 }
+
+function scheduleBeep(ctx: AudioContext): void {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.15);
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.35);
+}
+
+export function playReminderBeep(): void {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => scheduleBeep(ctx));
+    } else {
+      scheduleBeep(ctx);
+    }
+  } catch {
+    // silently fail if Web Audio API is unavailable
+  }
+}

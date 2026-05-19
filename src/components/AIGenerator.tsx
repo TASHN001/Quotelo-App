@@ -19,6 +19,8 @@ export function AIGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [defaultTemplate, setDefaultTemplate] = useState<string>('invoice-minimal');
   const [showClientPicker, setShowClientPicker] = useState(false);
+  const [inputMode, setInputMode] = useState<'voice' | 'text'>('voice');
+  const [textInput, setTextInput] = useState('');
 
   const shouldSendRef = useRef(false);
 
@@ -239,27 +241,64 @@ export function AIGenerator() {
               <p className={`${ds.headline} text-black mb-1`}>Converting speech...</p>
               <p className={`${ds.callout} text-[#8e8e93]`}>Processing your recording</p>
             </div>
-          ) : (
-            <div className="text-center animate-slide-up">
-              <p className={`${ds.headline} text-black mb-1`}>Tap to speak</p>
-              <p className={`${ds.callout} text-[#8e8e93]`}>Describe your invoice naturally</p>
+          ) : inputMode === 'text' ? (
+            <div className="w-full animate-slide-up">
+              <p className={`${ds.headline} text-black mb-3 text-center`}>Describe your invoice</p>
+              <textarea
+                value={textInput}
+                onChange={e => setTextInput(e.target.value)}
+                rows={5}
+                placeholder="e.g. Invoice for Acme Corp, web design R5000, due in 14 days"
+                className={`${ds.input} resize-none`}
+                disabled={isLoading}
+              />
+              <button
+                onClick={() => { if (textInput.trim()) handleSendWithTranscript(textInput); }}
+                disabled={isLoading || !textInput.trim()}
+                className={`${ds.btnPrimary} w-full mt-3 disabled:opacity-50`}
+              >
+                Generate Invoice
+              </button>
+              <button
+                onClick={() => { setInputMode('voice'); setTextInput(''); }}
+                className={`${ds.callout} text-[#f97316] font-semibold mt-3 w-full text-center`}
+              >
+                Use voice instead
+              </button>
             </div>
-          )}
+          ) : (
+            <>
+              <div className="text-center animate-slide-up">
+                <p className={`${ds.headline} text-black mb-1`}>Tap to speak</p>
+                <p className={`${ds.callout} text-[#8e8e93]`}>Describe your invoice naturally</p>
+              </div>
 
-          {/* Mic button — hidden while recording (pill takes over) */}
-          {!isListening && (
-            <button
-              onClick={handleMicClick}
-              disabled={isLoading || isTranscribing || !isSupported}
-              className={`relative w-24 h-24 flex items-center justify-center rounded-full ${ds.transition} ${ds.press} disabled:opacity-50 bg-[#f97316] ${ds.shadowOrange}`}
-              aria-label={t('ai.startVoiceInput')}
-            >
-              {isLoading || isTranscribing ? (
-                <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={2.5} />
-              ) : (
-                <Mic className="w-10 h-10 text-white" strokeWidth={2.5} />
+              {/* Mic button — hidden while recording (pill takes over) */}
+              {!isListening && (
+                <button
+                  onClick={handleMicClick}
+                  disabled={isLoading || isTranscribing || !isSupported}
+                  className={`relative w-24 h-24 flex items-center justify-center rounded-full ${ds.transition} ${ds.press} disabled:opacity-50 bg-[#f97316] ${ds.shadowOrange}`}
+                  aria-label={t('ai.startVoiceInput')}
+                >
+                  {isLoading || isTranscribing ? (
+                    <Loader2 className="w-10 h-10 text-white animate-spin" strokeWidth={2.5} />
+                  ) : (
+                    <Mic className="w-10 h-10 text-white" strokeWidth={2.5} />
+                  )}
+                </button>
               )}
-            </button>
+
+              {/* "Prefer to type?" toggle */}
+              {!isListening && !isLoading && !isTranscribing && (
+                <button
+                  onClick={() => setInputMode('text')}
+                  className={`${ds.footnote} text-[#8e8e93] underline underline-offset-2`}
+                >
+                  Prefer to type?
+                </button>
+              )}
+            </>
           )}
         </div>
 

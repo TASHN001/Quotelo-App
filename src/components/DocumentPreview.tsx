@@ -79,12 +79,7 @@ export function DocumentPreview() {
 
     setIsSaving(true);
 
-    const abbr = (business.business_name || 'INV')
-      .replace(/\s/g, '')
-      .substring(0, 3)
-      .toUpperCase();
-    const count = await db.getUserDocumentCount(authUser.id);
-    const invoiceNumber = `INV/${abbr}${String(count + 1).padStart(3, '0')}`;
+    const invoiceNumber = await db.getNextDocumentNumber(authUser.id, selectedClient?.id ?? null);
 
     const lineItems = invoiceDraft.items.map(item => ({
       name: item.description,

@@ -187,7 +187,7 @@ export function Profile() {
   };
 
   return (
-    <div className={`min-h-screen ${ds.bg} pb-28`}>
+    <div className={`h-screen overflow-y-auto ${ds.bg} pb-28`}>
       <div className="px-4 pt-14">
 
         <h1 className={`${ds.title1} text-black mb-5`}>Profile</h1>

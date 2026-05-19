@@ -7,7 +7,7 @@ import { ds, statusBadge } from '../lib/designSystem';
 import type { Client, Document } from '../lib/types';
 
 export function ClientDetails() {
-  const { setCurrentScreen, authUser, selectedClientId, setSavedDocumentId, formatCurrency } = useApp();
+  const { setCurrentScreen, authUser, selectedClientId, setSavedDocumentId, formatCurrency, setSelectedClient } = useApp();
   const [client, setClient] = useState<Client | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +47,12 @@ export function ClientDetails() {
     setCurrentScreen('invoice-detail');
   };
 
+  const handleCreateInvoice = () => {
+    if (!client) return;
+    setSelectedClient(client);
+    setCurrentScreen('ai-generator');
+  };
+
   if (isLoading) {
     return (
       <div className={`min-h-screen ${ds.bg} flex items-center justify-center`}>
@@ -82,6 +88,12 @@ export function ClientDetails() {
           <h1 className={`${ds.title2} text-black truncate`}>{client?.name || 'Client'}</h1>
           <p className={`${ds.footnote} text-[#8e8e93]`}>{client?.company_name}</p>
         </div>
+        <button
+          onClick={handleCreateInvoice}
+          className={`px-3 py-2 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.transition} ${ds.press} ${ds.shadowOrange}`}
+        >
+          + Invoice
+        </button>
       </div>
 
       <div className="px-4 flex flex-col gap-4">

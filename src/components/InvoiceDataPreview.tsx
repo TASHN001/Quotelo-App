@@ -1,25 +1,65 @@
-import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Edit } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Pencil, Check, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ds } from '../lib/designSystem';
 
 export function InvoiceDataPreview() {
-  const { invoiceDraft, setCurrentScreen, selectedClient, formatCurrency } = useApp();
+  const { invoiceDraft, setInvoiceDraft, setCurrentScreen, selectedClient, formatCurrency } = useApp();
+
+  // All useState calls MUST precede the early return to satisfy React hooks rules.
+  // States are initialised from invoiceDraft (or safe fallbacks if null).
+  const [editMode, setEditMode] = useState(false);
+  const [clientName, setClientName] = useState(invoiceDraft?.client?.name || '');
+  const [clientEmail, setClientEmail] = useState(invoiceDraft?.client?.email || '');
+  const [issueDate, setIssueDate] = useState(invoiceDraft?.issueDate || '');
+  const [dueDate, setDueDate] = useState(invoiceDraft?.dueDate || '');
+  const [notes, setNotes] = useState(invoiceDraft?.notes || '');
+  const [items, setItems] = useState(
+    (invoiceDraft?.items || []).map(i => ({ ...i }))
+  );
 
   if (!invoiceDraft) {
     setCurrentScreen('home');
     return null;
   }
 
-  const handleLooksGood = () => {
-    setCurrentScreen('document-preview');
+  const handleSaveEdits = () => {
+    const updatedItems = items.map(item => ({
+      ...item,
+      total: item.quantity * item.unitPrice,
+    }));
+    const subtotal = updatedItems.reduce((s, i) => s + i.total, 0);
+    const taxRate = invoiceDraft.subtotal > 0 ? invoiceDraft.tax / invoiceDraft.subtotal : 0;
+    const tax = subtotal * taxRate;
+
+    setInvoiceDraft({
+      ...invoiceDraft,
+      client: { name: clientName || null, email: clientEmail || null },
+      issueDate,
+      dueDate,
+      notes: notes || null,
+      items: updatedItems,
+      subtotal,
+      tax,
+      total: subtotal + tax,
+    });
+    setEditMode(false);
   };
 
-  const handleMakeChanges = () => {
-    setCurrentScreen('ai-generator');
+  const updateItem = (index: number, field: 'description' | 'quantity' | 'unitPrice', value: string) => {
+    setItems(prev => prev.map((item, i) => {
+      if (i !== index) return item;
+      return { ...item, [field]: field === 'description' ? value : (parseFloat(value) || 0) };
+    }));
   };
+
+  const inputCls = `${ds.input} text-sm py-2 mt-1`;
+
+  const cardCls = 'bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100  flex flex-col pb-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col pb-6">
+      {/* Header */}
       <div className="p-6 bg-white border-b border-gray-200">
         <div className="flex items-center justify-center mb-4">
           <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
@@ -28,54 +68,55 @@ export function InvoiceDataPreview() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Invoice Created!</h1>
         <p className="text-gray-600 text-center text-sm">
-          Review the details we extracted from your voice
+          {editMode ? 'Edit the fields below then tap Save.' : 'Review the details we extracted from your voice'}
         </p>
       </div>
 
       <div className="flex-1 p-6 space-y-4 overflow-y-auto">
-        {selectedClient && (
-          <div className="bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm animate-slide-up">
+
+        {/* Client card */}
+        {(selectedClient || invoiceDraft.client?.name) && (
+          <div className={cardCls}>
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
                 <User className="w-6 h-6 text-white" strokeWidth={2} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-xs font-semibold text-green-600 uppercase tracking-wider">Client</p>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 truncate">{selectedClient.name}</h3>
-                {selectedClient.email && (
-                  <p className="text-sm text-gray-600 truncate">{selectedClient.email}</p>
+                <p className="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">Client</p>
+                {editMode && !selectedClient ? (
+                  <>
+                    <input
+                      value={clientName}
+                      onChange={e => setClientName(e.target.value)}
+                      placeholder="Client name"
+                      className={inputCls}
+                    />
+                    <input
+                      value={clientEmail}
+                      onChange={e => setClientEmail(e.target.value)}
+                      placeholder="Email (optional)"
+                      className={`${inputCls} mt-2`}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-bold text-gray-900 truncate">
+                      {selectedClient?.name || invoiceDraft.client?.name}
+                    </h3>
+                    {(selectedClient?.email || invoiceDraft.client?.email) && (
+                      <p className="text-sm text-gray-600 truncate">
+                        {selectedClient?.email || invoiceDraft.client?.email}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {invoiceDraft.client && !selectedClient && (
-          <div className="bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                <User className="w-6 h-6 text-white" strokeWidth={2} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-xs font-semibold text-green-600 uppercase tracking-wider">Client</p>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                </div>
-                {invoiceDraft.client.name && (
-                  <h3 className="text-lg font-bold text-gray-900 truncate">{invoiceDraft.client.name}</h3>
-                )}
-                {invoiceDraft.client.email && (
-                  <p className="text-sm text-gray-600 truncate">{invoiceDraft.client.email}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        {/* Amount card */}
+        <div className={cardCls}>
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <DollarSign className="w-6 h-6 text-white" strokeWidth={2} />
@@ -95,7 +136,8 @@ export function InvoiceDataPreview() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        {/* Dates card */}
+        <div className={cardCls}>
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <Calendar className="w-6 h-6 text-white" strokeWidth={2} />
@@ -105,21 +147,35 @@ export function InvoiceDataPreview() {
                 <p className="text-xs font-semibold text-green-600 uppercase tracking-wider">Dates</p>
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               </div>
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-500">Issue Date</p>
-                  <p className="text-base font-semibold text-gray-900">{invoiceDraft.issueDate}</p>
+              {editMode ? (
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Issue Date</p>
+                    <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={inputCls} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Due Date</p>
+                    <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputCls} />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Due Date</p>
-                  <p className="text-base font-semibold text-gray-900">{invoiceDraft.dueDate}</p>
+              ) : (
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Issue Date</p>
+                    <p className="text-base font-semibold text-gray-900">{invoiceDraft.issueDate}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Due Date</p>
+                    <p className="text-base font-semibold text-gray-900">{invoiceDraft.dueDate}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border-2 border-green-200 shadow-sm animate-slide-up" style={{ animationDelay: '0.4s' }}>
+        {/* Line items card */}
+        <div className={cardCls}>
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
               <FileText className="w-6 h-6 text-white" strokeWidth={2} />
@@ -130,17 +186,48 @@ export function InvoiceDataPreview() {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               </div>
               <div className="space-y-3">
-                {invoiceDraft.items.map((item, index) => (
+                {(editMode ? items : invoiceDraft.items).map((item, index) => (
                   <div key={index} className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-                    <div className="flex justify-between items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm">{item.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Qty: {item.quantity} × {formatCurrency(item.unitPrice)}
-                        </p>
+                    {editMode ? (
+                      <div className="space-y-2">
+                        <input
+                          value={items[index].description}
+                          onChange={e => updateItem(index, 'description', e.target.value)}
+                          placeholder="Description"
+                          className={inputCls}
+                        />
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 mb-1">Qty</p>
+                            <input
+                              type="number"
+                              value={items[index].quantity}
+                              onChange={e => updateItem(index, 'quantity', e.target.value)}
+                              className={inputCls}
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 mb-1">Unit Price</p>
+                            <input
+                              type="number"
+                              value={items[index].unitPrice}
+                              onChange={e => updateItem(index, 'unitPrice', e.target.value)}
+                              className={inputCls}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <p className="font-bold text-gray-900 text-sm flex-shrink-0">{formatCurrency(item.total)}</p>
-                    </div>
+                    ) : (
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 text-sm">{item.description}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Qty: {item.quantity} × {formatCurrency(item.unitPrice)}
+                          </p>
+                        </div>
+                        <p className="font-bold text-gray-900 text-sm flex-shrink-0">{formatCurrency(item.total)}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -148,31 +235,62 @@ export function InvoiceDataPreview() {
           </div>
         </div>
 
-        {invoiceDraft.notes && (
-          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm animate-slide-up" style={{ animationDelay: '0.5s' }}>
+        {/* Notes */}
+        {(invoiceDraft.notes || editMode) && (
+          <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Notes</p>
-            <p className="text-sm text-gray-700">{invoiceDraft.notes}</p>
+            {editMode ? (
+              <textarea
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                rows={3}
+                placeholder="Additional notes..."
+                className={inputCls}
+              />
+            ) : (
+              <p className="text-sm text-gray-700">{invoiceDraft.notes}</p>
+            )}
           </div>
         )}
       </div>
 
+      {/* Footer actions */}
       <div className="p-6 bg-white border-t border-gray-200">
-        <div className="flex gap-3">
-          <button
-            onClick={handleMakeChanges}
-            className="flex-1 h-14 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all transform active:scale-95"
-          >
-            <Edit className="w-5 h-5" strokeWidth={2} />
-            Make Changes
-          </button>
-          <button
-            onClick={handleLooksGood}
-            className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95`}
-          >
-            Looks Good
-            <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
-          </button>
-        </div>
+        {editMode ? (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setEditMode(false)}
+              className="flex-1 h-14 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all transform active:scale-95"
+            >
+              <X className="w-5 h-5" strokeWidth={2} />
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveEdits}
+              className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95`}
+            >
+              <Check className="w-5 h-5" strokeWidth={2.5} />
+              Save Changes
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setEditMode(true)}
+              className="flex-1 h-14 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-all transform active:scale-95"
+            >
+              <Pencil className="w-5 h-5" strokeWidth={2} />
+              Edit Details
+            </button>
+            <button
+              onClick={() => setCurrentScreen('document-preview')}
+              className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95`}
+            >
+              Looks Good
+              <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

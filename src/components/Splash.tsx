@@ -22,7 +22,7 @@ export function Splash() {
     <div className="min-h-screen bg-white flex flex-col items-center justify-between p-8">
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-sm">
         <img
-          src="/Quotelo.png"
+          src="/Quotelo_Logo.png"
           alt="Quotelo"
           className="w-48 h-48 mb-6 drop-shadow-sm"
         />
