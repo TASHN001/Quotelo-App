@@ -214,7 +214,7 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
             <p>If you have any questions about this Agreement, please contact us at:</p>
             <div className="mt-3 bg-[#f2f2f7] rounded-lg p-4 text-sm">
               <p className="font-semibold text-black">Quotelo Legal</p>
-              <p className="text-[#3c3c43] mt-1">legal@quotelo.com</p>
+              <p className="text-[#3c3c43] mt-1">legal@quoteloapp.com</p>
               <p className="text-[#3c3c43]">Republic of South Africa</p>
             </div>
           </Section>

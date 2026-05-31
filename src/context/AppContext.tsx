@@ -61,6 +61,8 @@ interface AppState {
   language: Language;
   currency: Currency;
   country: CountryInfo | null;
+  previousScreen: string;
+  setPreviousScreen: (screen: string) => void;
   setCurrentScreen: (screen: string) => void;
   setUserProfile: (profile: LocalUserProfile) => void;
   setSelectedDocumentType: (type: string) => void;
@@ -98,6 +100,7 @@ const LANGUAGE_KEY = 'quotelo_language';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [currentScreen, setCurrentScreen] = useState('splash');
+  const [previousScreen, setPreviousScreen] = useState('home');
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<LocalUserProfile>({ name: '' });
   const [dbUserProfile, setDbUserProfile] = useState<DBUserProfile | null>(null);
@@ -491,6 +494,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         language,
         currency,
         country,
+        previousScreen,
+        setPreviousScreen,
         setCurrentScreen,
         setUserProfile,
         setSelectedDocumentType,

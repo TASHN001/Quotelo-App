@@ -42,9 +42,9 @@ export const translations = {
     'ai.startVoiceInput': 'Start voice input',
     'ai.sendMessage': 'Send message',
 
+    'documentType.quote': 'Quote',
     'documentType.invoice': 'Invoice',
-    'documentType.taxInvoice': 'Tax Invoice',
-    'documentType.proformaInvoice': 'Proforma Invoice',
+    'documentType.receipt': 'Receipt',
 
     'templates.title': 'Templates',
     'templates.subtitle': 'Choose your invoice style',
@@ -222,9 +222,9 @@ export const translations = {
     'ai.startVoiceInput': 'Begin stem invoer',
     'ai.sendMessage': 'Stuur boodskap',
 
+    'documentType.quote': 'Kwotasie',
     'documentType.invoice': 'Faktuur',
-    'documentType.taxInvoice': 'Belasting Faktuur',
-    'documentType.proformaInvoice': 'Proforma Faktuur',
+    'documentType.receipt': 'Kwitansie',
 
     'templates.title': 'Sjablone',
     'templates.subtitle': 'Kies jou faktuur styl',
@@ -401,9 +401,9 @@ export const translations = {
     'ai.startVoiceInput': 'Démarrer la saisie vocale',
     'ai.sendMessage': 'Envoyer le message',
 
+    'documentType.quote': 'Devis',
     'documentType.invoice': 'Facture',
-    'documentType.taxInvoice': 'Facture fiscale',
-    'documentType.proformaInvoice': 'Facture proforma',
+    'documentType.receipt': 'Reçu',
 
     'templates.title': 'Modèles',
     'templates.subtitle': 'Choisissez votre style de facture',
@@ -580,9 +580,9 @@ export const translations = {
     'ai.startVoiceInput': 'Iniciar entrada de voz',
     'ai.sendMessage': 'Enviar mensaje',
 
+    'documentType.quote': 'Cotización',
     'documentType.invoice': 'Factura',
-    'documentType.taxInvoice': 'Factura fiscal',
-    'documentType.proformaInvoice': 'Factura proforma',
+    'documentType.receipt': 'Recibo',
 
     'templates.title': 'Plantillas',
     'templates.subtitle': 'Elige tu estilo de factura',

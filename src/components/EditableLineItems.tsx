@@ -14,6 +14,7 @@ interface EditableLineItemsProps {
   items: LineItem[];
   currency: Currency;
   onUpdate: (items: LineItem[]) => Promise<void>;
+  readOnly?: boolean;
   styles?: {
     tableContainer?: string;
     tableHeader?: string;
@@ -23,7 +24,7 @@ interface EditableLineItemsProps {
   };
 }
 
-export function EditableLineItems({ items, currency, onUpdate, styles = {} }: EditableLineItemsProps) {
+export function EditableLineItems({ items, currency, onUpdate, readOnly = false, styles = {} }: EditableLineItemsProps) {
   const [lineItems, setLineItems] = useState<LineItem[]>(items);
   const [editingCell, setEditingCell] = useState<{ index: number; field: string } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -183,28 +184,32 @@ export function EditableLineItems({ items, currency, onUpdate, styles = {} }: Ed
                 <td className={styles.tableCell || 'py-2 sm:py-3 px-1 sm:px-2 text-xs sm:text-sm font-medium text-gray-900 text-right'}>
                   {formatCurrency(item.total)}
                 </td>
-                <td className="py-2 sm:py-3 px-1">
-                  <button
-                    onClick={() => deleteLineItem(index)}
-                    className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                    title="Delete line item"
-                  >
-                    <Trash2 className="w-4 h-4" strokeWidth={2} />
-                  </button>
-                </td>
+                {!readOnly && (
+                  <td className="py-2 sm:py-3 px-1">
+                    <button
+                      onClick={() => deleteLineItem(index)}
+                      className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                      title="Delete line item"
+                    >
+                      <Trash2 className="w-4 h-4" strokeWidth={2} />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
 
-        <button
-          data-pdf-hide
-          onClick={addLineItem}
-          className="mt-2 flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-semibold px-2 py-1 hover:bg-orange-50 rounded transition-colors"
-        >
-          <Plus className="w-4 h-4" strokeWidth={2} />
-          Add Line Item
-        </button>
+        {!readOnly && (
+          <button
+            data-pdf-hide
+            onClick={addLineItem}
+            className="mt-2 flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-semibold px-2 py-1 hover:bg-orange-50 rounded transition-colors"
+          >
+            <Plus className="w-4 h-4" strokeWidth={2} />
+            Add Line Item
+          </button>
+        )}
 
         {showSaved && (
           <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 z-50">

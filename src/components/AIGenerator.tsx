@@ -10,8 +10,8 @@ import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
 import { ds } from '../lib/designSystem';
 import { useEffect } from 'react';
 
-const DOCUMENT_TYPES = ['Invoice', 'Tax Invoice', 'Proforma Invoice'];
-const DOCUMENT_TYPE_KEYS = ['documentType.invoice', 'documentType.taxInvoice', 'documentType.proformaInvoice'] as const;
+const DOCUMENT_TYPES = ['Quote', 'Invoice', 'Receipt'];
+const DOCUMENT_TYPE_KEYS = ['documentType.quote', 'documentType.invoice', 'documentType.receipt'] as const;
 
 export function AIGenerator() {
   const { selectedDocumentType, setSelectedDocumentType, setCurrentScreen, business, setInvoiceDraft, setSelectedTemplateKey, t, authUser, selectedClient, setSelectedClient } = useApp();
@@ -251,6 +251,7 @@ export function AIGenerator() {
                 placeholder="e.g. Invoice for Acme Corp, web design R5000, due in 14 days"
                 className={`${ds.input} resize-none`}
                 disabled={isLoading}
+                autoFocus
               />
               <button
                 onClick={() => { if (textInput.trim()) handleSendWithTranscript(textInput); }}

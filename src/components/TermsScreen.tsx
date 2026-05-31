@@ -46,7 +46,7 @@ export function TermsScreen() {
               To use the Service, you must create an account using a valid email address and password. You agree to provide accurate and complete information during registration and to keep your account information updated.
             </Subsection>
             <Subsection title="3.2 Account Security">
-              You are solely responsible for maintaining the confidentiality of your account credentials. You must notify us immediately at support@quotelo.com if you suspect unauthorized access to your account. We are not liable for any losses arising from unauthorized use of your account.
+              You are solely responsible for maintaining the confidentiality of your account credentials. You must notify us immediately at support@quoteloapp.com if you suspect unauthorized access to your account. We are not liable for any losses arising from unauthorized use of your account.
             </Subsection>
             <Subsection title="3.3 One Account Per User">
               Each user may maintain only one account. Creating multiple accounts to circumvent plan restrictions or for fraudulent purposes is prohibited.
@@ -168,7 +168,7 @@ export function TermsScreen() {
             <p>For questions about these Terms, please contact us:</p>
             <div className="mt-3 bg-[#f2f2f7] rounded-lg p-4 text-sm">
               <p className="font-semibold text-black">Quotelo Legal</p>
-              <p className="text-[#3c3c43] mt-1">legal@quotelo.com</p>
+              <p className="text-[#3c3c43] mt-1">legal@quoteloapp.com</p>
               <p className="text-[#3c3c43]">Republic of South Africa</p>
             </div>
           </Section>

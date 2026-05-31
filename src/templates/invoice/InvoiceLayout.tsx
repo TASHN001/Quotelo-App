@@ -73,7 +73,7 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-end gap-3 sm:gap-4">
           <div className={styles.logoContainer || 'flex items-center justify-center flex-shrink-0'}>
             {data.business.logoUrl ? (
               <img

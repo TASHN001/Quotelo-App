@@ -1,6 +1,10 @@
-import { ChevronLeft, ChevronRight, Building2, User, Settings, Languages, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { EditBusinessModal } from './EditBusinessModal';
+import { db } from '../lib/database';
 import { ds } from '../lib/designSystem';
+import type { Business } from '../lib/types';
 
 export function ProfileDataScreen() {
   const {
@@ -9,8 +13,22 @@ export function ProfileDataScreen() {
     dbUserProfile,
     userProfile,
     language,
-    currency
+    currency,
+    refreshProfile,
+    showToast,
   } = useApp();
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleBusinessSave = async (businessData: Partial<Business>) => {
+    const userId = localStorage.getItem('quotelo_user_id');
+    if (!userId) return;
+    const result = await db.upsertBusiness(userId, businessData);
+    if (result) {
+      await refreshProfile();
+      showToast('Business details saved', 'success');
+    }
+    setShowEditModal(false);
+  };
 
   const getLanguageLabel = () => {
     switch (language) {
@@ -29,7 +47,14 @@ export function ProfileDataScreen() {
         <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
           <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
         </button>
-        <h1 className={`${ds.title2} text-black`}>Profile & Business</h1>
+        <h1 className={`${ds.title2} text-black flex-1`}>Profile & Business</h1>
+        <button
+          onClick={() => setShowEditModal(true)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.press} ${ds.transition}`}
+        >
+          <Pencil className="w-3.5 h-3.5" strokeWidth={2.5} />
+          Edit
+        </button>
       </div>
 
       <div className="px-4 flex flex-col gap-4 pb-10">
@@ -103,6 +128,15 @@ export function ProfileDataScreen() {
         </div>
 
       </div>
+
+      {showEditModal && (
+        <EditBusinessModal
+          business={business}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleBusinessSave}
+          userId={localStorage.getItem('quotelo_user_id') || ''}
+        />
+      )}
     </div>
   );
 }

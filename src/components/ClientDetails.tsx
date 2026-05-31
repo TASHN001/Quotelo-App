@@ -59,7 +59,7 @@ export function ClientDetails() {
 
     const d = window.document;
     const container = d.createElement('div');
-    Object.assign(container.style, { position: 'absolute', left: '-9999px', fontFamily: 'sans-serif', padding: '40px', maxWidth: '700px' });
+    Object.assign(container.style, { position: 'fixed', left: '-9999px', top: '0', width: '700px', fontFamily: 'sans-serif', padding: '40px', backgroundColor: '#ffffff' });
 
     const h1 = d.createElement('h1');
     h1.textContent = 'Customer Statement';
@@ -108,6 +108,7 @@ export function ClientDetails() {
     container.appendChild(table);
 
     d.body.appendChild(container);
+    await new Promise(resolve => requestAnimationFrame(resolve));
     try {
       const html2pdf = (await import('html2pdf.js')).default;
       const blob = await html2pdf().set({

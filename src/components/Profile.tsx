@@ -293,7 +293,7 @@ export function Profile() {
                 </div>
               </div>
               <button
-                onClick={() => showToast('Upgrade coming soon!', 'info')}
+                onClick={() => setCurrentScreen('upgrade-plan')}
                 className={`px-4 py-2 bg-[#f97316] text-white rounded-xl ${ds.footnote} font-semibold ${ds.shadowOrange} ${ds.press} ${ds.transition}`}
               >
                 Upgrade
@@ -347,7 +347,7 @@ export function Profile() {
                     {isSendingFeedback ? 'Sending...' : 'Send Feedback'}
                   </button>
                   <a
-                    href="mailto:support@quotelo.app?subject=Feedback"
+                    href="mailto:support@quoteloapp.com?subject=Feedback"
                     className={`flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#f2f2f7] text-[#3c3c43] rounded-xl ${ds.callout} font-semibold ${ds.press} ${ds.transition}`}
                   >
                     <Mail className="w-4 h-4" />

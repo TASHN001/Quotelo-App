@@ -27,6 +27,7 @@ import { CurrencyScreen } from './components/CurrencyScreen';
 import { ReminderSettingsScreen } from './components/ReminderSettings';
 import { EULAScreen } from './components/EULAScreen';
 import { TermsScreen } from './components/TermsScreen';
+import { UpgradePlanScreen } from './components/UpgradePlanScreen';
 import { Toast } from './components/Toast';
 import { BottomTabBar } from './components/BottomTabBar';
 
@@ -73,6 +74,7 @@ function AppRouter() {
     case 'eula':             return <EULAScreen />;
     case 'eula-view':        return <EULAScreen viewOnly />;
     case 'terms':            return <TermsScreen />;
+    case 'upgrade-plan':     return <UpgradePlanScreen />;
     default:                 return <Splash />;
   }
 }

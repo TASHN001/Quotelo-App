@@ -23,7 +23,7 @@ import type { Document, DocumentLineItem, InvoiceData } from '../lib/types';
 import type { Currency } from '../lib/currency';
 
 export function InvoiceDetail() {
-  const { setCurrentScreen, business, savedDocumentId, setSavedDocumentId, dbUserProfile, formatCurrency, showToast, authUser } = useApp();
+  const { setCurrentScreen, previousScreen, business, savedDocumentId, setSavedDocumentId, dbUserProfile, formatCurrency, showToast, authUser } = useApp();
   const [document, setDocument] = useState<Document | null>(null);
   const [lineItems, setLineItems] = useState<DocumentLineItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -437,7 +437,7 @@ export function InvoiceDetail() {
     <div className={`min-h-screen ${ds.bg} pb-28`}>
       {/* Sub-screen header */}
       <div className="flex items-center justify-between px-4 pt-12 pb-4 bg-[#f2f2f7]">
-        <button onClick={() => setCurrentScreen('home')} className={ds.headerIconBtn}>
+        <button onClick={() => setCurrentScreen(previousScreen as any)} className={ds.headerIconBtn}>
           <ChevronLeft className="w-4 h-4 text-[#3c3c43]" />
         </button>
         <p className={`${ds.headline} text-black`}>{document.document_number}</p>
@@ -515,6 +515,7 @@ export function InvoiceDetail() {
               onUpdate={handleUpdateField}
               onUpdateLineItems={handleUpdateLineItems}
               styles={templateStyles}
+              readOnly={true}
             />
           </div>
         </div>

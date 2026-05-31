@@ -10,7 +10,7 @@ import type { Document } from '../lib/types';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'outstanding' | 'paid-this-month';
 
 export function InvoicesList() {
-  const { setCurrentScreen, authUser, formatCurrency, setSavedDocumentId } = useApp();
+  const { setCurrentScreen, setPreviousScreen, authUser, formatCurrency, setSavedDocumentId } = useApp();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,6 +120,7 @@ export function InvoicesList() {
 
   const handleInvoiceClick = (documentId: string) => {
     setSavedDocumentId(documentId);
+    setPreviousScreen('invoices-list');
     setCurrentScreen('invoice-detail');
   };
 

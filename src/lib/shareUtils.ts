@@ -71,7 +71,7 @@ export function openWhatsApp(message: string, phoneNumber?: string): void {
     url = `https://wa.me/?text=${encodedMessage}`;
   }
 
-  window.open(url, '_blank');
+  window.location.href = url;
 }
 
 export async function blobToFile(blob: Blob, filename: string): Promise<File> {

@@ -24,7 +24,7 @@ export function Splash() {
         <img
           src="/Quotelo_Logo.png"
           alt="Quotelo"
-          className="w-48 h-48 mb-6 drop-shadow-sm"
+          className="w-64 h-64 mb-6 drop-shadow-sm"
         />
         <h1 className={`${ds.largeTitle} text-black mb-3 text-center`}>Quotelo</h1>
         <p className={`${ds.callout} text-[#8e8e93] text-center mb-14`}>

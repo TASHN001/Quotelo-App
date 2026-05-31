@@ -11,6 +11,7 @@ interface EditableInvoiceLayoutProps {
   lineItems: DocumentLineItem[];
   onUpdate: (field: string, value: any) => Promise<void>;
   onUpdateLineItems: (items: LineItem[]) => Promise<void>;
+  readOnly?: boolean;
   styles: {
     container?: string;
     header?: string;
@@ -49,7 +50,8 @@ export function EditableInvoiceLayout({
   lineItems,
   onUpdate,
   onUpdateLineItems,
-  styles
+  styles,
+  readOnly = false,
 }: EditableInvoiceLayoutProps) {
   const { t } = useApp();
 
@@ -237,6 +239,7 @@ export function EditableInvoiceLayout({
         items={convertLineItemsToEditable()}
         currency={(data.currency || 'ZAR') as Currency}
         onUpdate={onUpdateLineItems}
+        readOnly={readOnly}
         styles={{
           tableContainer: styles.tableContainer,
           tableHeader: styles.tableHeader,
