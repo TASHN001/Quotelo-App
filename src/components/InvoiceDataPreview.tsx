@@ -1,10 +1,17 @@
 import { useState } from 'react';
-import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Pencil, Check, X } from 'lucide-react';
+import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Pencil, Check, X, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { db } from '../lib/database';
 import { ds } from '../lib/designSystem';
 
 export function InvoiceDataPreview() {
-  const { invoiceDraft, setInvoiceDraft, setCurrentScreen, selectedClient, formatCurrency } = useApp();
+  const {
+    invoiceDraft, setInvoiceDraft, setCurrentScreen,
+    selectedClient, formatCurrency,
+    authUser, business, selectedTemplateKey,
+    setSavedDocumentId, refreshDocuments, showToast,
+    dbUserProfile, refreshProfile,
+  } = useApp();
 
   // All useState calls MUST precede the early return to satisfy React hooks rules.
   // States are initialised from invoiceDraft (or safe fallbacks if null).
@@ -17,6 +24,69 @@ export function InvoiceDataPreview() {
   const [items, setItems] = useState(
     (invoiceDraft?.items || []).map(i => ({ ...i }))
   );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveAndContinue = async () => {
+    if (!invoiceDraft || !authUser || !business) {
+      showToast('Missing required data. Please try again.', 'error');
+      return;
+    }
+
+    setIsSaving(true);
+
+    const invoiceNumber = await db.getNextDocumentNumber(authUser.id, selectedClient?.id ?? null);
+
+    const lineItems = invoiceDraft.items.map(item => ({
+      name: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      taxRate: 0,
+      lineTotal: item.total,
+    }));
+
+    const result = await db.saveInvoiceWithLineItems(
+      authUser.id,
+      business.id,
+      {
+        documentType: 'invoice',
+        documentNumber: invoiceNumber,
+        status: 'sent',
+        clientName: selectedClient?.name || invoiceDraft.client.name || 'Client',
+        clientEmail: selectedClient?.email || invoiceDraft.client.email || '',
+        clientPhone: selectedClient?.phone,
+        clientAddress: selectedClient?.billing_address,
+        issueDate: invoiceDraft.issueDate,
+        dueDate: invoiceDraft.dueDate,
+        subtotal: invoiceDraft.subtotal,
+        taxTotal: invoiceDraft.tax,
+        total: invoiceDraft.total,
+        currency: selectedClient?.client_currency || business.default_currency,
+        notes: invoiceDraft.notes || undefined,
+        footerMessage: 'Thank you for your business!',
+        templateKey: selectedTemplateKey || undefined,
+        clientId: selectedClient?.id,
+      },
+      lineItems
+    );
+
+    setIsSaving(false);
+
+    if (!result.success || !result.document) {
+      showToast(result.error || 'Failed to save invoice. Please try again.', 'error');
+      return;
+    }
+
+    showToast('Invoice saved successfully', 'success');
+    setSavedDocumentId(result.document.id);
+    await refreshDocuments();
+
+    if (dbUserProfile && !dbUserProfile.onboarding_complete) {
+      await db.updateUserProfile(authUser.id, { onboarding_complete: true });
+      await refreshProfile();
+    }
+
+    setCurrentScreen('invoice-detail');
+  };
 
   if (!invoiceDraft) {
     setCurrentScreen('home');
@@ -283,11 +353,21 @@ export function InvoiceDataPreview() {
               Edit Details
             </button>
             <button
-              onClick={() => setCurrentScreen('document-preview')}
-              className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95`}
+              onClick={handleSaveAndContinue}
+              disabled={isSaving}
+              className={`flex-1 h-14 flex items-center justify-center gap-2 ${ds.btnPrimary} transform active:scale-95 disabled:opacity-60`}
             >
-              Looks Good
-              <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" strokeWidth={2.5} />
+                  Saving…
+                </>
+              ) : (
+                <>
+                  Looks Good
+                  <ArrowRight className="w-5 h-5" strokeWidth={2.5} />
+                </>
+              )}
             </button>
           </div>
         )}
