@@ -141,7 +141,7 @@ export function Auth() {
                 type="text"
                 value={fullName}
                 onChange={e => setFullName(e.target.value)}
-                placeholder="Tash"
+                placeholder="Enter full name"
                 className={`${ds.input} pl-10`}
               />
             </div>

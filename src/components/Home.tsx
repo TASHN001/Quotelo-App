@@ -14,7 +14,7 @@ import { ds, statusBadge } from '../lib/designSystem';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export function Home() {
-  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setSavedDocumentId, setDraftDocumentData, formatCurrency, showToast, setSelectedClient } = useApp();
+  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setSavedDocumentId, setDraftDocumentData, setSelectedTemplateKey, formatCurrency, showToast, setSelectedClient } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [menuOpenAbove, setMenuOpenAbove] = useState(false);
@@ -76,6 +76,7 @@ export function Home() {
   const handleTryExample = () => {
     const sampleData = getSampleInvoiceData();
     setDraftDocumentData(sampleData);
+    setSelectedTemplateKey('invoice-minimal');
     setCurrentScreen('document-preview');
   };
 

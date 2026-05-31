@@ -35,7 +35,7 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
   const scrollHint = !hasScrolledToBottom;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="h-screen bg-white flex flex-col">
       {/* Sub-screen header */}
       <div className="flex items-center gap-4 px-4 pt-12 pb-4">
         <button onClick={() => setCurrentScreen('profile')} className={ds.headerIconBtn}>
@@ -241,7 +241,7 @@ export function EULAScreen({ viewOnly = false }: EULAScreenProps) {
                 className="sr-only"
               />
               <div
-                onClick={() => setAgreed(prev => !prev)}
+                onClick={e => { e.stopPropagation(); setAgreed(prev => !prev); }}
                 className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-200 cursor-pointer ${
                   agreed
                     ? 'bg-[#f97316] border-[#f97316] shadow-[0_2px_6px_rgba(249,115,22,0.4)]'

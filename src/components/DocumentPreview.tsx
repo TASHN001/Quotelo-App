@@ -27,8 +27,21 @@ export function DocumentPreview() {
 
   if (!selectedTemplateKey) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-500">{t('documentPreview.noTemplate')}</p>
+      <div className="min-h-screen bg-white flex flex-col">
+        <div className="flex items-center gap-3 px-4 pt-12 pb-4">
+          <button onClick={() => setCurrentScreen('home')} className={ds.headerIconBtn}>
+            <ArrowLeft className="w-4 h-4 text-[#3c3c43]" />
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6">
+          <p className="text-gray-500 text-center">{t('documentPreview.noTemplate')}</p>
+          <button
+            onClick={() => setCurrentScreen('templates-list')}
+            className={ds.btnPrimary}
+          >
+            Choose a Template
+          </button>
+        </div>
       </div>
     );
   }

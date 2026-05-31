@@ -326,17 +326,13 @@ export function Onboarding() {
     setIsLoading(false);
   };
 
-  const handleVoiceDemo = () => {
-    console.log('[Onboarding] Step 7: Starting voice demo...');
+  const handleVoiceDemo = async () => {
+    const userId = await getUserId();
+    if (userId) {
+      await db.updateUserProfile(userId, { onboarding_complete: true });
+      await refreshProfile();
+    }
     setCurrentScreen('ai-generator');
-  };
-
-  const handleGenerateSampleInvoice = () => {
-    console.log('[Onboarding] Step 7: Generating sample invoice...');
-    const sampleData = getSampleInvoiceData();
-    setDraftDocumentData(sampleData);
-    setSelectedTemplateKey('invoice-minimal');
-    setCurrentScreen('document-preview');
   };
 
   const handleSkipStep7 = async () => {
@@ -650,20 +646,6 @@ export function Onboarding() {
               </div>
             </button>
 
-            <button
-              onClick={handleGenerateSampleInvoice}
-              className={`w-full bg-white border border-[#e5e5ea] text-black ${ds.radiusLg} p-6 flex items-center gap-4 ${ds.shadow1} ${ds.transition} ${ds.press}`}
-            >
-              <div className={`w-14 h-14 bg-[#fff7ed] ${ds.radiusMd} flex items-center justify-center flex-shrink-0`}>
-                <FileText className="w-7 h-7 text-[#f97316]" strokeWidth={1.5} />
-              </div>
-              <div className="text-left flex-1">
-                <h3 className={`${ds.headline} text-black mb-1`}>Generate Sample Invoice</h3>
-                <p className={`${ds.footnote} text-[#8e8e93]`}>
-                  See a pre-filled invoice you can customize
-                </p>
-              </div>
-            </button>
           </div>
 
           <button
