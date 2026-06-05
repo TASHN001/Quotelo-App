@@ -217,7 +217,13 @@ export function AIGenerator() {
 
         {/* Example prompt hint */}
         <div className="bg-white rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <p className={`${ds.callout} text-[#8e8e93] italic`}>{t('ai.examplePrompt')}</p>
+          <p className={`${ds.callout} text-[#8e8e93] italic`}>
+            {selectedDocumentType === 'Quote'
+              ? '"Quote for [client name], [service], [amount], valid until [date]"'
+              : selectedDocumentType === 'Receipt'
+              ? '"Receipt for [client name], [service], [amount] paid"'
+              : '"Invoice for [client name], [service], [amount], due [date]"'}
+          </p>
         </div>
 
         {/* Error / follow-up */}

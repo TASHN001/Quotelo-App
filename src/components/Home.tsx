@@ -277,17 +277,17 @@ export function Home() {
                 return (
                   <div key={invoice.id} className={`relative overflow-hidden ${idx < filteredInvoices.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
                     {/* Left action panel — Share (revealed by swipe left) */}
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1">
-                      <button onClick={() => handleShare(invoice.id)} className="flex flex-col items-center gap-1">
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1 z-20">
+                      <button onClick={() => handleShare(invoice.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                         <Share2 className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="text-white text-[11px] font-semibold">Share</span>
                       </button>
                     </div>
                     {/* Right action panel — Mark Paid/Unpaid (revealed by swipe right) */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-20 flex flex-col items-center justify-center gap-1 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
+                    <div className={`absolute left-0 top-0 bottom-0 w-20 flex flex-col items-center justify-center gap-1 z-20 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
                       <button
                         onClick={() => isPaid ? handleMarkAsUnpaid(invoice.id) : handleMarkAsPaid(invoice.id)}
-                        className="flex flex-col items-center gap-1"
+                        className="flex flex-col items-center gap-1 w-full h-full justify-center"
                       >
                         <CheckCircle className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="text-white text-[11px] font-semibold">{isPaid ? 'Unpaid' : 'Paid'}</span>

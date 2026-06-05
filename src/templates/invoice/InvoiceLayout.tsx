@@ -73,13 +73,13 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
-        <div className="flex items-end gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className={styles.logoContainer || 'flex items-center justify-center flex-shrink-0'}>
             {data.business.logoUrl ? (
               <img
                 src={data.business.logoUrl}
                 alt={data.business.name}
-                style={{ height: '48px', width: 'auto', objectFit: 'contain', display: 'block' }}
+                style={{ height: '56px', width: 'auto', objectFit: 'contain', display: 'block' }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -88,7 +88,7 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
             )}
           </div>
-          <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900'}>
+          <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'}>
             {documentTitle}
           </h1>
         </div>
