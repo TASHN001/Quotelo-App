@@ -14,7 +14,7 @@ import { ds, statusBadge } from '../lib/designSystem';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export function Home() {
-  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, setDraftDocumentData, setSelectedTemplateKey, formatCurrency, showToast, setSelectedClient } = useApp();
+  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, setDraftDocumentData, setSelectedTemplateKey, formatCurrency, showToast, setSelectedClient, refreshDocuments } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [swipeState, setSwipeState] = useState<{ id: string; dir: 'left' | 'right' } | null>(null);
   const touchStartX = useRef(0);
@@ -125,7 +125,7 @@ export function Home() {
 
     if (result.success && result.document) {
       showToast(`Invoice duplicated as ${newDocNumber}`, 'success');
-      window.location.reload();
+      await refreshDocuments();
     } else {
       showToast('Failed to duplicate invoice', 'error');
     }
@@ -139,7 +139,7 @@ export function Home() {
     const updated = await db.updateDocumentStatus(invoiceId, 'paid', paidDate);
     if (updated) {
       showToast(`${formatCurrency(invoice.amount)} marked as paid`, 'success');
-      window.location.reload();
+      await refreshDocuments();
     } else {
       showToast('Failed to mark invoice as paid', 'error');
     }
@@ -150,7 +150,7 @@ export function Home() {
     const updated = await db.updateDocumentStatus(invoiceId, 'sent', null);
     if (updated) {
       showToast('Invoice marked as unpaid', 'success');
-      window.location.reload();
+      await refreshDocuments();
     } else {
       showToast('Failed to update invoice', 'error');
     }
