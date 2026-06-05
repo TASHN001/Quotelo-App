@@ -94,6 +94,13 @@ export function Home() {
     else setSwipeState(null);
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => { touchStartX.current = e.clientX; };
+  const handleMouseUp = (invoiceId: string, e: React.MouseEvent) => {
+    const delta = e.clientX - touchStartX.current;
+    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'left' });
+    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'right' });
+  };
+
   const handleShare = (invoiceId: string) => {
     setSwipeState(null);
     handleInvoiceClick(invoiceId);
@@ -276,14 +283,14 @@ export function Home() {
                 const isPaid = invoice.status === 'paid';
                 return (
                   <div key={invoice.id} className={`relative overflow-hidden ${idx < filteredInvoices.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
-                    {/* Left action panel — Share (revealed by swipe left) */}
+                    {/* Share panel (revealed by swipe left) */}
                     <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1 z-20">
                       <button onClick={() => handleShare(invoice.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                         <Share2 className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="text-white text-[11px] font-semibold">Share</span>
                       </button>
                     </div>
-                    {/* Right action panel — Mark Paid/Unpaid (revealed by swipe right) */}
+                    {/* Paid/Unpaid panel (revealed by swipe right) */}
                     <div className={`absolute left-0 top-0 bottom-0 w-20 flex flex-col items-center justify-center gap-1 z-20 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
                       <button
                         onClick={() => isPaid ? handleMarkAsUnpaid(invoice.id) : handleMarkAsPaid(invoice.id)}
@@ -301,7 +308,9 @@ export function Home() {
                       onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isSwiped) handleInvoiceClick(invoice.id); }}
                       onTouchStart={handleTouchStart}
                       onTouchEnd={e => handleTouchEnd(invoice.id, e)}
-                      className="relative z-10 w-full flex items-center gap-3 px-4 py-3 bg-white cursor-pointer"
+                      onMouseDown={handleMouseDown}
+                      onMouseUp={e => handleMouseUp(invoice.id, e)}
+                      className="relative z-10 w-full flex items-center gap-3 px-4 py-3 bg-white cursor-pointer select-none"
                       style={{
                         transform: `translateX(${swipeDir === 'left' ? -ACTION_W : swipeDir === 'right' ? ACTION_W : 0}px)`,
                         transition: 'transform 0.2s ease',

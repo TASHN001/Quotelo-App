@@ -135,6 +135,12 @@ export function InvoicesList() {
     else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
     else setSwipeState(null);
   };
+  const handleMouseDown = (e: React.MouseEvent) => { touchStartX.current = e.clientX; };
+  const handleMouseUp = (docId: string, e: React.MouseEvent) => {
+    const delta = e.clientX - touchStartX.current;
+    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'left' });
+    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
+  };
 
   const handleShare = (docId: string) => { setSwipeState(null); setSavedDocumentId(docId); setPreviousScreen('invoices-list'); setCurrentScreen('invoice-detail'); };
 
@@ -236,7 +242,9 @@ export function InvoicesList() {
                     onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isSwiped) handleInvoiceClick(doc.id); }}
                     onTouchStart={handleTouchStart}
                     onTouchEnd={e => handleTouchEnd(doc.id, e)}
-                    className="relative z-10 w-full flex items-center gap-3 px-4 py-3 bg-white cursor-pointer"
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={e => handleMouseUp(doc.id, e)}
+                    className="relative z-10 w-full flex items-center gap-3 px-4 py-3 bg-white cursor-pointer select-none"
                     style={{ transform: `translateX(${swipeDir === 'left' ? -ACTION_W : swipeDir === 'right' ? ACTION_W : 0}px)`, transition: 'transform 0.2s ease' }}
                   >
                     <div className="flex-1 text-left min-w-0">
