@@ -31,7 +31,7 @@ export const translations = {
     'home.invoices': 'invoices',
 
     'ai.title': 'AI Generator',
-    'ai.description': 'I can create an invoice for you instantly. Just tell me the details.',
+    'ai.description': 'Include client name, service, quantity, price and due date for best results.',
     'ai.switchDocument': 'SWITCH DOCUMENT',
     'ai.examplePrompt': '"Invoice for [client name], [service], [amount], due [date]"',
     'ai.placeholder': 'Describe your invoice...',
@@ -211,7 +211,7 @@ export const translations = {
     'home.invoices': 'fakture',
 
     'ai.title': 'KI Generator',
-    'ai.description': 'Ek kan onmiddellik \'n faktuur vir jou skep. Vertel my net die besonderhede.',
+    'ai.description': 'Sluit kliëntnaam, diens, hoeveelheid, prys en vervaldatum in vir beste resultate.',
     'ai.switchDocument': 'WISSEL DOKUMENT',
     'ai.examplePrompt': '"Faktuur vir [kliëntnaam], [diens], [bedrag], betaalbaar [datum]"',
     'ai.placeholder': 'Beskryf jou faktuur...',
@@ -390,7 +390,7 @@ export const translations = {
     'home.invoices': 'factures',
 
     'ai.title': 'Générateur IA',
-    'ai.description': 'Je peux créer une facture pour vous instantanément. Dites-moi simplement les détails.',
+    'ai.description': 'Incluez le nom du client, le service, la quantité, le prix et la date d\'échéance.',
     'ai.switchDocument': 'CHANGER DE DOCUMENT',
     'ai.examplePrompt': '"Facture pour [nom du client], [service], [montant], échéance [date]"',
     'ai.placeholder': 'Décrivez votre facture...',
@@ -569,7 +569,7 @@ export const translations = {
     'home.invoices': 'facturas',
 
     'ai.title': 'Generador IA',
-    'ai.description': 'Puedo crear una factura para ti instantáneamente. Solo dime los detalles.',
+    'ai.description': 'Incluye nombre del cliente, servicio, cantidad, precio y fecha de vencimiento.',
     'ai.switchDocument': 'CAMBIAR DOCUMENTO',
     'ai.examplePrompt': '"Factura para [nombre del cliente], [servicio], [monto], vence el [fecha]"',
     'ai.placeholder': 'Describe tu factura...',

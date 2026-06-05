@@ -219,10 +219,10 @@ export function AIGenerator() {
         <div className="bg-white rounded-xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           <p className={`${ds.callout} text-[#8e8e93] italic`}>
             {selectedDocumentType === 'Quote'
-              ? '"Quote for [client name], [service], [amount], valid until [date]"'
+              ? '"Quote for John, 10 boxes at R50 each, valid 30 days"'
               : selectedDocumentType === 'Receipt'
-              ? '"Receipt for [client name], [service], [amount] paid"'
-              : '"Invoice for [client name], [service], [amount], due [date]"'}
+              ? '"Receipt for Sarah, 3 sessions R800 each, paid today"'
+              : '"Invoice for John, consulting 5hrs at R500/hr, due Friday"'}
           </p>
         </div>
 
