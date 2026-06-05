@@ -274,24 +274,21 @@ export function Home() {
             </div>
           ) : (
             <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              {swipeState && (
-                <div className="fixed inset-0 z-10" onClick={() => setSwipeState(null)} />
-              )}
               {filteredInvoices.map((invoice, idx) => {
                 const isSwiped = swipeState?.id === invoice.id;
                 const swipeDir = isSwiped ? swipeState!.dir : null;
                 const isPaid = invoice.status === 'paid';
                 return (
                   <div key={invoice.id} className={`relative overflow-hidden ${idx < filteredInvoices.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
-                    {/* Share panel (revealed by swipe left) */}
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1 z-20">
+                    {/* Share panel — sits below card (no z-index). Revealed when card slides left. */}
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1">
                       <button onClick={() => handleShare(invoice.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                         <Share2 className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="text-white text-[11px] font-semibold">Share</span>
                       </button>
                     </div>
-                    {/* Paid/Unpaid panel (revealed by swipe right) */}
-                    <div className={`absolute left-0 top-0 bottom-0 w-20 flex flex-col items-center justify-center gap-1 z-20 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
+                    {/* Paid/Unpaid panel — sits below card (no z-index). Revealed when card slides right. */}
+                    <div className={`absolute left-0 top-0 bottom-0 w-20 flex flex-col items-center justify-center gap-1 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
                       <button
                         onClick={() => isPaid ? handleMarkAsUnpaid(invoice.id) : handleMarkAsPaid(invoice.id)}
                         className="flex flex-col items-center gap-1 w-full h-full justify-center"
@@ -300,13 +297,13 @@ export function Home() {
                         <span className="text-white text-[11px] font-semibold">{isPaid ? 'Unpaid' : 'Paid'}</span>
                       </button>
                     </div>
-                    {/* Swipeable card */}
+                    {/* Swipeable card — z-10 covers both panels at rest */}
                     <div
                       role="button"
                       tabIndex={0}
                       onClick={() => { if (!isSwiped) handleInvoiceClick(invoice.id); else setSwipeState(null); }}
                       onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isSwiped) handleInvoiceClick(invoice.id); }}
-                      onTouchStart={handleTouchStart}
+                      onTouchStart={e => { if (swipeState && swipeState.id !== invoice.id) setSwipeState(null); handleTouchStart(e); }}
                       onTouchEnd={e => handleTouchEnd(invoice.id, e)}
                       onMouseDown={handleMouseDown}
                       onMouseUp={e => handleMouseUp(invoice.id, e)}

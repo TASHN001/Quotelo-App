@@ -215,7 +215,6 @@ export function InvoicesList() {
           </div>
         ) : (
           <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            {swipeState && <div className="fixed inset-0 z-10" onClick={() => setSwipeState(null)} />}
             {filteredDocuments.map((doc, idx) => {
               const isSwiped = swipeState?.id === doc.id;
               const swipeDir = isSwiped ? swipeState!.dir : null;
@@ -223,13 +222,13 @@ export function InvoicesList() {
               const statusLabel = calculateDocumentStatus(doc);
               return (
                 <div key={doc.id} className={`relative overflow-hidden ${idx < filteredDocuments.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
-                  <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex items-center justify-center z-20">
+                  <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex items-center justify-center">
                     <button onClick={() => handleShare(doc.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                       <Share2 className="w-5 h-5 text-white" strokeWidth={2} />
                       <span className="text-white text-[11px] font-semibold">Share</span>
                     </button>
                   </div>
-                  <div className={`absolute left-0 top-0 bottom-0 w-20 flex items-center justify-center z-20 ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
+                  <div className={`absolute left-0 top-0 bottom-0 w-20 flex items-center justify-center ${isPaid ? 'bg-[#ff9500]' : 'bg-[#34c759]'}`}>
                     <button onClick={() => isPaid ? handleMarkAsUnpaid(doc.id) : handleMarkAsPaid(doc.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                       <CheckCircle className="w-5 h-5 text-white" strokeWidth={2} />
                       <span className="text-white text-[11px] font-semibold">{isPaid ? 'Unpaid' : 'Paid'}</span>
@@ -240,7 +239,7 @@ export function InvoicesList() {
                     tabIndex={0}
                     onClick={() => { if (!isSwiped) handleInvoiceClick(doc.id); else setSwipeState(null); }}
                     onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isSwiped) handleInvoiceClick(doc.id); }}
-                    onTouchStart={handleTouchStart}
+                    onTouchStart={e => { if (swipeState && swipeState.id !== doc.id) setSwipeState(null); handleTouchStart(e); }}
                     onTouchEnd={e => handleTouchEnd(doc.id, e)}
                     onMouseDown={handleMouseDown}
                     onMouseUp={e => handleMouseUp(doc.id, e)}
