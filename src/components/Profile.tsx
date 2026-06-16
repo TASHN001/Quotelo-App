@@ -334,7 +334,7 @@ export function Profile() {
                 <textarea
                   value={feedbackMessage}
                   onChange={e => setFeedbackMessage(e.target.value)}
-                  placeholder="Tell us what you think... (optional)"
+                  placeholder="Tell us how we can improve (optional)"
                   rows={3}
                   className={`${ds.input} resize-none text-sm mb-3`}
                 />

@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, FileText, Share2, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { getSampleInvoiceData } from '../lib/sampleData';
 import { ClientPickerModal } from './ClientPickerModal';
-import { ReminderBanner } from './ReminderBanner';
-import { SmartSuggestions } from './SmartSuggestions';
 import { Client, Document } from '../lib/types';
 import { db } from '../lib/database';
 import { isOverdue as checkOverdue } from '../lib/statusManager';
@@ -14,7 +11,7 @@ import { ds, statusBadge } from '../lib/designSystem';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export function Home() {
-  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, setDraftDocumentData, setSelectedTemplateKey, formatCurrency, showToast, setSelectedClient, refreshDocuments } = useApp();
+  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, formatCurrency, showToast, setSelectedClient, refreshDocuments } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [swipeState, setSwipeState] = useState<{ id: string; dir: 'left' | 'right' } | null>(null);
   const touchStartX = useRef(0);
@@ -74,13 +71,6 @@ export function Home() {
     setSavedDocumentId(invoiceId);
     setPreviousScreen('home');
     setCurrentScreen('invoice-detail');
-  };
-
-  const handleTryExample = () => {
-    const sampleData = getSampleInvoiceData();
-    setDraftDocumentData(sampleData);
-    setSelectedTemplateKey('invoice-minimal');
-    setCurrentScreen('document-preview');
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -213,9 +203,6 @@ export function Home() {
           </div>
         </div>
 
-        <SmartSuggestions />
-        <ReminderBanner />
-
         {/* Quick Actions */}
         <div className="mb-4">
           <p className={`${ds.caption} text-[#8e8e93] mb-2`}>QUICK ACTIONS</p>
@@ -263,10 +250,7 @@ export function Home() {
             <div className={`${ds.card} p-8 text-center`}>
               <FileText className="w-10 h-10 text-[#c7c7cc] mx-auto mb-3" />
               <p className={`${ds.headline} text-black mb-1`}>No invoices yet</p>
-              <p className={`${ds.callout} text-[#8e8e93] mb-4`}>Create your first invoice in 10 seconds.</p>
-              <button onClick={handleTryExample} className={`${ds.callout} text-[#f97316] font-semibold`}>
-                Try an example
-              </button>
+              <p className={`${ds.callout} text-[#8e8e93]`}>Create your first invoice in 10 seconds.</p>
             </div>
           ) : filteredInvoices.length === 0 ? (
             <div className={`${ds.card} p-8 text-center`}>

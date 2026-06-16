@@ -33,7 +33,7 @@ export function BottomTabBar() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 ${ds.tabBar}`}
+      className={`fixed bottom-0 left-0 right-0 z-50 ${ds.tabBar}`}
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="flex items-center justify-around pt-2 pb-4">

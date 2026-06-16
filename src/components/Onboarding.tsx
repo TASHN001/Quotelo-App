@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, Check, Shield, Mic, FileText, Sparkles } from 'lucide-react';
+import { Upload, Check, Shield, FileText, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { storage } from '../lib/storage';
 import { db } from '../lib/database';
@@ -12,7 +12,6 @@ import CountrySelect from './CountrySelect';
 import CurrencySelect from './CurrencySelect';
 import { CountryData } from '../lib/countryData';
 import { Currency } from '../lib/currency';
-import { getSampleInvoiceData } from '../lib/sampleData';
 import { ds } from '../lib/designSystem';
 
 interface OnboardingState {
@@ -41,7 +40,7 @@ interface OnboardingState {
 }
 
 export function Onboarding() {
-  const { setCurrentScreen, dbUserProfile, business, refreshProfile, setDraftDocumentData, setSelectedTemplateKey } = useApp();
+  const { setCurrentScreen, dbUserProfile, business, refreshProfile } = useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getUserId = async (): Promise<string | null> => {
@@ -321,53 +320,22 @@ export function Onboarding() {
       return;
     }
 
-    console.log('[Onboarding] Step 6: Signature saved, moving to final step...');
-    setState(prev => ({ ...prev, step: 7 }));
-    setIsLoading(false);
-  };
+    console.log('[Onboarding] Step 6: Signature saved, completing onboarding...');
 
-  const handleVoiceDemo = async () => {
-    const userId = await getUserId();
-    if (userId) {
-      await db.updateUserProfile(userId, { onboarding_complete: true });
-      await refreshProfile();
-    }
-    setCurrentScreen('ai-generator');
-  };
-
-  const handleSkipStep7 = async () => {
-    setIsLoading(true);
-
-    const userId = await getUserId();
-    if (!userId) {
-      console.error('[Onboarding] Step 7: No user ID found');
-      alert('User session not found. Please sign in again.');
-      setIsLoading(false);
-      return;
-    }
-
-    console.log('[Onboarding] Step 7: Skipping, completing onboarding...');
-
-    const profileResult = await db.updateUserProfile(userId, {
+    const profileResult2 = await db.updateUserProfile(userId, {
       onboarding_complete: true
     });
 
-    if (!profileResult) {
-      console.error('[Onboarding] Step 7: Failed to complete onboarding');
-      alert('Failed to complete onboarding. Please try again.');
-      setIsLoading(false);
-      return;
+    if (!profileResult2) {
+      console.error('[Onboarding] Step 6: Failed to complete onboarding');
     }
 
-    console.log('[Onboarding] Step 7: Onboarding complete, refreshing profile...');
     await refreshProfile();
-
-    console.log('[Onboarding] Step 7: Navigating to home...');
     setCurrentScreen('home');
     setIsLoading(false);
   };
 
-  const totalSteps = 7;
+  const totalSteps = 6;
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-6 pt-12 pb-10">
@@ -620,66 +588,27 @@ export function Onboarding() {
         </div>
       )}
 
-      {state.step === 7 && (
-        <div className="flex-1 flex flex-col">
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className={`w-20 h-20 bg-[#fff7ed] ${ds.radiusXl} flex items-center justify-center mb-6`}>
-              <Sparkles className="w-10 h-10 text-[#f97316]" strokeWidth={1.5} />
-            </div>
-            <h1 className={`${ds.title1} text-black mb-3`}>You're all set!</h1>
-            <p className={`${ds.body} text-[#8e8e93] max-w-xs`}>Create your first invoice now.</p>
+      <button
+        onClick={
+          state.step === 1 ? handleContinueStep1 :
+          state.step === 2 ? handleContinueStep2 :
+          state.step === 3 ? handleContinueStep3 :
+          state.step === 4 ? handleContinueStep4 :
+          state.step === 5 ? handleContinueStep5 :
+          handleContinueStep6
+        }
+        disabled={isLoading || (state.step === 3 && !state.industryGroup) || (state.step === 6 && !state.signatureDataUrl)}
+        className={`${ds.btnPrimary} w-full text-center mt-4 disabled:opacity-50`}
+      >
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span>Saving...</span>
           </div>
-
-          <div className="space-y-4 mb-6">
-            <button
-              onClick={handleVoiceDemo}
-              className={`w-full bg-[#f97316] text-white ${ds.radiusLg} p-6 flex items-center gap-4 ${ds.shadowOrange} ${ds.transition} ${ds.press}`}
-            >
-              <div className={`w-14 h-14 bg-white/20 ${ds.radiusMd} flex items-center justify-center flex-shrink-0`}>
-                <Mic className="w-7 h-7 text-white" strokeWidth={1.5} />
-              </div>
-              <div className="text-left flex-1">
-                <h3 className={`${ds.headline} text-white mb-1`}>Try Voice Demo</h3>
-                <p className={`${ds.footnote} text-white/70`}>
-                  Speak your invoice details and watch the magic happen
-                </p>
-              </div>
-            </button>
-
-          </div>
-
-          <button
-            onClick={handleSkipStep7}
-            className={`${ds.callout} text-[#8e8e93] text-center py-3 ${ds.transition}`}
-          >
-            Skip for now
-          </button>
-        </div>
-      )}
-
-      {state.step !== 7 && (
-        <button
-          onClick={
-            state.step === 1 ? handleContinueStep1 :
-            state.step === 2 ? handleContinueStep2 :
-            state.step === 3 ? handleContinueStep3 :
-            state.step === 4 ? handleContinueStep4 :
-            state.step === 5 ? handleContinueStep5 :
-            handleContinueStep6
-          }
-          disabled={isLoading || (state.step === 3 && !state.industryGroup) || (state.step === 6 && !state.signatureDataUrl)}
-          className={`${ds.btnPrimary} w-full text-center mt-4 disabled:opacity-50`}
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Saving...</span>
-            </div>
-          ) : (
-            'Continue'
-          )}
-        </button>
-      )}
+        ) : (
+          'Continue'
+        )}
+      </button>
     </div>
   );
 }
