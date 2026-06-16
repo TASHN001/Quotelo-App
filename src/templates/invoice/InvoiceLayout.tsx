@@ -73,13 +73,16 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className={styles.logoContainer || 'flex items-center justify-center flex-shrink-0'}>
+        <div className="flex items-end gap-3 sm:gap-4">
+          <div
+            className={styles.logoContainer || 'flex-shrink-0 overflow-hidden'}
+            style={styles.logoContainer ? undefined : { width: 64, height: 64, borderRadius: 8 }}
+          >
             {data.business.logoUrl ? (
               <img
                 src={data.business.logoUrl}
                 alt={data.business.name}
-                style={{ height: '56px', width: 'auto', objectFit: 'contain', display: 'block' }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -99,7 +102,7 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
         </div>
       </div>
 
-      <div className={styles.metaRow || 'grid grid-cols-1 md:grid-cols-2 gap-8 mb-8'}>
+      <div className={styles.metaRow || 'grid grid-cols-2 gap-8 mb-8'}>
         <div className={styles.infoBlock || ''}>
           <p className={styles.infoLabel || 'text-xs font-semibold text-gray-500 uppercase mb-2'}>
             {t('invoice.from')}

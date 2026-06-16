@@ -76,7 +76,7 @@ export function InvoiceDataPreview() {
       return;
     }
 
-    showToast('Invoice saved successfully', 'success');
+    showToast(`${invoiceDraft?.documentType || 'Invoice'} saved successfully`, 'success');
     setSavedDocumentId(result.document.id);
     await refreshDocuments();
 
@@ -136,7 +136,7 @@ export function InvoiceDataPreview() {
             <CheckCircle2 className="w-8 h-8 text-white" strokeWidth={2.5} />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Invoice Created!</h1>
+        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">{invoiceDraft.documentType || 'Invoice'} Created!</h1>
         <p className="text-gray-600 text-center text-sm">
           {editMode ? 'Edit the fields below then tap Save.' : 'Review the details we extracted from your voice'}
         </p>

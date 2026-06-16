@@ -146,7 +146,8 @@ export function InvoiceDetail() {
         document.payment_details,
         document.payment_terms,
         document.footer_message,
-        document.currency
+        document.currency,
+        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
       );
 
       const filename = getInvoiceFilename(document.document_number);
@@ -195,7 +196,8 @@ export function InvoiceDetail() {
         document.payment_details,
         document.payment_terms,
         document.footer_message,
-        document.currency
+        document.currency,
+        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
       );
 
       const filename = getInvoiceFilename(document.document_number);
@@ -263,7 +265,8 @@ export function InvoiceDetail() {
         document.payment_details,
         document.payment_terms,
         document.footer_message,
-        document.currency
+        document.currency,
+        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
       );
 
       const filename = getInvoiceFilename(document.document_number);
@@ -390,7 +393,8 @@ export function InvoiceDetail() {
     document.payment_details,
     document.payment_terms,
     document.footer_message,
-    document.currency
+    document.currency,
+    (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
   );
 
   let template = document.template_key ? getTemplate(document.template_key) : null;
