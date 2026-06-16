@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, FileText, Share2, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { ClientPickerModal } from './ClientPickerModal';
-import { Client, Document } from '../lib/types';
+import { Document } from '../lib/types';
 import { db } from '../lib/database';
 import { isOverdue as checkOverdue } from '../lib/statusManager';
 import { getCurrentDate } from '../lib/dateUtils';
@@ -11,13 +10,12 @@ import { ds, statusBadge } from '../lib/designSystem';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export function Home() {
-  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, formatCurrency, showToast, setSelectedClient, refreshDocuments } = useApp();
+  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, formatCurrency, showToast, refreshDocuments } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [swipeState, setSwipeState] = useState<{ id: string; dir: 'left' | 'right' } | null>(null);
   const touchStartX = useRef(0);
   const SWIPE_THRESHOLD = 50;
   const ACTION_W = 80;
-  const [showClientPicker, setShowClientPicker] = useState(false);
 
   const isInvoiceOverdue = (invoice: any) => {
     const doc: Document = {
@@ -147,20 +145,7 @@ export function Home() {
   };
 
   const handleCreateInvoice = () => {
-    setShowClientPicker(true);
-  };
-
-  const handleClientSelected = (client: Client | null) => {
-    if (client) {
-      localStorage.setItem('quotelo_last_selected_client_id', client.id);
-    }
-    setSelectedClient(client);
     setCurrentScreen('ai-generator');
-  };
-
-  const handleAddClient = () => {
-    setShowClientPicker(false);
-    setCurrentScreen('clients');
   };
 
   if (isLoading) {
@@ -316,14 +301,6 @@ export function Home() {
         </div>
       </div>
 
-      {showClientPicker && (
-        <ClientPickerModal
-          onClose={() => setShowClientPicker(false)}
-          onSelectClient={handleClientSelected}
-          onAddClient={handleAddClient}
-          userId={localStorage.getItem('quotelo_user_id') || ''}
-        />
-      )}
     </div>
   );
 }

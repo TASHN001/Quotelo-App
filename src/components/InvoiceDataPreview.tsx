@@ -3,6 +3,7 @@ import { CheckCircle2, Calendar, DollarSign, User, FileText, ArrowRight, Pencil,
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { ds } from '../lib/designSystem';
+import { loadDocumentDefaults } from './TemplatePreview';
 
 export function InvoiceDataPreview() {
   const {
@@ -35,6 +36,7 @@ export function InvoiceDataPreview() {
     setIsSaving(true);
 
     const invoiceNumber = await db.getNextDocumentNumber(authUser.id, selectedClient?.id ?? null);
+    const docDefaults = loadDocumentDefaults();
 
     const lineItems = invoiceDraft.items.map(item => ({
       name: item.description,
@@ -61,8 +63,10 @@ export function InvoiceDataPreview() {
         taxTotal: invoiceDraft.tax,
         total: invoiceDraft.total,
         currency: selectedClient?.client_currency || business.default_currency,
-        notes: invoiceDraft.notes || undefined,
-        footerMessage: 'Thank you for your business!',
+        notes: invoiceDraft.notes || docDefaults.notes || undefined,
+        paymentDetails: docDefaults.paymentDetails || undefined,
+        paymentTerms: docDefaults.termsConditions || undefined,
+        footerMessage: docDefaults.footerMessage || 'Thank you for your business!',
         templateKey: selectedTemplateKey || undefined,
         clientId: selectedClient?.id,
       },

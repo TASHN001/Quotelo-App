@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Download, Share2, MessageCircle, CheckCircle, Copy, Pencil } from 'lucide-react';
+import { ChevronLeft, Download, Share2, CheckCircle, Copy, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { getTemplate } from '../templates';
 import { normalizeDocumentData } from '../lib/invoiceHelpers';
 import { generatePDFBlob, getInvoiceFilename } from '../lib/pdfGenerator';
-import { storage } from '../lib/storage';
 import {
   shareNatively,
   createInvoiceShareMessage,
-  openWhatsApp,
   blobToFile,
   downloadBlob,
   canUseNativeShare
@@ -29,7 +27,6 @@ export function InvoiceDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
-  const [isWhatsAppSharing, setIsWhatsAppSharing] = useState(false);
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
@@ -229,72 +226,6 @@ export function InvoiceDetail() {
       showToast('Failed to share invoice. Please try again.', 'error');
     } finally {
       setIsSharing(false);
-    }
-  };
-
-  const handleWhatsAppShare = async () => {
-    if (!invoiceRef.current || !document || !authUser) {
-      showToast('Unable to share to WhatsApp', 'error');
-      return;
-    }
-
-    setIsWhatsAppSharing(true);
-
-    try {
-      const invoiceData: InvoiceData = normalizeDocumentData(
-        document.document_number,
-        document.issue_date,
-        document.due_date,
-        document.client_name,
-        document.client_email,
-        lineItems.map(item => ({
-          description: item.name,
-          quantity: item.quantity,
-          unitPrice: item.unit_price,
-          total: item.line_total
-        })),
-        document.subtotal,
-        document.tax_total,
-        document.total,
-        document.notes,
-        business,
-        dbUserProfile?.signature_data_url,
-        document.client_address,
-        document.client_phone,
-        document.reference,
-        document.payment_details,
-        document.payment_terms,
-        document.footer_message,
-        document.currency,
-        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
-      );
-
-      const filename = getInvoiceFilename(document.document_number);
-      const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
-
-      const shareMessage = createInvoiceShareMessage(
-        invoiceData,
-        business?.business_name,
-        (document.currency || business?.default_currency || 'ZAR') as Currency
-      );
-
-      let whatsappMessage = shareMessage;
-      try {
-        const uploadResult = await storage.uploadPDF(pdfBlob, filename, authUser.id);
-        if (uploadResult.url && !uploadResult.error) {
-          whatsappMessage = `${shareMessage}\n\nDownload PDF: ${uploadResult.url}`;
-        }
-      } catch {
-        // proceed without PDF link
-      }
-
-      openWhatsApp(whatsappMessage, document.client_phone);
-      showToast('Opening WhatsApp...', 'success');
-    } catch (error) {
-      console.error('[InvoiceDetail] Error sharing to WhatsApp:', error);
-      showToast('Failed to share to WhatsApp. Please try again.', 'error');
-    } finally {
-      setIsWhatsAppSharing(false);
     }
   };
 
@@ -554,16 +485,6 @@ export function InvoiceDetail() {
 
         {/* Secondary actions */}
         <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <button
-            onClick={handleWhatsAppShare}
-            disabled={isWhatsAppSharing}
-            className="w-full px-4 py-3 flex items-center gap-3 border-b border-[#f2f2f7] disabled:opacity-50"
-          >
-            <MessageCircle className="w-5 h-5 text-[#25d366]" strokeWidth={2} />
-            <span className={`${ds.callout} font-semibold text-black`}>
-              {isWhatsAppSharing ? 'Opening WhatsApp...' : 'Share via WhatsApp'}
-            </span>
-          </button>
           {currentStatus !== 'paid' && currentStatus !== 'cancelled' && (
             <button
               onClick={handleMarkAsPaid}
