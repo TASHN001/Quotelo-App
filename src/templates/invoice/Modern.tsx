@@ -12,10 +12,10 @@ export function ModernInvoice({ data }: ModernInvoiceProps) {
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
         header: 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 gap-4',
-        logoContainer: 'flex items-center justify-center flex-shrink-0',
+        logoContainer: 'flex-shrink-0 w-16 h-16 overflow-hidden rounded-lg',
         invoiceTitle: 'text-3xl sm:text-5xl md:text-6xl font-bold text-orange-600',
         invoiceNumber: 'text-xs sm:text-sm text-gray-600 font-medium',
-        metaRow: 'grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8',
+        metaRow: 'grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-6 sm:mb-8',
         infoBlock: 'bg-orange-50 p-3 sm:p-4 rounded-xl',
         infoLabel: 'text-xs font-semibold text-orange-700 uppercase mb-2',
         infoText: 'text-xs sm:text-sm text-gray-900',

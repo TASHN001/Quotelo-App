@@ -12,10 +12,10 @@ export function MinimalInvoice({ data }: MinimalInvoiceProps) {
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
         header: 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900 gap-4',
-        logoContainer: 'flex items-center justify-center flex-shrink-0',
+        logoContainer: 'flex-shrink-0 w-16 h-16 overflow-hidden rounded-lg',
         invoiceTitle: 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900',
         invoiceNumber: 'text-xs sm:text-sm text-gray-600 font-medium',
-        metaRow: 'grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8',
+        metaRow: 'grid grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8',
         infoLabel: 'text-xs font-semibold text-gray-500 uppercase mb-2',
         infoText: 'text-xs sm:text-sm text-gray-900',
         dateRow: 'mt-4 sm:mt-6 space-y-2',
