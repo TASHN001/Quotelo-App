@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Briefcase } from 'lucide-react';
+import { ArrowLeft, Briefcase, SlidersHorizontal } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { DefaultsModal } from './TemplatePreview';
 import { ds } from '../lib/designSystem';
 import { TemplatePreviewCard } from './TemplatePreviewCard';
 import { MinimalInvoice } from '../templates/invoice/Minimal';
@@ -18,6 +19,7 @@ export function TemplatesList() {
   const { setCurrentScreen, setSelectedPreviewTemplateKey, authUser, showToast } = useApp();
   const [preferences, setPreferences] = useState<TemplatePreference[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showDefaults, setShowDefaults] = useState(false);
   const sampleData = getSampleInvoiceData();
 
   useEffect(() => {
@@ -155,6 +157,13 @@ export function TemplatesList() {
               {favoriteCount > 0 ? `${favoriteCount} favorite${favoriteCount !== 1 ? 's' : ''}` : 'Choose your invoice style'}
             </p>
           </div>
+          <button
+            onClick={() => setShowDefaults(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 flex-shrink-0"
+          >
+            <SlidersHorizontal className="w-4 h-4" strokeWidth={2} />
+            <span className="hidden sm:inline">Defaults</span>
+          </button>
         </div>
       </div>
 
@@ -182,6 +191,7 @@ export function TemplatesList() {
           </div>
         </div>
       </div>
+      {showDefaults && <DefaultsModal onClose={() => setShowDefaults(false)} />}
     </div>
   );
 }

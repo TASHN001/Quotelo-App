@@ -28,7 +28,7 @@ function saveDocumentDefaults(defaults: DocumentDefaults) {
   localStorage.setItem(DEFAULTS_KEY, JSON.stringify(defaults));
 }
 
-function DefaultsModal({ onClose }: { onClose: () => void }) {
+export function DefaultsModal({ onClose }: { onClose: () => void }) {
   const [values, setValues] = useState<DocumentDefaults>(loadDocumentDefaults);
 
   const handleSave = () => {
@@ -70,7 +70,7 @@ function DefaultsModal({ onClose }: { onClose: () => void }) {
           These details will automatically appear on all new invoices, quotes, and receipts.
         </p>
         {/* Fields */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-5 pt-4 pb-20 flex flex-col gap-4">
           {field('Banking Details', 'paymentDetails', 'e.g. Bank: FNB\nAccount: 123456789\nBranch: 250655', 4)}
           {field('Terms & Conditions', 'termsConditions', 'e.g. Payment due within 30 days of invoice date.', 3)}
           {field('Footer Message', 'footerMessage', 'e.g. Thank you for your business!', 2)}
