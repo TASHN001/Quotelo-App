@@ -35,7 +35,10 @@ export function InvoiceDataPreview() {
 
     setIsSaving(true);
 
-    const invoiceNumber = await db.getNextDocumentNumber(authUser.id, selectedClient?.id ?? null);
+    const invoiceNumber = await db.getNextDocumentNumber(
+      authUser.id,
+      (invoiceDraft.documentType?.toLowerCase() || 'invoice') as 'invoice' | 'quote' | 'receipt'
+    );
     const docDefaults = loadDocumentDefaults();
 
     const lineItems = invoiceDraft.items.map(item => ({

@@ -92,7 +92,10 @@ export function DocumentPreview() {
 
     setIsSaving(true);
 
-    const invoiceNumber = await db.getNextDocumentNumber(authUser.id, selectedClient?.id ?? null);
+    const invoiceNumber = await db.getNextDocumentNumber(
+      authUser.id,
+      (invoiceDraft?.documentType?.toLowerCase() || 'invoice') as 'invoice' | 'quote' | 'receipt'
+    );
 
     const lineItems = invoiceDraft.items.map(item => ({
       name: item.description,

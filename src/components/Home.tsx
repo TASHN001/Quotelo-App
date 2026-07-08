@@ -106,7 +106,7 @@ export function Home() {
     const originalDoc = await db.getDocument(invoiceId);
     const newDocNumber = await db.getNextDocumentNumber(
       localStorage.getItem('quotelo_user_id') || '',
-      originalDoc?.client_id ?? null
+      (originalDoc?.document_type || 'invoice') as 'invoice' | 'quote' | 'receipt'
     );
 
     const result = await db.duplicateDocument(invoiceId, newDocNumber);
