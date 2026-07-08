@@ -109,7 +109,7 @@ export function DocumentPreview() {
       authUser.id,
       business.id,
       {
-        documentType: 'invoice',
+        documentType: (invoiceDraft?.documentType?.toLowerCase() || 'invoice') as 'invoice' | 'quote' | 'receipt',
         documentNumber: invoiceNumber,
         status: 'sent',
         clientName: selectedClient?.name || invoiceDraft.client.name || 'Client',
