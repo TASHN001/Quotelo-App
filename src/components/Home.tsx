@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Plus, FileText, Share2, CheckCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Document } from '../lib/types';
+import { Document, Client } from '../lib/types';
+import { ClientPickerModal } from './ClientPickerModal';
 import { db } from '../lib/database';
 import { isOverdue as checkOverdue } from '../lib/statusManager';
 import { getCurrentDate } from '../lib/dateUtils';
@@ -10,9 +11,10 @@ import { ds, statusBadge } from '../lib/designSystem';
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue';
 
 export function Home() {
-  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, formatCurrency, showToast, refreshDocuments } = useApp();
+  const { userProfile, recentInvoices, isLoading, setCurrentScreen, setPreviousScreen, setSavedDocumentId, formatCurrency, showToast, refreshDocuments, setSelectedClient, authUser } = useApp();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [swipeState, setSwipeState] = useState<{ id: string; dir: 'left' | 'right' } | null>(null);
+  const [showClientPicker, setShowClientPicker] = useState(false);
   const touchStartX = useRef(0);
   const SWIPE_THRESHOLD = 50;
   const ACTION_W = 80;
@@ -145,7 +147,7 @@ export function Home() {
   };
 
   const handleCreateInvoice = () => {
-    setCurrentScreen('ai-generator');
+    setShowClientPicker(true);
   };
 
   if (isLoading) {
@@ -301,6 +303,21 @@ export function Home() {
         </div>
       </div>
 
+      {showClientPicker && (
+        <ClientPickerModal
+          userId={authUser?.id ?? ''}
+          onClose={() => setShowClientPicker(false)}
+          onSelectClient={(client: Client | null) => {
+            setSelectedClient(client);
+            setShowClientPicker(false);
+            setCurrentScreen('ai-generator');
+          }}
+          onAddClient={() => {
+            setShowClientPicker(false);
+            setCurrentScreen('clients');
+          }}
+        />
+      )}
     </div>
   );
 }
