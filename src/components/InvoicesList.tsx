@@ -5,12 +5,13 @@ import { db } from '../lib/database';
 import { isOverdue, calculateDocumentStatus } from '../lib/statusManager';
 import { getCurrentDate } from '../lib/dateUtils';
 import { ds, statusBadge } from '../lib/designSystem';
-import type { Document } from '../lib/types';
+import type { Document, Client } from '../lib/types';
+import { ClientPickerModal } from './ClientPickerModal';
 
 type FilterType = 'all' | 'draft' | 'sent' | 'paid' | 'overdue' | 'outstanding' | 'paid-this-month';
 
 export function InvoicesList() {
-  const { setCurrentScreen, setPreviousScreen, authUser, formatCurrency, setSavedDocumentId, showToast } = useApp();
+  const { setCurrentScreen, setPreviousScreen, authUser, formatCurrency, setSavedDocumentId, showToast, setSelectedClient } = useApp();
   const [swipeState, setSwipeState] = useState<{ id: string; dir: 'left' | 'right' } | null>(null);
   const touchStartX = useRef(0);
   const SWIPE_THRESHOLD = 50;
@@ -21,6 +22,7 @@ export function InvoicesList() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTitle, setFilterTitle] = useState('All Invoices');
+  const [showClientPicker, setShowClientPicker] = useState(false);
 
   useEffect(() => {
     const savedFilter = localStorage.getItem('dashboard_invoice_filter') as FilterType | null;
@@ -187,7 +189,7 @@ export function InvoicesList() {
         <div className="flex items-end justify-between mb-5">
           <h1 className={`${ds.title1} text-black`}>Invoices</h1>
           <button
-            onClick={() => setCurrentScreen('ai-generator')}
+            onClick={() => setShowClientPicker(true)}
             className={`w-9 h-9 bg-[#f97316] rounded-full flex items-center justify-center ${ds.shadowOrange} ${ds.press} ${ds.transition} mb-1`}
           >
             <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
@@ -261,6 +263,22 @@ export function InvoicesList() {
           </div>
         )}
       </div>
+
+      {showClientPicker && (
+        <ClientPickerModal
+          userId={authUser?.id ?? ''}
+          onClose={() => setShowClientPicker(false)}
+          onSelectClient={(client: Client | null) => {
+            setSelectedClient(client);
+            setShowClientPicker(false);
+            setCurrentScreen('ai-generator');
+          }}
+          onAddClient={() => {
+            setShowClientPicker(false);
+            setCurrentScreen('clients');
+          }}
+        />
+      )}
     </div>
   );
 }
