@@ -238,7 +238,7 @@ export function AIGenerator() {
           {isLoading ? (
             <div className="text-center animate-slide-up">
               <Loader2 className="w-8 h-8 text-[#f97316] mx-auto mb-3 animate-spin" strokeWidth={2.5} />
-              <p className={`${ds.headline} text-black mb-1`}>Processing your invoice...</p>
+              <p className={`${ds.headline} text-black mb-1`}>Processing your {selectedDocumentType.toLowerCase()}...</p>
               <p className={`${ds.callout} text-[#8e8e93]`}>Our AI is extracting the details</p>
             </div>
           ) : isTranscribing ? (
@@ -249,12 +249,12 @@ export function AIGenerator() {
             </div>
           ) : inputMode === 'text' ? (
             <div className="w-full animate-slide-up">
-              <p className={`${ds.headline} text-black mb-3 text-center`}>Describe your invoice</p>
+              <p className={`${ds.headline} text-black mb-3 text-center`}>Describe your {selectedDocumentType.toLowerCase()}</p>
               <textarea
                 value={textInput}
                 onChange={e => setTextInput(e.target.value)}
                 rows={5}
-                placeholder="e.g. Invoice for Acme Corp, web design R5000, due in 14 days"
+                placeholder={`e.g. ${selectedDocumentType} for Acme Corp, web design R5000, due in 14 days`}
                 className={`${ds.input} resize-none`}
                 disabled={isLoading}
                 autoFocus
@@ -264,7 +264,7 @@ export function AIGenerator() {
                 disabled={isLoading || !textInput.trim()}
                 className={`${ds.btnPrimary} w-full mt-3 disabled:opacity-50`}
               >
-                Generate Invoice
+                Generate {selectedDocumentType}
               </button>
               <button
                 onClick={() => { setInputMode('voice'); setTextInput(''); }}

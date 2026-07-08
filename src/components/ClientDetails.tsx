@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, FileDown, Share2, CheckCircle, Pencil } from 'lucide-react';
+import { ChevronLeft, Share2, CheckCircle, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
 import { ClientForm } from './ClientForm';
 import { ds, statusBadge } from '../lib/designSystem';
-import { downloadBlob } from '../lib/shareUtils';
 import { getCurrentDate } from '../lib/dateUtils';
 import { calculateDocumentStatus } from '../lib/statusManager';
 import type { Client, Document } from '../lib/types';
@@ -106,162 +105,6 @@ export function ClientDetails() {
     else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
   };
 
-  const handleDownloadStatement = async () => {
-    if (!client || documents.length === 0) return;
-
-    const d = window.document;
-    const container = d.createElement('div');
-    Object.assign(container.style, {
-      position: 'fixed',
-      left: '-9999px',
-      top: '0',
-      width: '700px',
-      fontFamily: "'Helvetica Neue', Arial, sans-serif",
-      padding: '48px',
-      backgroundColor: '#ffffff',
-      color: '#1a1a1a',
-    });
-
-    // Header
-    const header = d.createElement('div');
-    Object.assign(header.style, { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', paddingBottom: '24px', borderBottom: '2px solid #f97316' });
-
-    const headerLeft = d.createElement('div');
-    const title = d.createElement('h1');
-    title.textContent = 'Customer Statement';
-    Object.assign(title.style, { fontSize: '28px', fontWeight: '700', margin: '0 0 4px', color: '#1a1a1a' });
-    const subtitle = d.createElement('p');
-    subtitle.textContent = `Client: ${client.name}`;
-    Object.assign(subtitle.style, { fontSize: '14px', color: '#6b7280', margin: '0' });
-    headerLeft.appendChild(title);
-    headerLeft.appendChild(subtitle);
-
-    const headerRight = d.createElement('div');
-    Object.assign(headerRight.style, { textAlign: 'right' });
-    const dateEl = d.createElement('p');
-    dateEl.textContent = `Generated: ${new Date().toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })}`;
-    Object.assign(dateEl.style, { fontSize: '13px', color: '#6b7280', margin: '0 0 4px' });
-    if (client.email) {
-      const emailEl = d.createElement('p');
-      emailEl.textContent = client.email;
-      Object.assign(emailEl.style, { fontSize: '13px', color: '#6b7280', margin: '0' });
-      headerRight.appendChild(emailEl);
-    }
-    headerRight.appendChild(dateEl);
-
-    header.appendChild(headerLeft);
-    header.appendChild(headerRight);
-    container.appendChild(header);
-
-    // Summary row
-    const summaryRow = d.createElement('div');
-    Object.assign(summaryRow.style, { display: 'flex', gap: '16px', marginBottom: '28px' });
-
-    const makeSummaryCard = (label: string, value: string, accent: string) => {
-      const card = d.createElement('div');
-      Object.assign(card.style, { flex: '1', background: '#f9fafb', borderRadius: '8px', padding: '16px', borderLeft: `4px solid ${accent}` });
-      const cardLabel = d.createElement('p');
-      cardLabel.textContent = label;
-      Object.assign(cardLabel.style, { fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 6px' });
-      const cardValue = d.createElement('p');
-      cardValue.textContent = value;
-      Object.assign(cardValue.style, { fontSize: '18px', fontWeight: '700', color: '#1a1a1a', margin: '0' });
-      card.appendChild(cardLabel);
-      card.appendChild(cardValue);
-      return card;
-    };
-
-    const currency = documents[0]?.currency || 'ZAR';
-    const fmt = (v: number) => v.toLocaleString('en-ZA', { style: 'currency', currency });
-
-    summaryRow.appendChild(makeSummaryCard('Total Invoiced', fmt(outstandingBalance + totalPaid), '#f97316'));
-    summaryRow.appendChild(makeSummaryCard('Amount Paid', fmt(totalPaid), '#34c759'));
-    summaryRow.appendChild(makeSummaryCard('Outstanding', fmt(outstandingBalance), '#ff3b30'));
-    container.appendChild(summaryRow);
-
-    // Table
-    const table = d.createElement('table');
-    Object.assign(table.style, { width: '100%', borderCollapse: 'collapse', fontSize: '13px' });
-
-    const thead = d.createElement('thead');
-    const headRow = d.createElement('tr');
-    Object.assign(headRow.style, { backgroundColor: '#f97316' });
-    ['#', 'Invoice', 'Issue Date', 'Due Date', 'Amount', 'Status'].forEach((label, i) => {
-      const th = d.createElement('th');
-      th.textContent = label;
-      Object.assign(th.style, {
-        padding: '10px 12px',
-        textAlign: i >= 4 ? 'right' : 'left',
-        fontWeight: '600',
-        color: '#ffffff',
-        fontSize: '12px',
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
-      });
-      if (i === 0) th.style.width = '40px';
-      headRow.appendChild(th);
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
-
-    const tbody = d.createElement('tbody');
-    documents.forEach((doc, idx) => {
-      const tr = d.createElement('tr');
-      Object.assign(tr.style, { backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f9fafb' });
-
-      const statusLabel = doc.status.charAt(0).toUpperCase() + doc.status.slice(1);
-      const statusColor = doc.status === 'paid' ? '#34c759' : doc.status === 'overdue' ? '#ff3b30' : '#f97316';
-
-      const cells: [string, 'left' | 'right', boolean][] = [
-        [`${idx + 1}`, 'left', false],
-        [doc.document_number, 'left', false],
-        [doc.issue_date, 'left', false],
-        [doc.due_date, 'left', false],
-        [fmt(doc.total), 'right', false],
-        [statusLabel, 'right', true],
-      ];
-
-      cells.forEach(([val, align, isStatus]) => {
-        const td = d.createElement('td');
-        Object.assign(td.style, {
-          padding: '10px 12px',
-          borderBottom: '1px solid #f2f2f7',
-          textAlign: align,
-          color: isStatus ? statusColor : '#1a1a1a',
-          fontWeight: isStatus ? '600' : '400',
-        });
-        td.textContent = val;
-        tr.appendChild(td);
-      });
-
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    container.appendChild(table);
-
-    // Footer
-    const footer = d.createElement('p');
-    footer.textContent = 'Generated by Quotelo';
-    Object.assign(footer.style, { marginTop: '32px', fontSize: '11px', color: '#9ca3af', textAlign: 'center' });
-    container.appendChild(footer);
-
-    d.body.appendChild(container);
-    await new Promise(resolve => requestAnimationFrame(resolve));
-
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      const blob = await html2pdf().set({
-        margin: 10,
-        filename: `Statement-${client.name}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      }).from(container).outputPdf('blob');
-      downloadBlob(blob as Blob, `Statement-${client.name}.pdf`);
-    } finally {
-      d.body.removeChild(container);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -299,15 +142,6 @@ export function ClientDetails() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {documents.length > 0 && (
-            <button
-              onClick={handleDownloadStatement}
-              className={`p-2 bg-white rounded-xl border border-[#e5e5ea] ${ds.transition} ${ds.press}`}
-              title="Download Statement"
-            >
-              <FileDown className="w-4 h-4 text-[#3c3c43]" />
-            </button>
-          )}
           <button
             onClick={() => setIsEditFormOpen(true)}
             className={`p-2 bg-white rounded-xl border border-[#e5e5ea] ${ds.transition} ${ds.press}`}

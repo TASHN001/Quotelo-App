@@ -35,13 +35,11 @@ export const EditorPreview = forwardRef<HTMLDivElement, EditorPreviewProps>(
           <span className="text-sm font-medium text-gray-700">Live Preview</span>
           <span className="text-xs text-gray-500">{template?.name || 'Modern'} Template</span>
         </div>
-        <div
-          ref={ref}
-          className="p-4 sm:p-6 overflow-x-auto"
-          style={{ minWidth: '320px' }}
-        >
+        <div className="p-4 sm:p-6 overflow-x-auto" style={{ minWidth: '320px' }}>
           <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%' }}>
-            <TemplateComponent data={invoiceData} />
+            <div ref={ref}>
+              <TemplateComponent data={invoiceData} />
+            </div>
           </div>
         </div>
       </div>
