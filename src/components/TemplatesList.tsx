@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Home as HomeIcon, User, Briefcase } from 'lucide-react';
+import { ArrowLeft, Briefcase } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ds } from '../lib/designSystem';
 import { TemplatePreviewCard } from './TemplatePreviewCard';
@@ -180,35 +180,6 @@ export function TemplatesList() {
               {industryTemplates.map(templateKey => renderTemplateCard(templateKey))}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="sticky bottom-0 bg-white border-t border-[#f2f2f7] px-6 py-4">
-        <div className="flex items-center justify-around relative">
-          <button
-            onClick={() => setCurrentScreen('home')}
-            className="flex flex-col items-center gap-1 text-gray-400"
-          >
-            <HomeIcon className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Home</span>
-          </button>
-
-          <div className="relative">
-            <button
-              onClick={() => setCurrentScreen('ai-generator')}
-              className="w-14 h-14 bg-[#f97316] rounded-full flex items-center justify-center shadow-lg absolute -top-8 left-1/2 -translate-x-1/2"
-            >
-              <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
-            </button>
-          </div>
-
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="flex flex-col items-center gap-1 text-gray-400"
-          >
-            <User className="w-6 h-6" strokeWidth={2} />
-            <span className="text-xs font-medium">Profile</span>
-          </button>
         </div>
       </div>
     </div>
