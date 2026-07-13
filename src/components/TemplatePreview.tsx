@@ -31,6 +31,12 @@ function saveDocumentDefaults(defaults: DocumentDefaults) {
 export function DefaultsModal({ onClose }: { onClose: () => void }) {
   const [values, setValues] = useState<DocumentDefaults>(loadDocumentDefaults);
 
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   const handleSave = () => {
     saveDocumentDefaults(values);
     onClose();
@@ -52,7 +58,7 @@ export function DefaultsModal({ onClose }: { onClose: () => void }) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'rgba(0,0,0,0.5)' }}>
+    <div className="fixed inset-0 z-[60] flex flex-col" style={{ background: 'rgba(0,0,0,0.5)' }}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-2xl max-h-[85vh] flex flex-col">
         {/* Handle */}
@@ -77,7 +83,7 @@ export function DefaultsModal({ onClose }: { onClose: () => void }) {
           {field('Default Notes', 'notes', 'e.g. Please reference the invoice number when making payment.', 2)}
         </div>
         {/* Save */}
-        <div className="px-5 py-4 border-t border-[#f2f2f7]">
+        <div className="px-5 pt-4 border-t border-[#f2f2f7]" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
           <button
             onClick={handleSave}
             className={`w-full ${ds.btnPrimary} py-3.5`}

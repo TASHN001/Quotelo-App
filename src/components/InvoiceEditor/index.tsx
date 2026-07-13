@@ -4,6 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { db } from '../../lib/database';
 import { getTemplate, templates } from '../../templates';
 import { normalizeDocumentData } from '../../lib/invoiceHelpers';
+import { loadDocumentDefaults } from '../TemplatePreview';
 import { generatePDFBlob, getInvoiceFilename } from '../../lib/pdfGenerator';
 import { downloadBlob } from '../../lib/shareUtils';
 import { ds } from '../../lib/designSystem';
@@ -266,7 +267,7 @@ export function InvoiceEditor() {
       return {} as InvoiceData;
     }
 
-    return normalizeDocumentData(
+    const data = normalizeDocumentData(
       document.document_number,
       document.issue_date,
       document.due_date,
@@ -294,6 +295,15 @@ export function InvoiceEditor() {
       (document.document_type as 'Invoice' | 'Quote' | 'Receipt') || 'Invoice',
       document.custom_logo_url
     );
+
+    const docDefaults = loadDocumentDefaults();
+    return {
+      ...data,
+      paymentInstructions: docDefaults.paymentDetails || data.paymentInstructions,
+      paymentTerms: data.paymentTerms || docDefaults.termsConditions || undefined,
+      footer: data.footer || docDefaults.footerMessage || undefined,
+      notes: data.notes || docDefaults.notes || undefined,
+    };
   };
 
   if (isLoading) {

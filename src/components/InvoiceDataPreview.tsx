@@ -67,7 +67,6 @@ export function InvoiceDataPreview() {
         total: invoiceDraft.total,
         currency: selectedClient?.client_currency || business.default_currency,
         notes: invoiceDraft.notes || docDefaults.notes || undefined,
-        paymentDetails: docDefaults.paymentDetails || undefined,
         paymentTerms: docDefaults.termsConditions || undefined,
         footerMessage: docDefaults.footerMessage || 'Thank you for your business!',
         templateKey: selectedTemplateKey || undefined,

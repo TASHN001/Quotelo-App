@@ -6,6 +6,7 @@ import { db } from '../lib/database';
 import { getTemplate, getMockInvoiceData } from '../templates';
 import { normalizeInvoiceDraft } from '../lib/invoiceHelpers';
 import { getCurrentTimestamp } from '../lib/dateUtils';
+import { loadDocumentDefaults } from './TemplatePreview';
 import type { InvoiceData } from '../lib/types';
 
 export function DocumentPreview() {
@@ -82,6 +83,16 @@ export function DocumentPreview() {
     invoiceData.signatureDataUrl = dbUserProfile?.signature_data_url;
   }
 
+  // Merge global document defaults (banking text, terms, footer, notes)
+  const docDefaults = loadDocumentDefaults();
+  invoiceData = {
+    ...invoiceData,
+    paymentInstructions: docDefaults.paymentDetails || invoiceData.paymentInstructions,
+    paymentTerms: docDefaults.termsConditions || invoiceData.paymentTerms,
+    footer: docDefaults.footerMessage || invoiceData.footer,
+    notes: invoiceData.notes || docDefaults.notes || undefined,
+  };
+
   const TemplateComponent = template.component;
 
   const handleSaveInvoice = async () => {
@@ -122,8 +133,9 @@ export function DocumentPreview() {
         taxTotal: invoiceDraft.tax,
         total: invoiceDraft.total,
         currency: selectedClient?.client_currency || business.default_currency,
-        notes: invoiceDraft.notes || undefined,
-        footerMessage: 'Thank you for your business!',
+        notes: invoiceDraft.notes || docDefaults.notes || undefined,
+        paymentTerms: docDefaults.termsConditions || undefined,
+        footerMessage: docDefaults.footerMessage || 'Thank you for your business!',
         templateKey: selectedTemplateKey || undefined,
         clientId: selectedClient?.id
       },
