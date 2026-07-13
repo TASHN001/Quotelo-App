@@ -13,6 +13,7 @@ interface InvoiceLayoutProps {
     logo?: string;
     invoiceTitle?: string;
     invoiceNumber?: string;
+    invoiceNumberLabel?: string;
     metaRow?: string;
     infoBlock?: string;
     infoLabel?: string;
@@ -73,16 +74,16 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
-        <div className="flex items-end gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <div
-            className={styles.logoContainer || 'flex-shrink-0 overflow-hidden'}
-            style={styles.logoContainer ? undefined : { width: 64, height: 64, borderRadius: 8 }}
+            className={styles.logoContainer || 'flex-shrink-0'}
+            style={styles.logoContainer ? undefined : { width: 80, height: 80 }}
           >
             {data.business.logoUrl ? (
               <img
                 src={data.business.logoUrl}
                 alt={data.business.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -96,13 +97,16 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
           </h1>
         </div>
         <div className="text-left sm:text-right">
-          <p className={styles.invoiceNumber || 'text-sm text-gray-600'}>
-            NO. {formatDocumentNumber(data.invoice.number)}
+          <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>
+            NO.
+          </p>
+          <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>
+            {formatDocumentNumber(data.invoice.number)}
           </p>
         </div>
       </div>
 
-      <div className={styles.metaRow || 'grid grid-cols-2 gap-8 mb-8'}>
+      <div className={styles.metaRow || 'grid grid-cols-2 gap-8 mb-6'}>
         <div className={styles.infoBlock || ''}>
           <p className={styles.infoLabel || 'text-xs font-semibold text-gray-500 uppercase mb-2'}>
             {t('invoice.from')}
@@ -113,10 +117,11 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               {data.business.address.street && (
                 <p className={styles.infoText || 'text-sm text-gray-700'}>{data.business.address.street}</p>
               )}
-              {(data.business.address.city || data.business.address.postalCode) && (
-                <p className={styles.infoText || 'text-sm text-gray-700'}>
-                  {[data.business.address.city, data.business.address.postalCode].filter(Boolean).join(', ')}
-                </p>
+              {data.business.address.city && (
+                <p className={styles.infoText || 'text-sm text-gray-700'}>{data.business.address.city}</p>
+              )}
+              {data.business.address.postalCode && (
+                <p className={styles.infoText || 'text-sm text-gray-700'}>{data.business.address.postalCode}</p>
               )}
               {data.business.address.country && (
                 <p className={styles.infoText || 'text-sm text-gray-700'}>{data.business.address.country}</p>
@@ -144,27 +149,6 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               VAT No: {data.business.vatNumber}
             </p>
           )}
-
-          <div className={styles.dateRow || 'mt-4 sm:mt-6 space-y-2'}>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <div className="flex-1">
-                <p className={styles.dateLabel || 'text-xs font-semibold text-gray-500 uppercase'}>
-                  {t('invoice.issueDate')}
-                </p>
-                <p className={styles.dateValue || 'text-sm text-gray-900 mt-1'}>
-                  {data.invoice.issueDate}
-                </p>
-              </div>
-              <div className="flex-1">
-                <p className={styles.dateLabel || 'text-xs font-semibold text-gray-500 uppercase'}>
-                  {t('invoice.dueDate')}
-                </p>
-                <p className={styles.dateValue || 'text-sm text-gray-900 mt-1'}>
-                  {data.invoice.dueDate}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className={styles.infoBlock || ''}>
@@ -177,10 +161,11 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               {data.client.address.street && (
                 <p className={styles.infoText || 'text-sm text-gray-700'}>{data.client.address.street}</p>
               )}
-              {(data.client.address.city || data.client.address.postalCode) && (
-                <p className={styles.infoText || 'text-sm text-gray-700'}>
-                  {[data.client.address.city, data.client.address.postalCode].filter(Boolean).join(', ')}
-                </p>
+              {data.client.address.city && (
+                <p className={styles.infoText || 'text-sm text-gray-700'}>{data.client.address.city}</p>
+              )}
+              {data.client.address.postalCode && (
+                <p className={styles.infoText || 'text-sm text-gray-700'}>{data.client.address.postalCode}</p>
               )}
               {data.client.address.country && (
                 <p className={styles.infoText || 'text-sm text-gray-700'}>{data.client.address.country}</p>
@@ -198,6 +183,27 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
               Tax No: {data.client.taxNumber}
             </p>
           )}
+        </div>
+      </div>
+
+      <div className={styles.dateRow || 'mb-6 sm:mb-8'}>
+        <div className="flex gap-6 sm:gap-8">
+          <div>
+            <p className={styles.dateLabel || 'text-xs font-semibold text-gray-500 uppercase'}>
+              {t('invoice.issueDate')}
+            </p>
+            <p className={styles.dateValue || 'text-sm text-gray-900 mt-1'}>
+              {data.invoice.issueDate}
+            </p>
+          </div>
+          <div>
+            <p className={styles.dateLabel || 'text-xs font-semibold text-gray-500 uppercase'}>
+              {t('invoice.dueDate')}
+            </p>
+            <p className={styles.dateValue || 'text-sm text-gray-900 mt-1'}>
+              {data.invoice.dueDate}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -268,7 +274,7 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
       </div>
 
       {(data.paymentDetails || data.paymentInstructions || data.paymentTerms || data.notes || data.invoice.reference) && (
-        <div className={styles.footer || 'space-y-6 mt-8'}>
+        <div className={styles.footer || 'space-y-4 mt-6'}>
           {data.invoice.reference && (
             <div>
               <p className={styles.footerLabel || 'text-xs font-semibold text-gray-500 uppercase mb-1'}>
@@ -354,14 +360,8 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
         </div>
       )}
 
-      {data.footer && (
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-600">{data.footer}</p>
-        </div>
-      )}
-
       {data.signatureDataUrl && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
+        <div className="mt-4 pt-3 border-t border-gray-200">
           <p className="text-xs font-semibold text-gray-500 uppercase mb-3">{t('invoice.signature')}</p>
           <img
             src={data.signatureDataUrl}
@@ -371,7 +371,13 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
         </div>
       )}
 
-      <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-2 opacity-70">
+      {data.footer && (
+        <div className="mt-4 pt-4 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-600">{data.footer}</p>
+        </div>
+      )}
+
+      <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-2 opacity-70">
         <span className="text-xs text-gray-500 dark:text-gray-400">
           Generated by
         </span>
