@@ -30,7 +30,7 @@ export async function generateInvoicePDF(
         removeContainer: true,
         imageTimeout: 15000,
         allowTaint: false,
-        windowWidth: 520,
+        windowWidth: 794,
         onclone: (doc: Document) => {
           doc.querySelectorAll('[data-pdf-hide]').forEach(el => (el as HTMLElement).style.display = 'none');
         },

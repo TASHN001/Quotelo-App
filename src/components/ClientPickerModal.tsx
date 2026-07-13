@@ -17,6 +17,12 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  useEffect(() => {
     loadClients();
   }, [userId]);
 
@@ -62,7 +68,7 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+    <div className="fixed inset-0 z-[60] flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="relative bg-white rounded-t-[20px] shadow-[0_-4px_16px_rgba(0,0,0,0.10)] max-h-[80vh] flex flex-col">
         {/* Drag handle */}
@@ -86,7 +92,7 @@ export function ClientPickerModal({ onClose, onSelectClient, onAddClient, userId
           />
         </div>
         {/* Client list */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
           {/* Continue without client option */}
           <button
             onClick={handleContinueWithoutClient}

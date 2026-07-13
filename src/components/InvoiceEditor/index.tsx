@@ -132,9 +132,10 @@ export function InvoiceEditor() {
         last_auto_save: new Date().toISOString()
       });
 
+      const itemsToSave = lineItems.filter(item => item.name.trim() || item.unit_price > 0);
       await db.deleteDocumentLineItems(document.id);
-      for (let i = 0; i < lineItems.length; i++) {
-        const item = lineItems[i];
+      for (let i = 0; i < itemsToSave.length; i++) {
+        const item = itemsToSave[i];
         await db.createLineItem({
           document_id: document.id,
           name: item.name,
@@ -273,7 +274,7 @@ export function InvoiceEditor() {
       document.due_date,
       document.client_name,
       document.client_email,
-      lineItems.map(item => ({
+      lineItems.filter(item => item.name.trim() || item.unit_price > 0).map(item => ({
         description: item.name,
         quantity: item.quantity,
         unitPrice: item.unit_price,
