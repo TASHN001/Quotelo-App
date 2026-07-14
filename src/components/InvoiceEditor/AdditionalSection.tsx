@@ -58,7 +58,7 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
           )}
         </div>
         <textarea
-          value={document.terms_conditions || ''}
+          value={document.terms_conditions || document.payment_terms || ''}
           onChange={(e) => onUpdate({ terms_conditions: e.target.value })}
           rows={4}
           placeholder="Enter your terms and conditions..."

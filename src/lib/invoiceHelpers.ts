@@ -181,20 +181,17 @@ export function normalizeDocumentData(
   documentType?: 'Invoice' | 'Quote' | 'Receipt',
   customLogoUrl?: string
 ): InvoiceData {
-  let parsedPaymentDetails;
-  try {
-    parsedPaymentDetails = paymentDetails ? JSON.parse(paymentDetails) : undefined;
-  } catch {
-    parsedPaymentDetails = undefined;
-  }
+  // Banking details always come from the business profile (the payment_details column is plain text)
+  const parsedPaymentDetails = business && (business.bank_name || business.bank_account_number || business.bank_swift_code)
+    ? {
+        bankName: business.bank_name,
+        accountNumber: business.bank_account_number,
+        swiftCode: business.bank_swift_code
+      }
+    : undefined;
 
-  if (!parsedPaymentDetails && business && (business.bank_name || business.bank_account_number || business.bank_swift_code)) {
-    parsedPaymentDetails = {
-      bankName: business.bank_name,
-      accountNumber: business.bank_account_number,
-      swiftCode: business.bank_swift_code
-    };
-  }
+  // payment_details column stores free-text payment instructions (never JSON in practice)
+  const documentInstructions = paymentDetails?.trim() || undefined;
 
   const formattedPaymentTerms = formatPaymentTermsString(paymentTerms);
 
@@ -232,7 +229,7 @@ export function normalizeDocumentData(
     currency: currency || business?.default_currency,
     notes,
     paymentDetails: parsedPaymentDetails,
-    paymentInstructions: business?.payment_instructions,
+    paymentInstructions: documentInstructions || business?.payment_instructions,
     paymentTerms: formattedPaymentTerms,
     footer: footerMessage || 'Thank you for your business!',
     signatureDataUrl

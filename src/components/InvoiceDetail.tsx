@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { ChevronLeft, Download, Share2, CheckCircle, Copy, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
@@ -12,11 +12,10 @@ import {
   downloadBlob,
   canUseNativeShare
 } from '../lib/shareUtils';
-import { calculateDocumentStatus, getStatusLabel, getStatusColor } from '../lib/statusManager';
+import { calculateDocumentStatus, getStatusLabel } from '../lib/statusManager';
 import { ds, statusBadge } from '../lib/designSystem';
-import { EditableInvoiceLayout } from './EditableInvoiceLayout';
+import { loadDocumentDefaults } from './TemplatePreview';
 import { getCurrentTimestamp, getCurrentDate } from '../lib/dateUtils';
-import type { LineItem } from './EditableLineItems';
 import type { Document, DocumentLineItem, InvoiceData } from '../lib/types';
 import type { Currency } from '../lib/currency';
 
@@ -30,6 +29,47 @@ export function InvoiceDetail() {
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
+
+  // Single source of truth for invoice data — shared by render, Export PDF, and Share PDF
+  const invoiceData = useMemo((): InvoiceData => {
+    if (!document) return {} as InvoiceData;
+    const data = normalizeDocumentData(
+      document.document_number,
+      document.issue_date,
+      document.due_date,
+      document.client_name,
+      document.client_email,
+      lineItems.map(item => ({
+        description: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        total: item.line_total
+      })),
+      document.subtotal,
+      document.tax_total,
+      document.total,
+      document.notes,
+      business,
+      document.custom_signature_url || dbUserProfile?.signature_data_url,
+      document.client_address,
+      document.client_phone,
+      document.reference,
+      document.payment_details,
+      document.terms_conditions || document.payment_terms,
+      document.footer_message,
+      document.currency,
+      (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt',
+      document.custom_logo_url
+    );
+    const docDefaults = loadDocumentDefaults();
+    return {
+      ...data,
+      paymentInstructions: docDefaults.paymentDetails || data.paymentInstructions,
+      paymentTerms: data.paymentTerms || docDefaults.termsConditions || undefined,
+      footer: data.footer || docDefaults.footerMessage || undefined,
+      notes: data.notes || docDefaults.notes || undefined,
+    };
+  }, [document, lineItems, business, dbUserProfile]);
 
   useEffect(() => {
     loadDocument();
@@ -57,59 +97,6 @@ export function InvoiceDetail() {
     setIsLoading(false);
   };
 
-  const handleUpdateField = async (field: string, value: any) => {
-    if (!document || !savedDocumentId) return;
-
-    try {
-      const updates: Partial<Document> = { [field]: value };
-      const updated = await db.updateDocument(savedDocumentId, updates);
-
-      if (updated) {
-        setDocument(updated);
-        showToast('Updated successfully', 'success');
-      }
-    } catch (error) {
-      console.error('[InvoiceDetail] Error updating field:', error);
-      showToast('Failed to update', 'error');
-      throw error;
-    }
-  };
-
-  const handleUpdateLineItems = async (items: LineItem[]) => {
-    if (!document || !savedDocumentId) return;
-
-    try {
-      await db.deleteDocumentLineItems(savedDocumentId);
-
-      for (const item of items) {
-        await db.addDocumentLineItem(savedDocumentId, {
-          name: item.description,
-          quantity: item.quantity,
-          unit_price: item.unitPrice,
-          line_total: item.total
-        });
-      }
-
-      const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-      const taxRate = document.tax_total / document.subtotal || 0;
-      const taxTotal = subtotal * taxRate;
-      const total = subtotal + taxTotal;
-
-      await db.updateDocument(savedDocumentId, {
-        subtotal,
-        tax_total: taxTotal,
-        total
-      });
-
-      await loadDocument();
-      showToast('Line items updated', 'success');
-    } catch (error) {
-      console.error('[InvoiceDetail] Error updating line items:', error);
-      showToast('Failed to update line items', 'error');
-      throw error;
-    }
-  };
-
   const handleExportPDF = async () => {
     if (!invoiceRef.current || !document) {
       showToast('Unable to generate PDF', 'error');
@@ -119,34 +106,6 @@ export function InvoiceDetail() {
     setIsExporting(true);
 
     try {
-      const invoiceData: InvoiceData = normalizeDocumentData(
-        document.document_number,
-        document.issue_date,
-        document.due_date,
-        document.client_name,
-        document.client_email,
-        lineItems.map(item => ({
-          description: item.name,
-          quantity: item.quantity,
-          unitPrice: item.unit_price,
-          total: item.line_total
-        })),
-        document.subtotal,
-        document.tax_total,
-        document.total,
-        document.notes,
-        business,
-        dbUserProfile?.signature_data_url,
-        document.client_address,
-        document.client_phone,
-        document.reference,
-        document.payment_details,
-        document.payment_terms,
-        document.footer_message,
-        document.currency,
-        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
-      );
-
       const filename = getInvoiceFilename(document.document_number);
       const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
 
@@ -169,34 +128,6 @@ export function InvoiceDetail() {
     setIsSharing(true);
 
     try {
-      const invoiceData: InvoiceData = normalizeDocumentData(
-        document.document_number,
-        document.issue_date,
-        document.due_date,
-        document.client_name,
-        document.client_email,
-        lineItems.map(item => ({
-          description: item.name,
-          quantity: item.quantity,
-          unitPrice: item.unit_price,
-          total: item.line_total
-        })),
-        document.subtotal,
-        document.tax_total,
-        document.total,
-        document.notes,
-        business,
-        dbUserProfile?.signature_data_url,
-        document.client_address,
-        document.client_phone,
-        document.reference,
-        document.payment_details,
-        document.payment_terms,
-        document.footer_message,
-        document.currency,
-        (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
-      );
-
       const filename = getInvoiceFilename(document.document_number);
       const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
 
@@ -300,72 +231,16 @@ export function InvoiceDetail() {
     );
   }
 
-  const invoiceData: InvoiceData = normalizeDocumentData(
-    document.document_number,
-    document.issue_date,
-    document.due_date,
-    document.client_name,
-    document.client_email,
-    lineItems.map(item => ({
-      description: item.name,
-      quantity: item.quantity,
-      unitPrice: item.unit_price,
-      total: item.line_total
-    })),
-    document.subtotal,
-    document.tax_total,
-    document.total,
-    document.notes,
-    business,
-    dbUserProfile?.signature_data_url,
-    document.client_address,
-    document.client_phone,
-    document.reference,
-    document.payment_details,
-    document.payment_terms,
-    document.footer_message,
-    document.currency,
-    (document.document_type ? (document.document_type.charAt(0).toUpperCase() + document.document_type.slice(1)) : 'Invoice') as 'Invoice' | 'Quote' | 'Receipt'
-  );
-
   let template = document.template_key ? getTemplate(document.template_key) : null;
-
-  // Fallback: Try adding 'invoice-' prefix for legacy keys
   if (!template && document.template_key && !document.template_key.startsWith('invoice-')) {
     template = getTemplate(`invoice-${document.template_key}`);
   }
-
-  const templateStyles = template?.component ? {
-    container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
-    header: 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900 gap-4',
-    logoContainer: 'w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center flex-shrink-0',
-    invoiceTitle: 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900',
-    invoiceNumber: 'text-xs sm:text-sm text-gray-600 font-medium',
-    metaRow: 'grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8',
-    infoLabel: 'text-xs font-semibold text-gray-500 uppercase mb-2',
-    infoText: 'text-xs sm:text-sm text-gray-900',
-    dateRow: 'mt-4 sm:mt-6 space-y-2',
-    dateLabel: 'text-xs font-semibold text-gray-500 uppercase',
-    dateValue: 'text-xs sm:text-sm text-gray-900 mt-1',
-    tableContainer: 'w-full overflow-x-auto mb-6 sm:mb-8 -mx-4 sm:mx-0',
-    tableHeader: 'border-b-2 border-gray-900',
-    tableHeaderCell: 'text-left py-2 sm:py-3 px-1 sm:px-2 text-xs sm:text-sm font-semibold text-gray-900',
-    tableRow: 'border-b border-gray-200',
-    tableCell: 'py-2 sm:py-3 px-1 sm:px-2 text-xs sm:text-sm text-gray-900',
-    totalsContainer: 'flex justify-end mb-6 sm:mb-8',
-    totalRow: 'flex justify-between py-1.5 sm:py-2 text-xs sm:text-sm',
-    totalLabel: 'text-gray-600',
-    totalValue: 'text-gray-900',
-    grandTotalRow: 'flex justify-between py-2 sm:py-3 border-t-2 border-gray-900',
-    grandTotalLabel: 'text-base sm:text-lg font-bold text-gray-900',
-    grandTotalValue: 'text-lg sm:text-xl font-bold text-gray-900',
-    footer: 'space-y-3 sm:space-y-4 mt-6 sm:mt-8',
-    footerLabel: 'text-xs font-semibold text-gray-500 uppercase mb-1',
-    footerText: 'text-xs sm:text-sm text-gray-700'
-  } : {};
+  if (!template) {
+    template = getTemplate('invoice-modern');
+  }
+  const TemplateComponent = template!.component;
 
   const currentStatus = calculateDocumentStatus(document);
-  const statusColors = getStatusColor(document);
   const statusLabel = getStatusLabel(document);
 
   return (
@@ -439,19 +314,13 @@ export function InvoiceDetail() {
           </div>
         </div>
 
-        {/* Invoice preview */}
+        {/* Invoice preview — single renderer used by both display and PDF capture */}
         <div>
           <p className={`${ds.caption} text-[#8e8e93] mb-2`}>PREVIEW</p>
-          <div ref={invoiceRef} className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] overflow-x-hidden">
-            <EditableInvoiceLayout
-              data={invoiceData}
-              document={document}
-              lineItems={lineItems}
-              onUpdate={handleUpdateField}
-              onUpdateLineItems={handleUpdateLineItems}
-              styles={templateStyles}
-              readOnly={true}
-            />
+          <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <div ref={invoiceRef}>
+              <TemplateComponent data={invoiceData} />
+            </div>
           </div>
         </div>
 

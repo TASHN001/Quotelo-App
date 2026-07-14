@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { ArrowLeft, Save, Download, AlertCircle, Clock } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { db } from '../../lib/database';
@@ -47,7 +47,7 @@ export function InvoiceEditor() {
   const [expandedSections, setExpandedSections] = useState({
     header: true,
     lineItems: true,
-    financials: true,
+    financials: false,
     additional: false,
     status: false,
     versions: false
@@ -134,18 +134,15 @@ export function InvoiceEditor() {
 
       const itemsToSave = lineItems.filter(item => item.name.trim() || item.unit_price > 0);
       await db.deleteDocumentLineItems(document.id);
-      for (let i = 0; i < itemsToSave.length; i++) {
-        const item = itemsToSave[i];
-        await db.createLineItem({
-          document_id: document.id,
-          name: item.name,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          tax_rate: item.tax_rate,
-          line_total: item.line_total,
-          sort_order: i
-        });
-      }
+      await db.createLineItems(itemsToSave.map((item, i) => ({
+        document_id: document.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        tax_rate: item.tax_rate,
+        line_total: item.line_total,
+        sort_order: i
+      })));
 
       const docVersions = await db.getDocumentVersions(document.id);
       setVersions(docVersions);
@@ -165,10 +162,9 @@ export function InvoiceEditor() {
   };
 
   const handleUpdateDocument = useCallback((updates: Partial<Document>) => {
-    if (!document) return;
     setDocument(prev => prev ? { ...prev, ...updates } : null);
     setHasUnsavedChanges(true);
-  }, [document]);
+  }, []);
 
   const handleUpdateBusinessLogo = useCallback(async (logoUrl: string) => {
     if (!business?.id) return;
@@ -263,6 +259,47 @@ export function InvoiceEditor() {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
+  // ponytail: useMemo here (before early returns) so the hook is always called unconditionally
+  const invoiceData = useMemo((): InvoiceData => {
+    if (!document) return {} as InvoiceData;
+    const data = normalizeDocumentData(
+      document.document_number,
+      document.issue_date,
+      document.due_date,
+      document.client_name,
+      document.client_email,
+      lineItems.filter(item => item.name.trim() || item.unit_price > 0).map(item => ({
+        description: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        total: item.line_total
+      })),
+      document.subtotal,
+      document.tax_total,
+      document.total,
+      document.notes,
+      business,
+      document.custom_signature_url || dbUserProfile?.signature_data_url,
+      document.client_address,
+      document.client_phone,
+      document.reference,
+      document.payment_details,
+      document.terms_conditions || document.payment_terms,
+      document.footer_message,
+      document.currency,
+      (document.document_type as 'Invoice' | 'Quote' | 'Receipt') || 'Invoice',
+      document.custom_logo_url
+    );
+    const docDefaults = loadDocumentDefaults();
+    return {
+      ...data,
+      paymentInstructions: docDefaults.paymentDetails || data.paymentInstructions,
+      paymentTerms: data.paymentTerms || docDefaults.termsConditions || undefined,
+      footer: data.footer || docDefaults.footerMessage || undefined,
+      notes: data.notes || docDefaults.notes || undefined,
+    };
+  }, [document, lineItems, business, dbUserProfile]);
+
   const buildInvoiceData = (): InvoiceData => {
     if (!document) {
       return {} as InvoiceData;
@@ -290,7 +327,7 @@ export function InvoiceEditor() {
       document.client_phone,
       document.reference,
       document.payment_details,
-      document.payment_terms,
+      document.terms_conditions || document.payment_terms,
       document.footer_message,
       document.currency,
       (document.document_type as 'Invoice' | 'Quote' | 'Receipt') || 'Invoice',
@@ -331,8 +368,6 @@ export function InvoiceEditor() {
       </div>
     );
   }
-
-  const invoiceData = buildInvoiceData();
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-10">
