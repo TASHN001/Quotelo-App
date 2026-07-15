@@ -9,7 +9,7 @@ export interface TemplateDefinition {
   documentType: string;
   planTier: 'free' | 'pro';
   previewImageUrl?: string;
-  component: React.ComponentType<{ data: InvoiceData }>;
+  component: React.ComponentType<{ data: InvoiceData; pdfMode?: boolean }>;
 }
 
 export const templates: TemplateDefinition[] = [

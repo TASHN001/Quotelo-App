@@ -6,6 +6,7 @@ const AI_BADGE_LOGO = '/Quotelo_Logo.png';
 
 interface InvoiceLayoutProps {
   data: InvoiceData;
+  pdfMode?: boolean;
   styles: {
     container?: string;
     header?: string;
@@ -39,7 +40,7 @@ interface InvoiceLayoutProps {
   };
 }
 
-export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
+export function InvoiceLayout({ data, pdfMode, styles }: InvoiceLayoutProps) {
   const { t } = useApp();
 
   const formatCurrencyWithSymbol = (amount: number) => {
@@ -74,45 +75,61 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
       <div className={styles.header || 'mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900'}>
-        {/* Three-column header: logo | title | doc-number — all vertically centred */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
-
-          {/* Left: Logo */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-            <div className={styles.logoContainer || 'flex-shrink-0'} style={styles.logoContainer ? undefined : { width: 80, height: 80 }}>
-              {data.business.logoUrl ? (
-                <img
-                  src={data.business.logoUrl}
-                  alt={data.business.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              ) : (
-                <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
-              )}
+        {pdfMode ? (
+          /* PDF export: logo + title on left, doc-number top-right (two-column) */
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div className={styles.logoContainer || 'flex-shrink-0'} style={styles.logoContainer ? undefined : { width: 80, height: 80 }}>
+                {data.business.logoUrl ? (
+                  <img
+                    src={data.business.logoUrl}
+                    alt={data.business.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
+                )}
+              </div>
+              <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'} style={{ margin: 0 }}>
+                {documentTitle}
+              </h1>
             </div>
-          </div>
-
-          {/* Centre: Document Title */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'} style={{ margin: 0 }}>
-              {documentTitle}
-            </h1>
-          </div>
-
-          {/* Right: Document Number */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <div style={{ textAlign: 'right' }}>
-              <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>
-                NO.
-              </p>
-              <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>
-                {formatDocumentNumber(data.invoice.number)}
-              </p>
+              <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>NO.</p>
+              <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>{formatDocumentNumber(data.invoice.number)}</p>
             </div>
           </div>
-
-        </div>
+        ) : (
+          /* In-app preview: logo | title | doc-number (three-column, all centred) */
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+              <div className={styles.logoContainer || 'flex-shrink-0'} style={styles.logoContainer ? undefined : { width: 80, height: 80 }}>
+                {data.business.logoUrl ? (
+                  <img
+                    src={data.business.logoUrl}
+                    alt={data.business.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
+                )}
+              </div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'} style={{ margin: 0 }}>
+                {documentTitle}
+              </h1>
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <div style={{ textAlign: 'right' }}>
+                <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>NO.</p>
+                <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>{formatDocumentNumber(data.invoice.number)}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className={styles.metaRow || 'grid grid-cols-2 gap-8 mb-6'}>

@@ -29,6 +29,7 @@ export function InvoiceDetail() {
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   // Single source of truth for invoice data — shared by render, Export PDF, and Share PDF
   const invoiceData = useMemo((): InvoiceData => {
@@ -98,7 +99,7 @@ export function InvoiceDetail() {
   };
 
   const handleExportPDF = async () => {
-    if (!invoiceRef.current || !document) {
+    if (!pdfRef.current || !document) {
       showToast('Unable to generate PDF', 'error');
       return;
     }
@@ -107,7 +108,7 @@ export function InvoiceDetail() {
 
     try {
       const filename = getInvoiceFilename(document.document_number);
-      const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
+      const pdfBlob = await generatePDFBlob(pdfRef.current, invoiceData);
 
       downloadBlob(pdfBlob, filename);
       showToast('PDF downloaded successfully', 'success');
@@ -120,7 +121,7 @@ export function InvoiceDetail() {
   };
 
   const handleShare = async () => {
-    if (!invoiceRef.current || !document || !authUser) {
+    if (!pdfRef.current || !document || !authUser) {
       showToast('Unable to share invoice', 'error');
       return;
     }
@@ -129,7 +130,7 @@ export function InvoiceDetail() {
 
     try {
       const filename = getInvoiceFilename(document.document_number);
-      const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
+      const pdfBlob = await generatePDFBlob(pdfRef.current, invoiceData);
 
       const shareMessage = createInvoiceShareMessage(
         invoiceData,
@@ -314,7 +315,7 @@ export function InvoiceDetail() {
           </div>
         </div>
 
-        {/* Invoice preview — single renderer used by both display and PDF capture */}
+        {/* Invoice preview — three-column header, in-app display only */}
         <div>
           <p className={`${ds.caption} text-[#8e8e93] mb-2`}>PREVIEW</p>
           <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
@@ -322,6 +323,15 @@ export function InvoiceDetail() {
               <TemplateComponent data={invoiceData} />
             </div>
           </div>
+        </div>
+
+        {/* Hidden off-screen renderer — two-column header, captured by PDF export/share */}
+        <div
+          ref={pdfRef}
+          style={{ position: 'absolute', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
+          aria-hidden="true"
+        >
+          <TemplateComponent data={invoiceData} pdfMode={true} />
         </div>
 
         {/* Primary action row */}

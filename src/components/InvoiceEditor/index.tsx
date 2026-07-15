@@ -121,18 +121,19 @@ export function InvoiceEditor() {
     setIsSaving(true);
 
     try {
-      const snapshot = {
+      // Non-critical: snapshot before save (already handles errors internally)
+      await db.createDocumentVersion(document.id, authUser.id, {
         document: { ...document },
         line_items: lineItems
-      };
-      await db.createDocumentVersion(document.id, authUser.id, snapshot);
+      });
 
       await db.updateDocument(document.id, {
         ...document,
         last_auto_save: new Date().toISOString()
       });
 
-      const itemsToSave = lineItems.filter(item => item.name.trim() || item.unit_price > 0);
+      // null-guard item.name — Supabase can return null for nullable text columns
+      const itemsToSave = lineItems.filter(item => (item.name || '').trim() || item.unit_price > 0);
       await db.deleteDocumentLineItems(document.id);
       await db.createLineItems(itemsToSave.map((item, i) => ({
         document_id: document.id,
@@ -144,15 +145,14 @@ export function InvoiceEditor() {
         sort_order: i
       })));
 
-      const docVersions = await db.getDocumentVersions(document.id);
-      setVersions(docVersions);
-
+      // Critical path done — mark saved before non-critical version history fetch
       setHasUnsavedChanges(false);
       setLastSaveTime(new Date());
+      if (!isAutoSave) showToast('Document saved successfully', 'success');
 
-      if (!isAutoSave) {
-        showToast('Document saved successfully', 'success');
-      }
+      // Non-critical: refresh version list (failure doesn't affect saved state)
+      const docVersions = await db.getDocumentVersions(document.id);
+      setVersions(docVersions);
     } catch (error) {
       console.error('[InvoiceEditor] Error saving:', error);
       showToast('Failed to save document', 'error');

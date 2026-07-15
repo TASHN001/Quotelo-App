@@ -3,12 +3,14 @@ import { InvoiceLayout } from './InvoiceLayout';
 
 interface ModernInvoiceProps {
   data: InvoiceData;
+  pdfMode?: boolean;
 }
 
-export function ModernInvoice({ data }: ModernInvoiceProps) {
+export function ModernInvoice({ data, pdfMode }: ModernInvoiceProps) {
   return (
     <InvoiceLayout
       data={data}
+      pdfMode={pdfMode}
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
         header: 'flex flex-col sm:flex-row items-center justify-between mb-5 sm:mb-6 pb-4 sm:pb-5 gap-4',

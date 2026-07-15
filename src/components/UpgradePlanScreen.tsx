@@ -21,7 +21,21 @@ const PRO_FEATURES = [
 ];
 
 export function UpgradePlanScreen() {
-  const { setCurrentScreen } = useApp();
+  const { setCurrentScreen, dbUserProfile } = useApp();
+  const isPro = dbUserProfile?.plan_tier === 'pro';
+
+  const handleUpgrade = () => {
+    // ponytail: full IAP requires Capacitor native SDK; placeholder CTA until wired
+    window.open('mailto:support@quoteloapp.com?subject=Upgrade%20to%20Pro%20Plan', '_blank');
+  };
+
+  const handleManageSubscription = () => {
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const url = isIOS
+      ? 'itms-apps://apps.apple.com/account/subscriptions'
+      : 'https://play.google.com/store/account/subscriptions';
+    window.open(url, '_blank');
+  };
 
   return (
     <div className={`h-screen overflow-y-auto ${ds.bg}`}>
@@ -34,16 +48,18 @@ export function UpgradePlanScreen() {
 
       <div className="px-4 pb-10 flex flex-col gap-4">
 
-        {/* Current plan */}
+        {/* Free plan */}
         <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <p className={`${ds.caption} text-[#8e8e93] mb-3`}>CURRENT PLAN</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className={`${ds.caption} text-[#8e8e93]`}>{isPro ? 'PREVIOUS PLAN' : 'CURRENT PLAN'}</p>
+          </div>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-[#f2f2f7] rounded-xl flex items-center justify-center">
               <Zap className="w-5 h-5 text-[#8e8e93]" strokeWidth={2} />
             </div>
             <div>
               <p className={`${ds.headline} text-black font-semibold`}>Free Plan</p>
-              <p className={`${ds.footnote} text-[#8e8e93]`}>R0 / month</p>
+              <p className={`${ds.footnote} text-[#8e8e93]`}>$0 / month</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -65,11 +81,11 @@ export function UpgradePlanScreen() {
               </div>
               <div>
                 <p className={`${ds.headline} text-white font-semibold`}>Pro Plan</p>
-                <p className={`${ds.footnote} text-white/80`}>R149 / month</p>
+                <p className={`${ds.footnote} text-white/80`}>$12 / month</p>
               </div>
             </div>
             <span className="bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full">
-              BEST VALUE
+              {isPro ? 'ACTIVE' : 'BEST VALUE'}
             </span>
           </div>
 
@@ -82,12 +98,21 @@ export function UpgradePlanScreen() {
             ))}
           </div>
 
-          <a
-            href="mailto:support@quoteloapp.com?subject=Upgrade%20to%20Pro%20Plan"
-            className="block w-full bg-white text-[#f97316] text-center font-semibold rounded-xl py-3 text-[15px] active:scale-[0.97] transition-all duration-150"
-          >
-            Contact Us to Upgrade
-          </a>
+          {isPro ? (
+            <button
+              onClick={handleManageSubscription}
+              className="block w-full bg-white text-[#f97316] text-center font-semibold rounded-xl py-3 text-[15px] active:scale-[0.97] transition-all duration-150"
+            >
+              Manage Subscription
+            </button>
+          ) : (
+            <button
+              onClick={handleUpgrade}
+              className="block w-full bg-white text-[#f97316] text-center font-semibold rounded-xl py-3 text-[15px] active:scale-[0.97] transition-all duration-150"
+            >
+              Upgrade to Pro
+            </button>
+          )}
         </div>
 
         <p className={`${ds.footnote} text-[#8e8e93] text-center`}>

@@ -3,12 +3,14 @@ import { InvoiceLayout } from './InvoiceLayout';
 
 interface MinimalInvoiceProps {
   data: InvoiceData;
+  pdfMode?: boolean;
 }
 
-export function MinimalInvoice({ data }: MinimalInvoiceProps) {
+export function MinimalInvoice({ data, pdfMode }: MinimalInvoiceProps) {
   return (
     <InvoiceLayout
       data={data}
+      pdfMode={pdfMode}
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
         header: 'flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900 gap-4',

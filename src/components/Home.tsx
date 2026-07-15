@@ -18,6 +18,7 @@ export function Home() {
   const touchStartX = useRef(0);
   const SWIPE_THRESHOLD = 50;
   const ACTION_W = 80;
+  const CLOSE_THRESHOLD = 10;
 
   const isInvoiceOverdue = (invoice: any) => {
     const doc: Document = {
@@ -79,16 +80,30 @@ export function Home() {
 
   const handleTouchEnd = (invoiceId: string, e: React.TouchEvent) => {
     const delta = e.changedTouches[0].clientX - touchStartX.current;
-    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'left' });
-    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'right' });
-    else setSwipeState(null);
+    const currentDir = swipeState?.id === invoiceId ? swipeState.dir : null;
+    if (currentDir === 'left') {
+      setSwipeState(delta > CLOSE_THRESHOLD ? null : { id: invoiceId, dir: 'left' });
+    } else if (currentDir === 'right') {
+      setSwipeState(delta < -CLOSE_THRESHOLD ? null : { id: invoiceId, dir: 'right' });
+    } else {
+      if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'left' });
+      else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'right' });
+      else setSwipeState(null);
+    }
   };
 
   const handleMouseDown = (e: React.MouseEvent) => { touchStartX.current = e.clientX; };
   const handleMouseUp = (invoiceId: string, e: React.MouseEvent) => {
     const delta = e.clientX - touchStartX.current;
-    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'left' });
-    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'right' });
+    const currentDir = swipeState?.id === invoiceId ? swipeState.dir : null;
+    if (currentDir === 'left') {
+      if (delta > CLOSE_THRESHOLD) setSwipeState(null);
+    } else if (currentDir === 'right') {
+      if (delta < -CLOSE_THRESHOLD) setSwipeState(null);
+    } else {
+      if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'left' });
+      else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: invoiceId, dir: 'right' });
+    }
   };
 
   const handleShare = (invoiceId: string) => {
@@ -252,7 +267,7 @@ export function Home() {
                 return (
                   <div key={invoice.id} className={`relative overflow-hidden ${idx < filteredInvoices.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}>
                     {/* Share panel — sits below card (no z-index). Revealed when card slides left. */}
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex flex-col items-center justify-center gap-1">
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#f97316] flex flex-col items-center justify-center gap-1">
                       <button onClick={() => handleShare(invoice.id)} className="flex flex-col items-center gap-1 w-full h-full justify-center">
                         <Share2 className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="text-white text-[11px] font-semibold">Share</span>

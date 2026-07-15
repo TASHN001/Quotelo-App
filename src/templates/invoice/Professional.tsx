@@ -3,12 +3,14 @@ import { InvoiceLayout } from './InvoiceLayout';
 
 interface ProfessionalInvoiceProps {
   data: InvoiceData;
+  pdfMode?: boolean;
 }
 
-export function ProfessionalInvoice({ data }: ProfessionalInvoiceProps) {
+export function ProfessionalInvoice({ data, pdfMode }: ProfessionalInvoiceProps) {
   return (
     <InvoiceLayout
       data={data}
+      pdfMode={pdfMode}
       styles={{
         container: 'bg-white p-4 sm:p-6 md:p-8 w-full max-w-full box-border',
         header: 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 pb-4 sm:pb-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 sm:p-6 rounded-xl -mx-4 sm:-mx-6 md:-mx-8 -mt-4 sm:-mt-6 md:-mt-8 gap-4',

@@ -142,7 +142,7 @@ export function TemplatesList() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col pb-24 transition-colors">
+    <div className="min-h-screen bg-white flex flex-col pb-28 transition-colors">
       <div className="bg-white p-4 sm:p-6 border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-2 sm:gap-4">
           <button

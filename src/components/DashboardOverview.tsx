@@ -402,7 +402,7 @@ export function DashboardOverview() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 pb-8">
+      <div className="flex-1 overflow-auto p-4 pb-28">
         <div className="grid grid-cols-2 gap-3 mb-6">
           <KPICard
             icon={<Send className="w-5 h-5 text-blue-600" />}
