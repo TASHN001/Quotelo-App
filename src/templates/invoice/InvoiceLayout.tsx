@@ -73,36 +73,45 @@ export function InvoiceLayout({ data, styles }: InvoiceLayoutProps) {
 
   return (
     <div className={styles.container || 'bg-white p-8 w-full'}>
-      <div className={styles.header || 'flex flex-col sm:flex-row items-start justify-between mb-6 sm:mb-8 gap-4'}>
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div
-            className={styles.logoContainer || 'flex-shrink-0'}
-            style={styles.logoContainer ? undefined : { width: 80, height: 80 }}
-          >
-            {data.business.logoUrl ? (
-              <img
-                src={data.business.logoUrl}
-                alt={data.business.name}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            ) : (
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
-            )}
+      <div className={styles.header || 'mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-gray-900'}>
+        {/* Three-column header: logo | title | doc-number — all vertically centred */}
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+
+          {/* Left: Logo */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+            <div className={styles.logoContainer || 'flex-shrink-0'} style={styles.logoContainer ? undefined : { width: 80, height: 80 }}>
+              {data.business.logoUrl ? (
+                <img
+                  src={data.business.logoUrl}
+                  alt={data.business.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              ) : (
+                <span className="text-xs text-gray-400 uppercase tracking-wider">Your Logo</span>
+              )}
+            </div>
           </div>
-          <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'}>
-            {documentTitle}
-          </h1>
-        </div>
-        <div className="text-left sm:text-right">
-          <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>
-            NO.
-          </p>
-          <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>
-            {formatDocumentNumber(data.invoice.number)}
-          </p>
+
+          {/* Centre: Document Title */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h1 className={styles.invoiceTitle || 'text-3xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-none'} style={{ margin: 0 }}>
+              {documentTitle}
+            </h1>
+          </div>
+
+          {/* Right: Document Number */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <div style={{ textAlign: 'right' }}>
+              <p className={styles.invoiceNumberLabel || 'text-xs font-semibold text-gray-500 uppercase tracking-widest'}>
+                NO.
+              </p>
+              <p className={styles.invoiceNumber || 'text-sm text-gray-800 font-medium'}>
+                {formatDocumentNumber(data.invoice.number)}
+              </p>
+            </div>
+          </div>
+
         </div>
       </div>
 
