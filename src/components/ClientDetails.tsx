@@ -89,20 +89,33 @@ export function ClientDetails() {
     setCurrentScreen('ai-generator');
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
+  const CLOSE_THRESHOLD = 10;
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (docId: string, e: React.TouchEvent) => {
     const delta = e.changedTouches[0].clientX - touchStartX.current;
-    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'left' });
-    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
-    else setSwipeState(null);
+    const currentDir = swipeState?.id === docId ? swipeState.dir : null;
+    if (currentDir === 'left') {
+      setSwipeState(delta > CLOSE_THRESHOLD ? null : { id: docId, dir: 'left' });
+    } else if (currentDir === 'right') {
+      setSwipeState(delta < -CLOSE_THRESHOLD ? null : { id: docId, dir: 'right' });
+    } else {
+      if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'left' });
+      else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
+      else setSwipeState(null);
+    }
   };
   const handleMouseDown = (e: React.MouseEvent) => { touchStartX.current = e.clientX; };
   const handleMouseUp = (docId: string, e: React.MouseEvent) => {
     const delta = e.clientX - touchStartX.current;
-    if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'left' });
-    else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
+    const currentDir = swipeState?.id === docId ? swipeState.dir : null;
+    if (currentDir === 'left') {
+      if (delta > CLOSE_THRESHOLD) setSwipeState(null);
+    } else if (currentDir === 'right') {
+      if (delta < -CLOSE_THRESHOLD) setSwipeState(null);
+    } else {
+      if (delta < -SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'left' });
+      else if (delta > SWIPE_THRESHOLD) setSwipeState({ id: docId, dir: 'right' });
+    }
   };
 
 
@@ -204,7 +217,7 @@ export function ClientDetails() {
                     className={`relative overflow-hidden ${idx < documents.length - 1 ? 'border-b border-[#f2f2f7]' : ''}`}
                   >
                     {/* Share panel */}
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#007aff] flex items-center justify-center">
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#f97316] flex items-center justify-center">
                       <button
                         onClick={() => handleShare(doc.id)}
                         className="flex flex-col items-center gap-1 w-full h-full justify-center"
