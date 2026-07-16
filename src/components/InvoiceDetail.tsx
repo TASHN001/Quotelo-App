@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { flushSync } from 'react-dom';
 import { ChevronLeft, Download, Share2, CheckCircle, Copy, Pencil } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/database';
@@ -29,7 +30,7 @@ export function InvoiceDetail() {
   const [isMarkingPaid, setIsMarkingPaid] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
-  const pdfRef = useRef<HTMLDivElement>(null);
+  const [isPdfCapturing, setIsPdfCapturing] = useState(false);
 
   // Single source of truth for invoice data — shared by render, Export PDF, and Share PDF
   const invoiceData = useMemo((): InvoiceData => {
@@ -99,7 +100,7 @@ export function InvoiceDetail() {
   };
 
   const handleExportPDF = async () => {
-    if (!pdfRef.current || !document) {
+    if (!invoiceRef.current || !document) {
       showToast('Unable to generate PDF', 'error');
       return;
     }
@@ -108,7 +109,14 @@ export function InvoiceDetail() {
 
     try {
       const filename = getInvoiceFilename(document.document_number);
-      const pdfBlob = await generatePDFBlob(pdfRef.current, invoiceData);
+
+      // Switch the visible preview to two-column PDF layout synchronously before capture.
+      // The off-screen element approach produces a blank PDF because html2canvas's
+      // windowWidth:794 clips anything left of x=0. Using the already-visible element
+      // guarantees html2canvas can render it; the "Generating..." spinner masks the
+      // brief layout change.
+      flushSync(() => setIsPdfCapturing(true));
+      const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
 
       downloadBlob(pdfBlob, filename);
       showToast('PDF downloaded successfully', 'success');
@@ -116,12 +124,13 @@ export function InvoiceDetail() {
       console.error('[InvoiceDetail] Error generating PDF:', error);
       showToast('Failed to generate PDF. Please try again.', 'error');
     } finally {
+      setIsPdfCapturing(false);
       setIsExporting(false);
     }
   };
 
   const handleShare = async () => {
-    if (!pdfRef.current || !document || !authUser) {
+    if (!invoiceRef.current || !document || !authUser) {
       showToast('Unable to share invoice', 'error');
       return;
     }
@@ -130,7 +139,8 @@ export function InvoiceDetail() {
 
     try {
       const filename = getInvoiceFilename(document.document_number);
-      const pdfBlob = await generatePDFBlob(pdfRef.current, invoiceData);
+      flushSync(() => setIsPdfCapturing(true));
+      const pdfBlob = await generatePDFBlob(invoiceRef.current, invoiceData);
 
       const shareMessage = createInvoiceShareMessage(
         invoiceData,
@@ -157,6 +167,7 @@ export function InvoiceDetail() {
       console.error('[InvoiceDetail] Error sharing invoice:', error);
       showToast('Failed to share invoice. Please try again.', 'error');
     } finally {
+      setIsPdfCapturing(false);
       setIsSharing(false);
     }
   };
@@ -315,23 +326,14 @@ export function InvoiceDetail() {
           </div>
         </div>
 
-        {/* Invoice preview — three-column header, in-app display only */}
+        {/* Invoice preview — pdfMode toggles to two-column header during PDF export/share */}
         <div>
           <p className={`${ds.caption} text-[#8e8e93] mb-2`}>PREVIEW</p>
           <div className="bg-white rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <div ref={invoiceRef}>
-              <TemplateComponent data={invoiceData} />
+              <TemplateComponent data={invoiceData} pdfMode={isPdfCapturing} />
             </div>
           </div>
-        </div>
-
-        {/* Hidden off-screen renderer — two-column header, captured by PDF export/share */}
-        <div
-          ref={pdfRef}
-          style={{ position: 'absolute', left: '-9999px', top: 0, width: '794px', zIndex: -1 }}
-          aria-hidden="true"
-        >
-          <TemplateComponent data={invoiceData} pdfMode={true} />
         </div>
 
         {/* Primary action row */}

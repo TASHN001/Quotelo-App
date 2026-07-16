@@ -78,7 +78,7 @@ export function InvoiceLayout({ data, pdfMode, styles }: InvoiceLayoutProps) {
         {pdfMode ? (
           /* PDF export: logo + title on left, doc-number top-right (two-column) */
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
               <div className={styles.logoContainer || 'flex-shrink-0'} style={styles.logoContainer ? undefined : { width: 80, height: 80 }}>
                 {data.business.logoUrl ? (
                   <img
