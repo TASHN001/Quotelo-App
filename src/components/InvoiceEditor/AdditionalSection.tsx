@@ -114,12 +114,12 @@ export function AdditionalSection({ document, business, onUpdate }: AdditionalSe
           <MessageSquare className="w-4 h-4 text-[#8e8e93]" />
           <label className={`${ds.callout} font-semibold text-black`}>Footer Message</label>
         </div>
-        <input
-          type="text"
+        <textarea
           value={document.footer_message || ''}
           onChange={(e) => onUpdate({ footer_message: e.target.value })}
+          rows={2}
           placeholder="e.g., 'Thank you for your business!'"
-          className={ds.input}
+          className={`${ds.input} resize-none`}
         />
       </div>
     </div>

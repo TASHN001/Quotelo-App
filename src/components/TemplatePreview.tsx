@@ -77,10 +77,10 @@ export function DefaultsModal({ onClose }: { onClose: () => void }) {
         </p>
         {/* Fields */}
         <div className="flex-1 overflow-y-auto px-5 pt-4 pb-20 flex flex-col gap-4">
-          {field('Banking Details', 'paymentDetails', 'e.g. Bank: FNB\nAccount: 123456789\nBranch: 250655', 4)}
-          {field('Terms & Conditions', 'termsConditions', 'e.g. Payment due within 30 days of invoice date.', 3)}
-          {field('Footer Message', 'footerMessage', 'e.g. Thank you for your business!', 2)}
-          {field('Default Notes', 'notes', 'e.g. Please reference the invoice number when making payment.', 2)}
+          {field('Notes', 'notes', "Add any additional notes for the client (e.g., 'Thank you for your business!')", 3)}
+          {field('Terms & Conditions', 'termsConditions', 'Enter your terms and conditions...', 4)}
+          {field('Payment Instructions', 'paymentDetails', 'Bank details, payment links, or other payment instructions...', 4)}
+          {field('Footer Message', 'footerMessage', "e.g. 'Thank you for your business!'", 2)}
         </div>
         {/* Save */}
         <div className="px-5 pt-4 border-t border-[#f2f2f7]" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
