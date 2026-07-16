@@ -121,21 +121,28 @@ export function InvoiceEditor() {
     setIsSaving(true);
 
     try {
-      // Non-critical: snapshot before save (already handles errors internally)
-      await db.createDocumentVersion(document.id, authUser.id, {
-        document: { ...document },
-        line_items: lineItems
-      });
+      // Non-critical: version snapshot — isolated so it can never block a save
+      try {
+        await db.createDocumentVersion(document.id, authUser.id, {
+          document: { ...document },
+          line_items: lineItems
+        });
+      } catch {
+        // version history is best-effort; save must proceed regardless
+      }
 
-      await db.updateDocument(document.id, {
+      const saved = await db.updateDocument(document.id, {
         ...document,
         last_auto_save: new Date().toISOString()
       });
+      if (!saved) throw new Error('Document update failed — check Supabase RLS / column names');
 
       // null-guard item.name — Supabase can return null for nullable text columns
       const itemsToSave = lineItems.filter(item => (item.name || '').trim() || item.unit_price > 0);
-      await db.deleteDocumentLineItems(document.id);
-      await db.createLineItems(itemsToSave.map((item, i) => ({
+      const deleted = await db.deleteDocumentLineItems(document.id);
+      if (!deleted) throw new Error('Failed to clear old line items');
+
+      const created = await db.createLineItems(itemsToSave.map((item, i) => ({
         document_id: document.id,
         name: item.name,
         quantity: item.quantity,
@@ -144,15 +151,19 @@ export function InvoiceEditor() {
         line_total: item.line_total,
         sort_order: i
       })));
+      if (!created) throw new Error('Failed to write line items');
 
-      // Critical path done — mark saved before non-critical version history fetch
       setHasUnsavedChanges(false);
       setLastSaveTime(new Date());
       if (!isAutoSave) showToast('Document saved successfully', 'success');
 
-      // Non-critical: refresh version list (failure doesn't affect saved state)
-      const docVersions = await db.getDocumentVersions(document.id);
-      setVersions(docVersions);
+      // Non-critical: refresh version list
+      try {
+        const docVersions = await db.getDocumentVersions(document.id);
+        setVersions(docVersions);
+      } catch {
+        // version list is cosmetic; ignore
+      }
     } catch (error) {
       console.error('[InvoiceEditor] Error saving:', error);
       showToast('Failed to save document', 'error');
@@ -268,7 +279,7 @@ export function InvoiceEditor() {
       document.due_date,
       document.client_name,
       document.client_email,
-      lineItems.filter(item => item.name.trim() || item.unit_price > 0).map(item => ({
+      lineItems.filter(item => (item.name || '').trim() || item.unit_price > 0).map(item => ({
         description: item.name,
         quantity: item.quantity,
         unitPrice: item.unit_price,
@@ -311,7 +322,7 @@ export function InvoiceEditor() {
       document.due_date,
       document.client_name,
       document.client_email,
-      lineItems.filter(item => item.name.trim() || item.unit_price > 0).map(item => ({
+      lineItems.filter(item => (item.name || '').trim() || item.unit_price > 0).map(item => ({
         description: item.name,
         quantity: item.quantity,
         unitPrice: item.unit_price,

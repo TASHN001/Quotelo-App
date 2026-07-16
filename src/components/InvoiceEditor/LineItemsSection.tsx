@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Plus, Trash2, GripVertical, Bookmark, Archive, RotateCcw, ChevronDown } from 'lucide-react';
 import { ds } from '../../lib/designSystem';
 import type { DocumentLineItem, SavedLineItem } from '../../lib/types';
@@ -41,11 +41,9 @@ export function LineItemsSection({
   const handleUpdateItem = (index: number, field: keyof DocumentLineItem, value: any) => {
     const updated = [...lineItems];
     updated[index] = { ...updated[index], [field]: value };
-
     if (field === 'quantity' || field === 'unit_price') {
       updated[index].line_total = updated[index].quantity * updated[index].unit_price;
     }
-
     onUpdate(updated);
   };
 
@@ -76,15 +74,8 @@ export function LineItemsSection({
     setShowSavedItems(false);
   };
 
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDragOverIndex(index);
-  };
-
+  const handleDragStart = (index: number) => setDraggedIndex(index);
+  const handleDragOver = (e: React.DragEvent, index: number) => { e.preventDefault(); setDragOverIndex(index); };
   const handleDragEnd = () => {
     if (draggedIndex !== null && dragOverIndex !== null && draggedIndex !== dragOverIndex) {
       const updated = [...lineItems];
@@ -98,16 +89,6 @@ export function LineItemsSection({
 
   return (
     <div className="pt-4 space-y-3">
-      {/* Column headers */}
-      <div className="hidden sm:grid grid-cols-12 gap-2 px-2">
-        <div className="col-span-1"></div>
-        <div className={`col-span-4 ${ds.caption} text-[#8e8e93]`}>Description</div>
-        <div className={`col-span-2 text-right ${ds.caption} text-[#8e8e93]`}>Qty</div>
-        <div className={`col-span-2 text-right ${ds.caption} text-[#8e8e93]`}>Price</div>
-        <div className={`col-span-2 text-right ${ds.caption} text-[#8e8e93]`}>Total</div>
-        <div className="col-span-1"></div>
-      </div>
-
       <div className="space-y-2">
         {lineItems.map((item, index) => (
           <div
@@ -116,76 +97,67 @@ export function LineItemsSection({
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
-            className={`group bg-white rounded-xl border ${ds.transition} ${
+            className={`bg-white rounded-xl border ${ds.transition} ${
               dragOverIndex === index ? 'border-[#f97316] bg-[#fff3e8]' : 'border-[#f2f2f7]'
-            } ${draggedIndex === index ? 'opacity-50' : ''} p-3`}
+            } ${draggedIndex === index ? 'opacity-50' : ''} p-3 space-y-2`}
           >
-            <div className="grid grid-cols-12 gap-2 items-center">
-              <div className="col-span-1 flex items-center justify-center cursor-grab active:cursor-grabbing">
-                <GripVertical className="w-4 h-4 text-[#c7c7cc]" />
-              </div>
+            {/* Row 1: grip | description | delete */}
+            <div className="flex items-center gap-2">
+              <GripVertical className="w-4 h-4 text-[#c7c7cc] flex-shrink-0 cursor-grab active:cursor-grabbing" />
+              <input
+                type="text"
+                value={item.name}
+                onChange={(e) => handleUpdateItem(index, 'name', e.target.value)}
+                placeholder="Item description"
+                className={`${ds.input} py-2 text-[15px] flex-1 min-w-0`}
+              />
+              <button
+                onClick={() => handleDeleteItem(index)}
+                className={`p-1.5 text-[#8e8e93] hover:text-[#ff3b30] ${ds.transition} flex-shrink-0`}
+                title="Remove item"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
 
-              <div className="col-span-12 sm:col-span-4">
-                <input
-                  type="text"
-                  value={item.name}
-                  onChange={(e) => handleUpdateItem(index, 'name', e.target.value)}
-                  placeholder="Item description"
-                  className={`${ds.input} py-2 text-[15px]`}
-                />
-              </div>
-
-              <div className="col-span-4 sm:col-span-2">
-                <label className={`${ds.caption} text-[#8e8e93] sm:hidden mb-1 block`}>Qty</label>
+            {/* Row 2: qty | price | total — fixed widths prevent amount overlapping price */}
+            <div className="flex items-end gap-2 pl-6">
+              <div className="w-20 flex-shrink-0">
+                <label className={`${ds.caption} text-[#8e8e93] block mb-1`}>QTY</label>
                 <input
                   type="number"
                   value={item.quantity}
                   onChange={(e) => handleUpdateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
                   min="0"
                   step="0.01"
-                  className={`${ds.input} py-2 text-[15px] text-right`}
+                  className={`${ds.input} py-2 text-[14px] text-right w-full`}
                 />
               </div>
-
-              <div className="col-span-4 sm:col-span-2">
-                <label className={`${ds.caption} text-[#8e8e93] sm:hidden mb-1 block`}>Price</label>
+              <div className="flex-1 min-w-0">
+                <label className={`${ds.caption} text-[#8e8e93] block mb-1`}>PRICE</label>
                 <input
                   type="number"
                   value={item.unit_price}
                   onChange={(e) => handleUpdateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
                   min="0"
                   step="0.01"
-                  className={`${ds.input} py-2 text-[15px] text-right`}
+                  className={`${ds.input} py-2 text-[14px] text-right w-full`}
                 />
               </div>
-
-              <div className="col-span-3 sm:col-span-2 flex items-center justify-end">
-                <span className={`${ds.callout} font-semibold text-black`}>
+              <div className="w-24 flex-shrink-0 text-right">
+                <label className={`${ds.caption} text-[#8e8e93] block mb-1`}>AMOUNT</label>
+                <span className={`${ds.callout} font-bold text-black block truncate tabular-nums`}>
                   {formatCurrency(item.line_total)}
                 </span>
               </div>
-
-              <div className="col-span-1 flex items-center justify-end gap-1">
-                <button
-                  onClick={() => onSaveItem(item)}
-                  className={`p-1.5 text-[#8e8e93] hover:text-[#f97316] ${ds.transition} opacity-0 group-hover:opacity-100`}
-                  title="Save for reuse"
-                >
-                  <Bookmark className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDeleteItem(index)}
-                  className={`p-1.5 text-[#8e8e93] hover:text-[#ff3b30] ${ds.transition}`}
-                  title="Remove item"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-[#f2f2f7] sm:hidden flex justify-between items-center">
-              <span className={`${ds.caption} text-[#8e8e93]`}>Tax Rate:</span>
-              <div className="flex items-center gap-1">
+            {/* Row 3: tax rate */}
+            <div className="flex items-center justify-between pl-6 pt-1.5 border-t border-[#f2f2f7]">
+              <span className={`${ds.caption} text-[#8e8e93]`}>TAX RATE</span>
+              <div className="flex items-center gap-1.5">
                 <input
                   type="number"
                   value={item.tax_rate}
@@ -219,16 +191,12 @@ export function LineItemsSection({
               className={`flex items-center gap-2 px-4 py-3 bg-[#f2f2f7] rounded-xl ${ds.callout} text-black font-medium ${ds.transition}`}
             >
               <Bookmark className="w-4 h-4" />
-              <span className="hidden sm:inline">Saved</span>
               <ChevronDown className="w-4 h-4" />
             </button>
 
             {showSavedItems && (
               <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setShowSavedItems(false)}
-                />
+                <div className="fixed inset-0 z-10" onClick={() => setShowSavedItems(false)} />
                 <div className={`absolute right-0 top-full mt-2 w-64 bg-white rounded-xl ${ds.shadow3} z-20 overflow-hidden border border-[#f2f2f7]`}>
                   <div className="p-3 border-b border-[#f2f2f7]">
                     <h4 className={`${ds.callout} font-semibold text-black`}>Saved Items</h4>
@@ -263,7 +231,7 @@ export function LineItemsSection({
           >
             <div className="flex items-center gap-2">
               <Archive className="w-4 h-4 text-[#8e8e93]" />
-              <span className={`${ds.callout} text-[#8e8e93]`}>Archived Items ({archivedItems.length})</span>
+              <span className={`${ds.callout} text-[#8e8e93]`}>Archived ({archivedItems.length})</span>
             </div>
             <ChevronDown className={`w-4 h-4 text-[#8e8e93] ${ds.transition} ${showArchived ? 'rotate-180' : ''}`} />
           </button>
@@ -271,14 +239,11 @@ export function LineItemsSection({
           {showArchived && (
             <div className="p-2 space-y-1 border-t border-[#f2f2f7]">
               {archivedItems.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between px-3 py-2 bg-[#f2f2f7] rounded-xl"
-                >
+                <div key={item.id} className="flex items-center justify-between px-3 py-2 bg-[#f2f2f7] rounded-xl">
                   <div className="flex-1 min-w-0">
-                    <p className={`${ds.callout} text-[#8e8e93] truncate`}>{item.name}</p>
+                    <p className={`${ds.callout} text-[#8e8e93] truncate`}>{item.name || 'Unnamed item'}</p>
                     <p className={`${ds.footnote} text-[#c7c7cc]`}>
-                      {item.quantity} x {formatCurrency(item.unit_price)}
+                      {item.quantity} × {formatCurrency(item.unit_price)}
                     </p>
                   </div>
                   <button
